@@ -493,7 +493,7 @@
   .lrow:hover .leye,.lrow.off .leye{opacity:1}
   .lend{margin-top:8px;border:1.5px dashed var(--line);border-radius:9px;padding:9px;text-align:center;font-size:12px;color:var(--muted)}
   .lend.over{border-color:var(--gold);background:#fff4d6;color:#7a5600}
-  .pbe-c{display:flex;flex-direction:column;min-width:0;min-height:0}
+  .pbe-c{display:flex;flex-direction:column;min-width:0;min-height:0;max-width:none;margin:0;padding:0} /* reset the admin's global main{} box */
   .pbe-banners .mbanner{margin:8px 10px 0;box-shadow:0 4px 14px rgba(11,61,46,.08)}
   .bbtns{display:flex;gap:6px;flex-wrap:wrap}
   .pbe-stage{flex:1;min-height:0;overflow:hidden;display:flex;justify-content:center;align-items:flex-start;padding:12px}
@@ -591,6 +591,14 @@
     #pbSave{padding:6px 9px}
     #pbPublish{padding:6px 10px;font-size:12.5px}
     .pbe-dev button{padding:6px 8px}
+  }
+  @media (max-width:480px){
+    .pbe-title{max-width:22vw}
+    .pbe-dev{flex-shrink:0}
+    .pbe-dev button{padding:5px 6px;font-size:13px}
+    .pbe-top .btn-icon,.pbe-top .ib{padding:5px 6px}
+  }
+  @media (max-width:900px){
     .pbe-body{display:block;position:relative}
     .pbe-left,.pbe-right,.pbe-c{position:absolute;inset:0;display:none}
     .pbe[data-pane="add"] .pbe-left{display:flex}
