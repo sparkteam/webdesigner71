@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Site Worker for webdesigner71.com + www (custom domains are attached in the Cloudflare dashboard).
+  // Deploy from the repo root:  npx wrangler deploy
+  // Only ./public is uploaded; docs/, admin-worker/, site-worker/ and this file are never served.
+  "name": "webdesigner71",
+  "main": "site-worker/src/index.js",
+  "compatibility_date": "2026-10-23",
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    // Only the homepage runs the script (CMS rewrite); everything else is served directly.
+    "run_worker_first": ["/", "/index.html"]
+  },
+  // CMS Phase 1 homepage content (written by the webdesigner71-admin Worker)
+  "kv_namespaces": [
+    { "binding": "CONTENT", "id": "3f74fcbc2ed24005b175a784968c3c3e" }
+  ]
+}
