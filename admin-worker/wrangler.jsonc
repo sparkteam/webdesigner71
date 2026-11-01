@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "wd71-admin-api",
+  "name": "webdesigner71-admin",
   "main": "src/index.js",
   "compatibility_date": "2026-10-30",
   "observability": {
@@ -10,7 +10,7 @@
 
   // Create with: npx wrangler kv namespace create USERS   -> paste the id below
   "kv_namespaces": [
-    { "binding": "USERS", "id": "REPLACE_WITH_KV_NAMESPACE_ID" }
+    { "binding": "USERS", "id": "4f8644922b684a2f9233b4f059f1898d" }
   ],
 
   "vars": {
@@ -25,9 +25,9 @@
   //   APPROVAL_SECRET  - random, >= 32 chars (signs approve/reject email links)
   //   RESEND_API_KEY   - from resend.com (if missing, emails are only logged)
 
-  // Custom domain (uncomment once webdesigner71.com zone is in the same Cloudflare account):
-  // "routes": [
-  //   { "pattern": "api.webdesigner71.com", "custom_domain": true }
-  // ],
+  // Custom domain (Cloudflare creates the DNS record for this subdomain):
+  "routes": [
+    { "pattern": "api.webdesigner71.com", "custom_domain": true }
+  ],
   "workers_dev": true
 }
