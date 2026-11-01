@@ -2,7 +2,7 @@
 // signs fake Google ID tokens with a locally generated RSA key, and exercises the full flow.
 import { spawn } from "node:child_process";
 import { generateKeyPairSync, createSign, randomBytes, createHmac } from "node:crypto";
-import { writeFileSync, rmSync, mkdtempSync } from "node:fs";
+import { writeFileSync, rmSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import http from "node:http";
@@ -33,9 +33,16 @@ function googleToken(claims, { key = privateKey, kid = "test-kid" } = {}) {
   return `${h}.${p}.${b64u(s)}`;
 }
 
+// Test config = wrangler.jsonc minus the custom-domain route: with a route, `wrangler dev` rewrites
+// request.url to the route host (api.webdesigner71.com), so the localhost-only TEST_MODE would never apply.
+const TEST_CONFIG = ".wrangler.e2e.json";
+const cfg = JSON.parse(readFileSync("wrangler.jsonc", "utf8").replace(/^\s*\/\/.*$/gm, ""));
+delete cfg.routes; delete cfg.$schema;
+writeFileSync(TEST_CONFIG, JSON.stringify(cfg, null, 2));
+
 const persist = mkdtempSync(join(tmpdir(), "wd71kv-"));
 let logs = "";
-const dev = spawn("npx", ["wrangler", "dev", "--local", "--port", String(PORT), "--persist-to", persist, "--ip", "127.0.0.1"], { stdio: ["ignore", "pipe", "pipe"], detached: true });
+const dev = spawn("npx", ["wrangler", "dev", "--config", TEST_CONFIG, "--local", "--port", String(PORT), "--persist-to", persist, "--ip", "127.0.0.1"], { stdio: ["ignore", "pipe", "pipe"], detached: true });
 dev.stdout.on("data", (d) => (logs += d));
 dev.stderr.on("data", (d) => (logs += d));
 
@@ -57,7 +64,7 @@ try {
   let r = await login({ email: "x@gmail.com" }, { key: evilKey });
   check("forged signature rejected (401)", r.status === 401, r.status);
   r = await login({ email: "x@gmail.com", aud: "other.apps.googleusercontent.com" });
-  check("wrong aud rejected", r.status === 401 && (await r.json()).error === "bad_audience");
+  { const jj = await r.json(); check("wrong aud rejected", r.status === 401 && jj.error === "bad_audience", JSON.stringify(jj)); }
   r = await login({ email: "x@gmail.com", iss: "evil.com" });
   check("wrong iss rejected", r.status === 401 && (await r.json()).error === "bad_issuer");
   r = await login({ email: "x@gmail.com", exp: Math.floor(Date.now() / 1000) - 3600 });
@@ -147,6 +154,66 @@ try {
   r = await api("/admin/users", { token: userToken });
   check("approved user can list users", r.status === 200 && (await r.json()).users.length === 2);
 
+  // --- CMS Phase 1: homepage content
+  const C0 = { heroTitle: "আপনার ব্যবসার ওয়েবসাইট, মাত্র", heroHighlight: "৩৯০০ টাকায়", heroSub: "ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে", accentColor: "#D4A017" };
+  r = await api("/content", { origin: null });
+  j = await r.json();
+  check("public GET /content (empty) -> {content:null}", r.status === 200 && j.content === null, JSON.stringify(j));
+  r = await api("/admin/content", { method: "OPTIONS" });
+  check("CORS preflight allows PUT", r.status === 204 && /\bPUT\b/.test(r.headers.get("access-control-allow-methods") || ""));
+  r = await api("/admin/content", { method: "PUT", body: { ...C0, version: 0 } });
+  check("PUT /admin/content without token -> 401", r.status === 401);
+  r = await api("/admin/content", { method: "PUT", token: userToken, body: { ...C0, version: 0 } });
+  check("non-admin PUT /admin/content -> 403", r.status === 403 && (await r.json()).error === "admin_only");
+  r = await api("/admin/content/undo", { method: "POST", token: userToken, body: {} });
+  check("non-admin undo -> 403", r.status === 403);
+  r = await api("/admin/content/undo", { method: "POST", token: adminToken, body: {} });
+  check("undo with no previous -> 404", r.status === 404);
+  r = await api("/admin/content", { method: "PUT", token: adminToken, body: { ...C0, version: 0 } });
+  j = await r.json();
+  check("admin save -> 200 version 1", r.status === 200 && j.ok && j.content.version === 1 && j.content.heroTitle === C0.heroTitle && j.content.updatedBy === ADMIN, JSON.stringify(j));
+  r = await api("/content", { origin: null });
+  j = await r.json();
+  check("public GET /content returns saved content (no updatedBy)", j.content && j.content.version === 1 && j.content.heroSub === C0.heroSub && !("updatedBy" in j.content), JSON.stringify(j));
+  r = await api("/content", { token: adminToken });
+  check("GET /content with session includes updatedBy", (await r.json()).content.updatedBy === ADMIN);
+  r = await api("/content", { token: "garbage" });
+  check("GET /content with bad token still 200 (public)", r.status === 200);
+  for (const [name, body, field] of [
+    ["bad color -> 400 accentColor", { ...C0, accentColor: "red", version: 1 }, "accentColor"],
+    ["short hex -> 400", { ...C0, accentColor: "#FFF", version: 1 }, "accentColor"],
+    ["empty title -> 400 heroTitle", { ...C0, heroTitle: "   ", version: 1 }, "heroTitle"],
+    ["title > 120 chars -> 400", { ...C0, heroTitle: "ক".repeat(121), version: 1 }, "heroTitle"],
+    ["highlight > 40 chars -> 400", { ...C0, heroHighlight: "x".repeat(41), version: 1 }, "heroHighlight"],
+    ["sub > 300 chars -> 400", { ...C0, heroSub: "x".repeat(301), version: 1 }, "heroSub"],
+    ["non-string field -> 400", { ...C0, heroSub: 5, version: 1 }, "heroSub"],
+    ["control chars -> 400", { ...C0, heroTitle: "a\nb", version: 1 }, "heroTitle"],
+    ["missing version -> 400", { ...C0 }, "version"],
+  ]) {
+    r = await api("/admin/content", { method: "PUT", token: adminToken, body });
+    j = await r.json();
+    check(name, r.status === 400 && j.error === "invalid_field" && j.field === field, r.status + " " + JSON.stringify(j));
+  }
+  r = await api("/admin/content", { method: "PUT", token: adminToken, body: { ...C0, heroTitle: "x".repeat(120), heroHighlight: "", heroSub: "", accentColor: "#0b7a55", version: 1 } });
+  j = await r.json();
+  check("boundary values accepted (120 chars, empty optional), color upper-cased", r.status === 200 && j.content.version === 2 && j.content.accentColor === "#0B7A55" && j.content.heroHighlight === "", JSON.stringify(j));
+  r = await api("/admin/content", { method: "PUT", token: adminToken, body: { ...C0, version: 1 } });
+  j = await r.json();
+  check("stale version -> 409 version_conflict", r.status === 409 && j.error === "version_conflict" && j.content.version === 2, JSON.stringify(j));
+  r = await api("/admin/content", { method: "PUT", token: adminToken, body: { ...C0, heroTitle: "নতুন <b>শিরোনাম</b>", version: 2 } });
+  j = await r.json();
+  check("HTML-looking text stored as plain text", r.status === 200 && j.content.heroTitle === "নতুন <b>শিরোনাম</b>" && j.content.version === 3);
+  r = await api("/admin/content/undo", { method: "POST", token: adminToken, body: { version: 2 } });
+  check("undo with stale version -> 409", r.status === 409);
+  r = await api("/admin/content/undo", { method: "POST", token: adminToken, body: { version: 3 } });
+  j = await r.json();
+  check("undo restores previous content (new version 4)", r.status === 200 && j.content.version === 4 && j.content.heroTitle === "x".repeat(120) && j.content.accentColor === "#0B7A55", JSON.stringify(j));
+  r = await api("/admin/content/undo", { method: "POST", token: adminToken, body: {} });
+  j = await r.json();
+  check("undo again swaps back (redo)", r.status === 200 && j.content.version === 5 && j.content.heroTitle === "নতুন <b>শিরোনাম</b>");
+  r = await api("/admin/content", { method: "PUT", token: adminToken, body: { ...C0, version: 5 } });
+  check("save original values again", r.status === 200 && (await r.json()).content.version === 6);
+
   // --- admin-only management
   r = await api("/admin/users/" + encodeURIComponent(ADMIN) + "/reject", { method: "POST", token: userToken });
   check("non-admin manage -> 403", r.status === 403);
@@ -197,6 +264,7 @@ try {
   try { process.kill(-dev.pid, "SIGTERM"); } catch {}
   rmSync(persist, { recursive: true, force: true });
   rmSync(".dev.vars", { force: true });
+  rmSync(TEST_CONFIG, { force: true });
   console.log(`\n${pass} passed, ${fail} failed`);
   setTimeout(() => process.exit(fail ? 1 : 0), 500);
 }

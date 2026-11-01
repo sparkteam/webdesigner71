@@ -10,7 +10,9 @@
 
   // Create with: npx wrangler kv namespace create USERS   -> paste the id below
   "kv_namespaces": [
-    { "binding": "USERS", "id": "4f8644922b684a2f9233b4f059f1898d" }
+    { "binding": "USERS", "id": "4f8644922b684a2f9233b4f059f1898d" },
+    // CMS Phase 1 homepage content (shared with the `webdesigner71` site Worker)
+    { "binding": "CONTENT", "id": "3f74fcbc2ed24005b175a784968c3c3e" }
   ],
 
   "vars": {

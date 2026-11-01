@@ -3,7 +3,7 @@
  * Google sign-in  ->  email approval by ADMIN_EMAIL  ->  session token.
  *
  * Bindings (see wrangler.jsonc):
- *   KV:      USERS
+ *   KV:      USERS, CONTENT (homepage CMS, Phase 1)
  *   vars:    ADMIN_EMAIL, GOOGLE_CLIENT_ID, EMAIL_FROM, ALLOWED_ORIGINS
  *   secrets: SESSION_SECRET, APPROVAL_SECRET, RESEND_API_KEY (optional: logs instead of sending)
  */
@@ -14,6 +14,14 @@ const SESSION_TTL = 12 * 60 * 60; // 12h
 const APPROVAL_TTL = 7 * 24 * 60 * 60; // 7 days
 const RENOTIFY_AFTER = 60 * 60; // 1h
 const CLOCK_SKEW = 60;
+const CONTENT_KEY = "content:homepage";
+const CONTENT_PREV_KEY = "content:homepage:prev";
+const CONTENT_RULES = {
+  heroTitle: { min: 1, max: 120 },
+  heroHighlight: { min: 0, max: 40 },
+  heroSub: { min: 0, max: 300 },
+};
+const COLOR_RE = /^#[0-9A-Fa-f]{6}$/;
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
@@ -31,7 +39,7 @@ export default {
     } catch (err) {
       const status = err instanceof HttpError ? err.status : 500;
       if (status === 500) console.error(JSON.stringify({ msg: "unhandled", error: String(err && err.stack || err) }));
-      const res = json({ error: err instanceof HttpError ? err.message : "server_error" }, status);
+      const res = json({ error: err instanceof HttpError ? err.message : "server_error", ...(err && err.field ? { field: err.field } : {}) }, status);
       if (cors) for (const [k, v] of Object.entries(cors)) res.headers.set(k, v);
       return res;
     }
@@ -78,6 +86,19 @@ async function route(request, env, ctx, url) {
     await putUser(env, user);
     log("user_" + user.status, { email, by: me.email, via: "panel" });
     return json({ ok: true, user: publicUser(user, env) });
+  }
+
+  /* ---------- CMS Phase 1: homepage content ---------- */
+  if (p === "/content" && m === "GET") return getContent(request, env);
+  if (p === "/admin/content" && m === "PUT") {
+    const me = await requireSession(request, env);
+    if (!isAdmin(me.email, env)) throw new HttpError(403, "admin_only");
+    return putContent(request, env, me);
+  }
+  if (p === "/admin/content/undo" && m === "POST") {
+    const me = await requireSession(request, env);
+    if (!isAdmin(me.email, env)) throw new HttpError(403, "admin_only");
+    return undoContent(request, env, me);
   }
   throw new HttpError(404, "not_found");
 }
@@ -308,6 +329,105 @@ async function approvalLink(request, env, url, action) {
   return page(`${bn} সম্পন্ন ✓`, `<p><b>${esc(user.email)}</b> ${action === "approve" ? "এখন অ্যাডমিন প্যানেলে লগইন করতে পারবেন।" : "লগইন করতে পারবেন না।"}</p><p class="en">User ${user.status}.</p>`);
 }
 
+/* ---------------- CMS content (Phase 1) ---------------- */
+
+function contentKV(env) {
+  if (!env.CONTENT) throw new HttpError(500, "content_not_configured");
+  return env.CONTENT;
+}
+
+const charLen = (s) => [...s].length;
+
+// Returns the clean content fields, or throws 400 {error:"invalid_field", field}.
+function validateContent(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) throw new HttpError(400, "invalid_json");
+  const out = {};
+  for (const [name, rule] of Object.entries(CONTENT_RULES)) {
+    const v = body[name] === undefined && rule.min === 0 ? "" : body[name];
+    if (typeof v !== "string") throw fieldError(name);
+    const t = v.trim();
+    // plain text only: no control characters (incl. newlines); output is always escaped
+    if (/[\u0000-\u001f\u007f]/.test(t)) throw fieldError(name);
+    const n = charLen(t);
+    if (n < rule.min || n > rule.max) throw fieldError(name);
+    out[name] = t;
+  }
+  if (typeof body.accentColor !== "string" || !COLOR_RE.test(body.accentColor)) throw fieldError("accentColor");
+  out.accentColor = body.accentColor.toUpperCase();
+  return out;
+}
+function fieldError(field) {
+  const e = new HttpError(400, "invalid_field");
+  e.field = field;
+  return e;
+}
+
+function publicContent(c, withMeta) {
+  if (!c) return null;
+  const out = {
+    heroTitle: c.heroTitle, heroHighlight: c.heroHighlight, heroSub: c.heroSub,
+    accentColor: c.accentColor, version: c.version, updatedAt: c.updatedAt,
+  };
+  if (withMeta) out.updatedBy = c.updatedBy;
+  return out;
+}
+
+async function readJsonBody(request) {
+  const len = Number(request.headers.get("content-length") || 0);
+  if (len > 16384) throw new HttpError(413, "too_large");
+  const text = await request.text();
+  if (text.length > 16384) throw new HttpError(413, "too_large");
+  if (!text) return {};
+  try { return JSON.parse(text); } catch { throw new HttpError(400, "invalid_json"); }
+}
+
+async function getContent(request, env) {
+  const c = await contentKV(env).get(CONTENT_KEY, "json");
+  // updatedBy is only shown to a signed-in, approved user; never 401 here (public endpoint)
+  let withMeta = false;
+  if (c && (request.headers.get("authorization") || "").startsWith("Bearer ")) {
+    try { await requireSession(request, env); withMeta = true; } catch {}
+  }
+  return json({ content: publicContent(c, withMeta) });
+}
+
+async function putContent(request, env, me) {
+  const body = await readJsonBody(request);
+  const fields = validateContent(body);
+  if (!Number.isInteger(body.version) || body.version < 0) throw fieldError("version");
+  const kv = contentKV(env);
+  const cur = await kv.get(CONTENT_KEY, "json");
+  const curVersion = cur ? Number(cur.version) || 0 : 0;
+  if (body.version !== curVersion) {
+    return json({ error: "version_conflict", content: publicContent(cur, true) }, 409);
+  }
+  const next = { ...fields, updatedAt: new Date().toISOString(), updatedBy: me.email, version: curVersion + 1 };
+  if (cur) await kv.put(CONTENT_PREV_KEY, JSON.stringify(cur));
+  await kv.put(CONTENT_KEY, JSON.stringify(next));
+  log("content_saved", { by: me.email, version: next.version });
+  return json({ ok: true, content: publicContent(next, true) });
+}
+
+async function undoContent(request, env, me) {
+  const body = await readJsonBody(request);
+  const kv = contentKV(env);
+  const [cur, prev] = await Promise.all([kv.get(CONTENT_KEY, "json"), kv.get(CONTENT_PREV_KEY, "json")]);
+  if (!prev) throw new HttpError(404, "no_previous");
+  const curVersion = cur ? Number(cur.version) || 0 : 0;
+  if (body.version !== undefined && body.version !== curVersion) {
+    return json({ error: "version_conflict", content: publicContent(cur, true) }, 409);
+  }
+  // Swap: previous becomes live (with a new, higher version so open editors get a 409), live becomes previous.
+  const next = {
+    heroTitle: prev.heroTitle, heroHighlight: prev.heroHighlight, heroSub: prev.heroSub, accentColor: prev.accentColor,
+    updatedAt: new Date().toISOString(), updatedBy: me.email, version: curVersion + 1,
+  };
+  if (cur) await kv.put(CONTENT_PREV_KEY, JSON.stringify(cur));
+  await kv.put(CONTENT_KEY, JSON.stringify(next));
+  log("content_undo", { by: me.email, version: next.version });
+  return json({ ok: true, content: publicContent(next, true) });
+}
+
 /* ---------------- Email (Resend) ---------------- */
 
 async function notifyAdmin(env, url, user) {
@@ -393,7 +513,7 @@ function corsHeaders(request, env) {
   if (!ok) return null;
   return {
     "access-control-allow-origin": origin,
-    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-methods": "GET, POST, PUT, OPTIONS",
     "access-control-allow-headers": "authorization, content-type",
     "access-control-max-age": "86400",
     vary: "Origin",
