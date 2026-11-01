@@ -9,6 +9,7 @@ import http from "node:http";
 import { execFileSync } from "node:child_process";
 import * as M from "../src/cms-model.js";
 import * as PG from "../src/cms-pages.js";
+import * as PO from "../src/cms-posts.js";
 
 const PORT = 8799;
 const BASE = `http://localhost:${PORT}`;
@@ -499,6 +500,212 @@ try {
     check("pages: no page keys left after delete", left.length === 0, left.join());
     r = await api("/admin/pages", { method: "PATCH", token: adminToken });
     check("pages: wrong method -> 404/405", r.status === 404 || r.status === 405);
+  }
+
+  // --- Posts / blog (Phase 4)
+  {
+    const po = (path, o = {}) => api("/admin/posts" + path, { token: adminToken, ...o });
+    r = await api("/admin/posts");
+    check("posts: list without token -> 401", r.status === 401);
+    r = await api("/admin/posts", { token: userToken });
+    check("posts: non-admin list -> 403 (drafts are admin-only)", r.status === 403);
+    r = await po("");
+    j = await r.json();
+    check("posts: admin list (empty) + terms + limits", r.status === 200 && j.posts.length === 0 && j.terms.categories.length === 0 && j.limits.perPage === 9, JSON.stringify(j).slice(0, 200));
+    // terms
+    r = await po("/terms", { method: "POST", token: userToken, body: { kind: "category", name: "ডিজাইন" } });
+    check("posts: non-admin create category -> 403", r.status === 403);
+    r = await po("/terms", { method: "POST", body: { kind: "author", name: "x" } });
+    check("posts: bad term kind -> 400", r.status === 400 && (await r.json()).field === "kind");
+    r = await po("/terms", { method: "POST", body: { kind: "category", name: "" } });
+    check("posts: empty term name -> 400", r.status === 400 && (await r.json()).field === "name");
+    r = await po("/terms", { method: "POST", body: { kind: "category", name: "ওয়েব ডিজাইন", slug: "web-design" } });
+    j = await r.json();
+    const cat1 = j.term;
+    check("posts: create category -> 201", r.status === 201 && /^c/.test(cat1.id) && cat1.slug === "web-design", JSON.stringify(j));
+    r = await po("/terms", { method: "POST", body: { kind: "category", name: "SEO Tips" } });
+    j = await r.json();
+    const cat2 = j.term;
+    check("posts: category auto slug from latin name", r.status === 201 && cat2.slug === "seo-tips", JSON.stringify(j));
+    r = await po("/terms", { method: "POST", body: { kind: "category", name: "অন্য", slug: "web-design" } });
+    check("posts: duplicate term slug -> 400 taken", r.status === 400 && (await r.json()).reason === "taken");
+    r = await po("/terms", { method: "POST", body: { kind: "category", name: "ওয়েব ডিজাইন" } });
+    j = await r.json();
+    check("posts: same name returns existing term", r.status === 200 && j.existed && j.term.id === cat1.id);
+    r = await po("/terms", { method: "POST", body: { kind: "tag", name: "বাংলা" } });
+    j = await r.json();
+    const tag1 = j.term;
+    check("posts: create tag (bengali name -> fallback slug)", r.status === 201 && /^t/.test(tag1.id) && /^tag-[a-z0-9]+$/.test(tag1.slug), JSON.stringify(j));
+    r = await po("/terms/" + tag1.id, { method: "PUT", body: { name: "বাংলা টিপস", slug: "bangla" } });
+    j = await r.json();
+    check("posts: rename tag + slug", r.status === 200 && j.term.name === "বাংলা টিপস" && j.term.slug === "bangla", JSON.stringify(j));
+    r = await po("/terms/" + tag1.id, { method: "PUT", body: { color: "red" } });
+    check("posts: unknown term field -> 400", r.status === 400);
+    r = await po("/terms/czzzzzzzz", { method: "PUT", body: { name: "x" } });
+    check("posts: unknown term -> 404", r.status === 404);
+
+    // create + validation
+    const bad = async (name, body, field, reason) => { const rr = await po("", { method: "POST", body }); const jj = await rr.json(); check("posts: " + name + " -> 400 " + field + "/" + reason, rr.status === 400 && jj.field === field && (!reason || jj.reason === reason), rr.status + " " + JSON.stringify(jj)); };
+    await bad("missing title", { title: "" }, "title", "required");
+    await bad("reserved slug", { title: "x", slug: "category" }, "slug", "reserved");
+    await bad("bad slug", { title: "x", slug: "Hello World" }, "slug", "format");
+    await bad("unknown key", { title: "x", html: "<script>" }, "html", "unknown");
+    await bad("external image", { title: "x", image: "https://evil.example/x.png" }, "image", "image");
+    await bad("bad date", { title: "x", date: "tomorrow" }, "date");
+    await bad("bad term id", { title: "x", categories: ["../x"] }, "categories");
+    await bad("tag id in categories", { title: "x", categories: [tag1.id] }, "categories");
+    await bad("script in code block is fine but bad block type fails", { title: "x", blocks: [{ id: "bxxxx1", type: "script", content: {} }] }, "blocks.0.type");
+    r = await po("", { method: "POST", token: userToken, body: { title: "x" } });
+    check("posts: non-admin create -> 403", r.status === 403);
+    const code = "function hi() {\n\treturn '<b>hi</b>';\n}";
+    const blocks = [
+      { id: "btoc001", type: "toc", content: {} },
+      { id: "bh20001", type: "heading", content: { text: "প্রথম অংশ", level: "h2" } },
+      { id: "btx0001", type: "text", content: { html: "<p>" + "শব্দ ".repeat(450) + "</p>" } },
+      { id: "bcode01", type: "code", content: { code, lang: "JS" } },
+      { id: "bcall01", type: "callout", content: { variant: "warn", title: "সাবধান", text: "এটা **জরুরি**" } },
+    ];
+    r = await po("", { method: "POST", body: { title: "Hello Blog World", categories: [cat1.id, "cdeleted1"], tags: [tag1.id], blocks, author: "মোশফিক" } });
+    j = await r.json();
+    const q1 = j.post;
+    check("posts: create -> 201 draft, auto slug, unknown term dropped", r.status === 201 && q1.status === "draft" && q1.slug === "hello-blog-world" && q1.version === 1 && q1.categories.length === 1 && q1.categories[0] === cat1.id, JSON.stringify(j).slice(0, 300));
+    check("posts: code block keeps tabs/newlines", q1.blocks[3].content.code === code, JSON.stringify(q1.blocks[3]));
+    r = await po("", { method: "POST", body: { title: "Hello Blog World" } });
+    j = await r.json();
+    const q2 = j.post;
+    check("posts: same title -> unique slug -2", r.status === 201 && q2.slug === "hello-blog-world-2", JSON.stringify(j).slice(0, 200));
+    r = await po("", { method: "POST", body: { title: "x", slug: "hello-blog-world" } });
+    check("posts: explicit taken slug -> 400 taken", r.status === 400 && (await r.json()).reason === "taken");
+    r = await po("", { method: "POST", body: { title: "শুধু বাংলা শিরোনাম" } });
+    j = await r.json();
+    const q3 = j.post;
+    check("posts: bengali-only title gets a fallback slug", r.status === 201 && /^post-[a-z0-9]+$/.test(q3.slug), JSON.stringify(j).slice(0, 200));
+    r = await po("");
+    j = await r.json();
+    const e1 = j.posts.find((x) => x.id === q1.id);
+    check("posts: index entry has reading time + status", j.posts.length === 3 && e1.readMin === 2 && e1.status === "draft" && e1.excerpt.length > 10, JSON.stringify(e1));
+    r = await po("/" + q1.id, { token: userToken });
+    check("posts: non-admin get -> 403", r.status === 403);
+    r = await po("/" + q1.id);
+    j = await r.json();
+    check("posts: admin get -> post + terms", r.status === 200 && j.post.id === q1.id && j.terms.categories.length === 2);
+    r = await po("/qnotthere1");
+    check("posts: unknown id -> 404", r.status === 404);
+    r = await po("/p1234567");
+    check("posts: page id in posts route -> 404", r.status === 404);
+
+    // save
+    const edit = { title: q1.title, slug: q1.slug, excerpt: "ছোট সারাংশ", image: "", imageAlt: "", categories: q1.categories, tags: q1.tags, author: q1.author, date: "", seo: q1.seo, blocks: q1.blocks };
+    r = await po("/" + q1.id, { method: "PUT", body: { ...edit, version: 1 } });
+    j = await r.json();
+    check("posts: save -> v2", r.status === 200 && j.post.version === 2 && j.post.excerpt === "ছোট সারাংশ", JSON.stringify(j).slice(0, 200));
+    r = await po("/" + q1.id, { method: "PUT", body: { ...edit, version: 1 } });
+    j = await r.json();
+    check("posts: stale save -> 409 with current post", r.status === 409 && j.error === "version_conflict" && j.post.version === 2);
+    r = await po("/" + q1.id, { method: "PUT", body: { ...edit } });
+    check("posts: save without version -> 400", r.status === 400);
+    r = await po("/" + q1.id, { method: "PUT", body: { ...edit, slug: q2.slug, version: 2 } });
+    check("posts: save with another post's slug -> 400 taken", r.status === 400 && (await r.json()).reason === "taken");
+    r = await po("/" + q1.id + "/undo", { method: "POST", body: { version: 2 } });
+    j = await r.json();
+    check("posts: undo -> previous excerpt", r.status === 200 && j.post.version === 3 && j.post.excerpt === "", JSON.stringify(j).slice(0, 200));
+    r = await po("/" + q1.id, { method: "PUT", body: { ...edit, version: 3 } });
+    check("posts: save again -> v4", r.status === 200);
+
+    // publish
+    r = await api("/posts/hello-blog-world");
+    check("posts: no public JSON for drafts", r.status === 404);
+    r = await po("/" + q1.id + "/publish", { method: "POST", body: {} });
+    check("posts: publish without version -> 400", r.status === 400);
+    r = await po("/" + q1.id + "/publish", { method: "POST", token: userToken, body: { version: 4 } });
+    check("posts: non-admin publish -> 403", r.status === 403);
+    r = await po("/" + q1.id + "/publish", { method: "POST", body: { version: 4 } });
+    j = await r.json();
+    const pub1 = j.post;
+    check("posts: publish -> published, date set", r.status === 200 && pub1.status === "published" && pub1.publishedSlug === "hello-blog-world" && Date.parse(pub1.date) > Date.now() - 60000, JSON.stringify(j).slice(0, 200));
+    check("posts: postpub + posts:public keys", listLocalKV("CONTENT", "postpub:").join() === "postpub:hello-blog-world" && listLocalKV("CONTENT", "posts:public").length === 1, listLocalKV("CONTENT").join());
+    // scheduled
+    const future = new Date(Date.now() + 3 * 86400000).toISOString();
+    r = await po("/" + q2.id, { method: "PUT", body: { title: q2.title, slug: q2.slug, date: future, version: 1 } });
+    check("posts: set future date", r.status === 200);
+    r = await po("/" + q2.id + "/publish", { method: "POST", body: { version: 2 } });
+    j = await r.json();
+    check("posts: publish with future date keeps it (scheduled)", r.status === 200 && j.post.status === "published" && j.post.date === future);
+    r = await po("");
+    j = await r.json();
+    check("posts: scheduled post computes to 'scheduled'", PO.postStatus(j.posts.find((x) => x.id === q2.id), Date.now()) === "scheduled" && PO.postStatus(j.posts.find((x) => x.id === q1.id)) === "published");
+    // slug change while published -> redirect
+    r = await po("/" + q1.id, { method: "PUT", body: { ...edit, slug: "hello-blog", version: 5 } });
+    j = await r.json();
+    check("posts: edit published -> changed flag in index", r.status === 200 && (await (await po("")).json()).posts.find((x) => x.id === q1.id).changed === true);
+    r = await po("/" + q1.id + "/publish", { method: "POST", body: { version: 6 } });
+    j = await r.json();
+    check("posts: republish with new slug -> redirect left behind", r.status === 200 && j.post.redirects[0] === "hello-blog-world" && listLocalKV("CONTENT", "postredirect:").join() === "postredirect:hello-blog-world" && !listLocalKV("CONTENT", "postpub:").includes("postpub:hello-blog-world"), listLocalKV("CONTENT").join());
+    r = await po("/" + q3.id + "/unpublish", { method: "POST", body: { version: 1 } });
+    check("posts: unpublish a draft -> 409", r.status === 409);
+    // duplicate
+    r = await po("/" + q1.id + "/duplicate", { method: "POST", body: {} });
+    j = await r.json();
+    const q4 = j.post;
+    check("posts: duplicate -> draft copy, fresh block ids, no date", r.status === 201 && q4.status === "draft" && q4.slug === "hello-blog-copy" && q4.title.endsWith("(কপি)") && q4.date === "" && q4.blocks[0].id !== q1.blocks[0].id && q4.categories[0] === cat1.id, JSON.stringify(j).slice(0, 300));
+    // trash / restore / delete
+    r = await po("/" + q4.id, { method: "DELETE" });
+    check("posts: permanent delete outside trash -> 409", r.status === 409 && (await r.json()).error === "not_in_trash");
+    r = await po("/" + q1.id + "/trash", { method: "POST", body: { version: 7 } });
+    j = await r.json();
+    check("posts: trash a published post -> taken down", r.status === 200 && j.post.status === "trash" && listLocalKV("CONTENT", "postpub:").length === 1 && listLocalKV("CONTENT", "postredirect:").length === 0, listLocalKV("CONTENT").join());
+    r = await po("/" + q1.id, { method: "PUT", body: { ...edit, version: 8 } });
+    check("posts: editing a trashed post -> 409", r.status === 409);
+    r = await po("/" + q1.id + "/restore", { method: "POST", body: {} });
+    j = await r.json();
+    check("posts: restore -> draft", r.status === 200 && j.post.status === "draft" && j.post.trashedAt === "");
+    // bulk
+    r = await po("/bulk", { method: "POST", body: { action: "explode", ids: [q1.id] } });
+    check("posts: bulk bad action -> 400", r.status === 400);
+    r = await po("/bulk", { method: "POST", body: { action: "trash", ids: [] } });
+    check("posts: bulk empty ids -> 400", r.status === 400);
+    r = await po("/bulk", { method: "POST", token: userToken, body: { action: "trash", ids: [q1.id] } });
+    check("posts: non-admin bulk -> 403", r.status === 403);
+    r = await po("/bulk", { method: "POST", body: { action: "publish", ids: [q1.id, q3.id, "qmissing01"] } });
+    j = await r.json();
+    check("posts: bulk publish (missing id reported)", r.status === 200 && j.done.length === 2 && j.failed.length === 1 && j.failed[0].id === "qmissing01" && listLocalKV("CONTENT", "postpub:").length === 3, JSON.stringify(j).slice(0, 300));
+    r = await po("/bulk", { method: "POST", body: { action: "unpublish", ids: [q3.id, q4.id] } });
+    j = await r.json();
+    check("posts: bulk unpublish (draft reported as not_published)", j.done.length === 1 && j.failed[0].error === "not_published");
+    r = await po("/bulk", { method: "POST", body: { action: "delete", ids: [q4.id] } });
+    j = await r.json();
+    check("posts: bulk delete outside trash refused", j.done.length === 0 && j.failed[0].error === "not_in_trash");
+    // media usedBy
+    r = await upload(PNG, "post.png", "image/png");
+    const mItem = (await r.json()).item;
+    r = await po("/" + q4.id, { method: "PUT", body: { title: q4.title, slug: q4.slug, image: mItem.url, version: q4.version } });
+    check("posts: featured image from media library", r.status === 200 && (await r.json()).post.image === mItem.url);
+    r = await api("/admin/media", { token: adminToken });
+    j = await r.json();
+    const mi = j.items.find((x) => x.key === mItem.key);
+    check("media: usedBy lists the post", mi && mi.usedBy.length === 1 && mi.usedBy[0].kind === "post" && mi.usedBy[0].id === q4.id, JSON.stringify(mi));
+    r = await api("/admin/media/" + mItem.key, { method: "DELETE", token: adminToken });
+    j = await r.json();
+    check("media: delete in use by a post -> 409 with usedBy", r.status === 409 && j.error === "in_use" && j.usedBy[0].id === q4.id, JSON.stringify(j));
+    r = await api("/admin/media/" + mItem.key + "?force=1", { method: "DELETE", token: adminToken });
+    check("media: forced delete", r.status === 200);
+    // term delete -> posts keep working
+    r = await po("/terms/" + cat1.id, { method: "DELETE" });
+    j = await r.json();
+    check("posts: delete category reports usage", r.status === 200 && j.posts >= 1 && !j.terms.categories.some((x) => x.id === cat1.id), JSON.stringify(j));
+    r = await po("/" + q4.id, { method: "PUT", body: { title: q4.title, slug: q4.slug, categories: [cat1.id], version: q4.version + 1 } });
+    j = await r.json();
+    check("posts: saving with a deleted category drops it silently", r.status === 200 && j.post.categories.length === 0, JSON.stringify(j).slice(0, 200));
+    // cleanup -> no keys left
+    r = await po("/bulk", { method: "POST", body: { action: "trash", ids: [q1.id, q2.id, q3.id, q4.id] } });
+    j = await r.json();
+    check("posts: bulk trash all", j.done.length === 4 && listLocalKV("CONTENT", "postpub:").length === 0 && listLocalKV("CONTENT", "posts:public").length === 0, listLocalKV("CONTENT").join());
+    r = await po("/bulk", { method: "POST", body: { action: "delete", ids: [q1.id, q2.id, q3.id, q4.id] } });
+    j = await r.json();
+    check("posts: bulk delete from trash", j.done.length === 4 && j.posts.length === 0);
+    for (const t of [cat2, tag1]) await po("/terms/" + t.id, { method: "DELETE" });
+    const leftQ = listLocalKV("CONTENT").filter((k) => /^(post:|posts:|postpub:|postredirect:)/.test(k));
+    check("posts: no post keys left", leftQ.length === 0, leftQ.join());
   }
 
   // --- admin-only management

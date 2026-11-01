@@ -1,10 +1,11 @@
 /**
- * WebDesigner71 CMS — shared page-builder model, sanitizer & renderer (Phase 3).
+ * WebDesigner71 CMS — shared page-builder model, sanitizer & renderer (Phase 3; blog blocks + TOC anchors: Phase 4).
  *
  * ONE dependency-free module used by three places (no secrets — it is served publicly):
  *   • site-worker/src/index.js    imports it (bundled) and renders published pages server-side
  *   • public/cms/page-bridge.js   imports it inside the editor's preview iframe (same renderer → exact preview)
  *   • public/admin/index.html     loads it with import("/cms/pages.js") for the editor (schema, defaults, patterns)
+ *   • public/cms/posts.js          the blog (Phase 4) builds on it: same blocks, same renderer
  *   • admin-worker/src/cms-pages.js is a byte-identical copy used to validate every write;
  *     site-worker/test/check.mjs fails if the two copies differ.
  *
@@ -39,7 +40,8 @@ export const SLUG_MAX = 60;
 /** Directories shipped in public/ (static assets always win over pages; check.mjs keeps this list honest). */
 export const STATIC_DIRS = ["admin", "assets", "cms", "old-homepage"];
 export const RESERVED_SLUGS = [...new Set([...STATIC_DIRS, "media", "api", "index", "index-html", "wrangler-jsonc",
-  "sitemap", "sitemap-xml", "robots", "robots-txt", "favicon", "404", "login", "logout", "preview", "page-preview", "static", "www"])];
+  "sitemap", "sitemap-xml", "robots", "robots-txt", "favicon", "404", "login", "logout", "preview", "page-preview", "static", "www",
+  "blog"])]; // Phase 4: /blog/* is the blog
 export const PAGE_ID_RE = /^p[a-z0-9]{6,20}$/;
 export const BLOCK_ID_RE = /^b[a-z0-9]{4,15}$/;
 export const COLOR_HEX_RE = /^#[0-9A-Fa-f]{6}$/;
@@ -390,6 +392,10 @@ export const ICONS = {
   layout: { label: "ডিজাইন", d: "M3 3h18v18H3zM3 9h18M9 21V9" },
   search: { label: "খোঁজ", d: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm10 2-4.3-4.3" },
   award: { label: "পুরস্কার", d: "M12 15a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM8.2 13.9 7 23l5-3 5 3-1.2-9.1" },
+  bulb: { label: "আইডিয়া", d: "M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z" },
+  info: { label: "তথ্য", d: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm0-6v-4m0-4h.01" },
+  alert: { label: "সতর্কতা", d: "M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4m0 4h.01" },
+  edit: { label: "লেখা", d: "M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" },
 };
 export function iconSvg(name, cls = "pb-ico") {
   const ic = ICONS[name];
@@ -458,7 +464,9 @@ const f = {
   email: (k, label) => ({ k, t: "email", label }),
   items: (k, label, max, fields, o = {}) => ({ k, t: "items", label, max, fields, ...o }),
   table: (k, label) => ({ k, t: "table", label }),
+  code: (k, label, max) => ({ k, t: "code", label, max }),
 };
+export const CALLOUTS = ["tip", "info", "warn", "success", "note"];
 const ALIGN3 = ["left", "center", "right"], ALIGN3_L = { left: "বামে", center: "মাঝে", right: "ডানে" };
 export const BUTTON_VARIANTS = ["gold", "green", "outline", "ghost"];
 const BTN_L = { gold: "সোনালি", green: "সবুজ", outline: "বর্ডার", ghost: "স্বচ্ছ (গাঢ় ব্যাকগ্রাউন্ডে)" };
@@ -538,6 +546,18 @@ export const BLOCKS = {
     fields: [f.s("title", "শিরোনাম", 120), f.b("useSettings", "খালি ঘরে সেটিংসের তথ্য বসবে", true), f.phone("phone", "ফোন"), f.phone("whatsapp", "হোয়াটসঅ্যাপ নম্বর"), f.email("email", "ইমেইল"),
       f.s("address", "ঠিকানা", 200), f.s("hours", "সময়", 120), f.url("map", "ম্যাপ লিংক (Google Maps)"),
       f.e("layout", "সাজানো", ["list", "grid"], { list: "লিস্ট", grid: "কার্ড গ্রিড" }, "list")] },
+  /* Phase 4 — blog-friendly blocks (work on pages too) */
+  toc: { label: "সূচিপত্র", icon: "≡", group: "blog", desc: "লেখার H2/H3 শিরোনাম থেকে নিজে থেকেই তৈরি হয়",
+    fields: [f.s("title", "শিরোনাম", 80, { def: "এই লেখায় যা আছে" }), f.e("levels", "যে শিরোনামগুলো দেখাবে", ["h2", "h2-h3"], { h2: "শুধু H2", "h2-h3": "H2 ও H3" }, "h2-h3"),
+      f.b("numbered", "নম্বরসহ", true), f.b("collapsible", "খোলা-বন্ধ করা যাবে")] },
+  callout: { label: "কলআউট বক্স", icon: "💡", group: "blog", desc: "টিপস, তথ্য, সতর্কতা বা সফলতার রঙিন বক্স",
+    fields: [f.e("variant", "ধরন", CALLOUTS, { tip: "💡 টিপস", info: "ℹ️ তথ্য", warn: "⚠️ সতর্কতা", success: "✅ সফলতা", note: "📝 নোট" }, "tip"),
+      f.s("title", "শিরোনাম", 120), f.s("text", "লেখা", 1500, { min: 1, multiline: true, hint: "** ** = বোল্ড" })] },
+  code: { label: "কোড", icon: "</>", group: "blog", desc: "কোড বা কমান্ড — যেমন লেখা তেমনই দেখাবে",
+    fields: [f.code("code", "কোড", 20000), f.s("lang", "ভাষা (যেমন HTML, CSS, JS)", 24), f.s("caption", "ক্যাপশন", 200), f.b("wrap", "লম্বা লাইন ভেঙে দেখাবে")] },
+  gallery: { label: "গ্যালারি", icon: "▦", group: "blog", desc: "একাধিক ছবি গ্রিডে, ক্যাপশনসহ",
+    fields: [f.items("items", "ছবি", 24, [f.img("image", "ছবি"), f.s("alt", "ছবির বিবরণ (alt)", 150), f.s("caption", "ক্যাপশন", 200)], { itemLabel: "caption", add: { image: "/assets/hero-illustration.svg", alt: "", caption: "" } }),
+      f.e("cols", "প্রতি সারিতে", [2, 3, 4], { 2: "২টি", 3: "৩টি", 4: "৪টি" }, 3), f.e("ratio", "আকৃতি", ["1-1", "4-3", "3-2", "16-9", "auto"], { "1-1": "বর্গ", "4-3": "৪:৩", "3-2": "৩:২", "16-9": "১৬:৯", auto: "আসল" }, "4-3"), f.b("zoom", "ক্লিক করলে বড় ছবি খুলবে", true)] },
 };
 export const BLOCK_TYPES = Object.keys(BLOCKS);
 export const CONTAINERS = ["section", "columns", "column"];
@@ -568,6 +588,14 @@ function cleanField(fd, v, path) {
     case "phone": { const t = str(v, path, 30); if (t && !PHONE_RE.test(t)) throw new PageError(path, "phone"); return t; }
     case "email": { const t = str(v, path, 120); if (t && !EMAIL_RE.test(t)) throw new PageError(path, "email"); return t; }
     case "items": return list(v, path, fd.max, (it, p) => cleanFields(fd.fields, it, p, ["id"]));
+    case "code": {
+      // whitespace is meaningful in code: only normalise newlines, drop control characters (tab kept) and blank edges
+      if (v === undefined || v === null) v = "";
+      if (typeof v !== "string") throw new PageError(path, "type");
+      const t = v.replace(/\r\n?/g, "\n").replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "").replace(/^\s*\n/, "").replace(/\s+$/, "");
+      if (clen(t) > fd.max) throw new PageError(path, "too_long");
+      return t;
+    }
     case "table": {
       if (v === undefined || v === null) v = [["", ""], ["", ""]];
       if (!Array.isArray(v) || !v.length) throw new PageError(path, "type");
@@ -659,6 +687,10 @@ const S = {
   video: { url: "" },
   quote: { text: "ভালো ডিজাইন মানে ভালো ব্যবসা।", cite: "WebDesigner71" },
   contact: { title: "যোগাযোগ করুন" },
+  toc: {},
+  callout: { variant: "tip", title: "টিপস", text: "এখানে পাঠকের জন্য **গুরুত্বপূর্ণ** একটি কথা লিখুন।" },
+  code: { code: "<a class=\"btn\" href=\"/#contact\">যোগাযোগ</a>", lang: "HTML" },
+  gallery: { items: [{ image: "/assets/hero-illustration.svg", alt: "ছবি ১" }, { image: "/assets/hero-illustration.svg", alt: "ছবি ২" }, { image: "/assets/hero-illustration.svg", alt: "ছবি ৩" }] },
 };
 /** A new block of `type` with sample content and fresh ids (columns come with their column children). */
 export function newBlock(type, ratio) {
@@ -699,7 +731,8 @@ const RENDER = {
   hero: (b, c) => "<section" + wrapAttrs(b, ["th-" + c.theme, "al-" + c.align, "ht-" + c.height, c.image ? "has-img" : "", c.bgImage ? "has-bg" : ""].filter(Boolean).join(" ")) + '><div class="pb-hero-in"><div class="pb-hero-txt">' +
     (c.eyebrow ? '<span class="pb-badge">' + esc(c.eyebrow) + "</span>" : "") + "<" + c.level + ">" + inlineHtml(c.heading) + "</" + c.level + ">" + (c.sub ? '<p class="pb-sub">' + nl2br(c.sub) + "</p>" : "") + btnsHtml(c.buttons) + "</div>" +
     (c.image ? '<div class="pb-hero-img"><img' + attrs({ src: c.image, alt: c.imageAlt, loading: "eager", decoding: "async" }) + "></div>" : "") + "</div></section>",
-  heading: (b, c) => "<div" + wrapAttrs(b, "l" + c.level.slice(1)) + ">" + (c.eyebrow ? '<p class="pb-eyebrow">' + esc(c.eyebrow) + "</p>" : "") + "<" + c.level + ">" + inlineHtml(c.text) + "</" + c.level + "></div>",
+  heading: (b, c, ctx) => "<div" + wrapAttrs(b, "l" + c.level.slice(1)) + ">" + (c.eyebrow ? '<p class="pb-eyebrow">' + esc(c.eyebrow) + "</p>" : "") + "<" + c.level +
+    (ctx.toc && ctx.toc.ids[b.id] && !(b.adv && b.adv.anchor) ? ' id="' + ctx.toc.ids[b.id] + '"' : "") + ">" + inlineHtml(c.text) + "</" + c.level + "></div>",
   text: (b, c, ctx) => (c.html ? "<div" + wrapAttrs(b) + ">" + c.html + "</div>" : editorPh(ctx, b, "খালি প্যারাগ্রাফ — ডানে লেখা যোগ করুন")),
   image: (b, c, ctx) => {
     if (!c.src) return editorPh(ctx, b, "🖼 ছবি বাছুন");
@@ -759,7 +792,69 @@ const RENDER = {
       (h ? "<a" + linkA(h, /^https?:/.test(h)) + ">" + esc(val) + "</a>" : "<span>" + esc(val) + "</span>") + "</span></li>").join("") + "</ul></div>";
   },
 };
+Object.assign(RENDER, {
+  toc: (b, c, ctx) => {
+    const items = ((ctx.toc && ctx.toc.items) || []).filter((x) => x.level === "h2" || c.levels === "h2-h3");
+    if (!items.length) return editorPh(ctx, b, "≡ সূচিপত্র — লেখায় H2/H3 শিরোনাম যোগ করলে এখানে নিজে থেকে দেখাবে");
+    const tag = c.numbered ? "ol" : "ul";
+    const list = "<" + tag + ">" + items.map((x) => '<li class="lv' + x.level.slice(1) + '"><a href="#' + esc(x.id) + '">' + esc(x.text) + "</a></li>").join("") + "</" + tag + ">";
+    const title = c.title || "সূচিপত্র";
+    return "<nav" + wrapAttrs(b, c.numbered ? "num" : "", { "aria-label": title }) + ">" + (c.collapsible ? "<details open><summary>" + esc(title) + "</summary>" + list + "</details>" : '<p class="pb-toc-t">' + esc(title) + "</p>" + list) + "</nav>";
+  },
+  callout: (b, c) => "<aside" + wrapAttrs(b, "v-" + c.variant, { role: "note" }) + '><span class="pb-co-ic" aria-hidden="true">' + iconSvg(CALLOUT_ICON[c.variant]) + "</span><div>" +
+    (c.title ? '<p class="pb-co-t">' + esc(c.title) + "</p>" : "") + "<p>" + nl2br(c.text) + "</p></div></aside>",
+  code: (b, c, ctx) => (c.code ? "<figure" + wrapAttrs(b, c.wrap ? "wrap" : "") + ">" + (c.lang ? '<div class="pb-code-bar"><span>' + esc(c.lang) + "</span></div>" : "") +
+    '<pre dir="ltr" tabindex="0"><code>' + esc(c.code) + "</code></pre>" + (c.caption ? "<figcaption>" + esc(c.caption) + "</figcaption>" : "") + "</figure>" : editorPh(ctx, b, "</> কোড লিখুন")),
+  gallery: (b, c, ctx) => {
+    const items = c.items.filter((x) => x.image);
+    if (!items.length) return editorPh(ctx, b, "▦ গ্যালারিতে ছবি যোগ করুন");
+    return "<div" + wrapAttrs(b, "cols-" + c.cols + " r-" + c.ratio) + ">" + items.map((x) => {
+      const im = "<img" + attrs({ src: x.image, alt: x.alt, loading: "lazy", decoding: "async" }) + ">";
+      return "<figure>" + (c.zoom ? "<a" + attrs({ href: x.image, target: "_blank", rel: "noopener" }) + ">" + im + "</a>" : im) + (x.caption ? "<figcaption>" + esc(x.caption) + "</figcaption>" : "") + "</figure>";
+    }).join("") + "</div>";
+  },
+});
+const CALLOUT_ICON = { tip: "bulb", info: "info", warn: "alert", success: "check", note: "edit" };
 const bnDigits = (n) => String(n).replace(/\d/g, (d) => BN_DIGITS[d]);
+/** Plain text of [[hl]] / **bold** markup. */
+export const plainInline = (t) => String(t || "").replace(/\*\*([^*]+?)\*\*/g, "$1").replace(/\[\[([^\]]+?)\]\]/g, "$1");
+/** Table of contents for a block tree: null unless it contains a toc block (so pages without one render exactly as before). */
+export function buildToc(blocks) {
+  let has = false;
+  walkBlocks(blocks, (b) => { if (b.type === "toc" && !b.hidden) has = true; });
+  if (!has) return null;
+  const items = [], ids = {};
+  walkBlocks(blocks, (b) => {
+    if (b.hidden || b.type !== "heading" || !b.content || (b.content.level !== "h2" && b.content.level !== "h3")) return;
+    const id = (b.adv && b.adv.anchor) || "h-" + b.id;
+    ids[b.id] = id;
+    items.push({ id, level: b.content.level, text: plainInline(b.content.text) });
+  });
+  return { items, ids };
+}
+/** All readable text of a block tree (reading time, excerpts) — driven by the field schema. */
+export function blockText(blocks) {
+  const out = [];
+  const take = (fields, c) => {
+    for (const fd of fields) {
+      const v = c && c[fd.k];
+      if (fd.t === "s" && !/^(lang|alt|imageAlt|bgAlt)$/.test(fd.k)) out.push(plainInline(v));
+      else if (fd.t === "rich") out.push(String(v || "").replace(/<(?:\/?(?:p|li|ul|ol|h\d|blockquote|div)|br)\b[^>]*>/gi, " ").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'"));
+      else if (fd.t === "code") out.push(v);
+      else if (fd.t === "items" && Array.isArray(v)) for (const it of v) take(fd.fields, it);
+      else if (fd.t === "table" && Array.isArray(v)) for (const r of v) out.push(r.map(plainInline).join(" "));
+    }
+  };
+  walkBlocks(blocks, (b) => { if (!b.hidden && b.type !== "toc" && BLOCKS[b.type]) take(BLOCKS[b.type].fields, b.content); });
+  return out.filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
+}
+/** Every /media/<key> URL referenced anywhere inside a value (media library "used by" counts). */
+export function mediaRefs(v, out = new Set()) {
+  if (typeof v === "string") { if (/^\/media\/[A-Za-z0-9]/.test(v)) out.add(v); }
+  else if (Array.isArray(v)) for (const x of v) mediaRefs(x, out);
+  else if (v && typeof v === "object") for (const x of Object.values(v)) mediaRefs(x, out);
+  return out;
+}
 /**
  * Blocks → HTML. ctx = { page:{ title, slug }, settings, editor }. editor:true ONLY adds placeholders for empty
  * blocks / empty containers (so they can be clicked and dropped into); all other output is identical.
@@ -916,10 +1011,39 @@ export const BASE_CSS = `
 .pb-404 .pb-in{align-items:center;max-width:680px}
 .pb-404 .code{font-size:clamp(4rem,14vw,7rem);font-weight:700;color:var(--gold);line-height:1}
 .pb-404 h1{color:var(--green);font-size:clamp(1.6rem,4.5vw,2.3rem);margin:0}
+.pb-toc{background:#fff;border:1px solid rgba(11,61,46,.12);border-left:4px solid var(--gold);border-radius:14px;padding:18px 22px}
+.pb-toc-t,.pb-toc summary{font-weight:700;color:var(--green);font-size:1.05rem;margin:0 0 8px;cursor:pointer}
+.pb-toc ol,.pb-toc ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;line-height:1.5}
+.pb-toc li.lv3{margin-left:18px;font-size:.95em}
+.pb-toc a{color:var(--ink);text-decoration:none;border-bottom:1px dashed rgba(11,61,46,.25)}
+.pb-toc a:hover{color:var(--green);border-bottom-color:var(--gold)}
+.pb-callout{display:flex;gap:14px;align-items:flex-start;padding:18px 20px;border-radius:14px;border:1px solid;line-height:1.75}
+.pb-callout p{margin:0}.pb-callout .pb-co-t{font-weight:700;margin-bottom:4px}
+.pb-co-ic{flex:0 0 auto;display:inline-flex;width:36px;height:36px;border-radius:10px;align-items:center;justify-content:center;background:rgba(255,255,255,.7)}
+.pb-co-ic .pb-ico{width:20px;height:20px}
+.pb-callout.v-tip{background:#fdf6e3;border-color:rgba(212,160,23,.45);color:#5c4708}.pb-callout.v-tip .pb-co-ic{color:#a57a06}
+.pb-callout.v-info{background:#eaf3fb;border-color:#b9d5ee;color:#1d4466}.pb-callout.v-info .pb-co-ic{color:#2468a8}
+.pb-callout.v-warn{background:#fdeeee;border-color:#f0c2c2;color:#6b1f1f}.pb-callout.v-warn .pb-co-ic{color:#b42318}
+.pb-callout.v-success{background:#e8f5ee;border-color:#b5dcc6;color:#0b3d2e}.pb-callout.v-success .pb-co-ic{color:#14804a}
+.pb-callout.v-note{background:#f5f4f0;border-color:#dcd8cc;color:#3b3a36}.pb-callout.v-note .pb-co-ic{color:#6b6758}
+.pb-code{margin:0;border-radius:14px;overflow:hidden;background:#0f1f1a;color:#e8efe9;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+.pb-code-bar{display:flex;justify-content:space-between;padding:8px 16px;background:#16302a;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:#a8c2b8;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.pb-code pre{margin:0;padding:16px 18px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;font-size:.9rem;line-height:1.65;tab-size:2;text-align:left}
+.pb-code.wrap pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.pb-code figcaption{padding:8px 16px;font-size:.85rem;color:#a8c2b8;background:#16302a}
+.pb-gallery{display:grid;gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.pb-gallery.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.pb-gallery.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pb-gallery figure{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.pb-gallery a{display:block;border-radius:12px;overflow:hidden}
+.pb-gallery img{display:block;width:100%;height:auto;border-radius:12px;object-fit:cover;background:#efe9dc;transition:transform .3s ease}
+.pb-gallery a:hover img{transform:scale(1.03)}
+.pb-gallery.r-1-1 img{aspect-ratio:1/1}.pb-gallery.r-4-3 img{aspect-ratio:4/3}.pb-gallery.r-3-2 img{aspect-ratio:3/2}.pb-gallery.r-16-9 img{aspect-ratio:16/9}
+.pb-gallery figcaption{font-size:.88rem;color:var(--muted);text-align:center;line-height:1.5}
 @media (max-width:${T}px){.pb-cards.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}.pb-testimonial.cols-3{grid-template-columns:repeat(2,minmax(0,1fr))}.pb-hero.has-img .pb-hero-in{grid-template-columns:1fr}}
 @media (max-width:${Mo}px){.pb-section{padding:48px 0}.pb-hero{padding:56px 0}.pb-cta{padding:44px 0}.pb-flow{padding:28px 0}
 .pb-cards,.pb-cards.cols-2,.pb-cards.cols-4,.pb-testimonial,.pb-testimonial.cols-3,.pb-list.cols-2{grid-template-columns:1fr}
-.pb-buttons.full .btn{width:100%}.pb-table th,.pb-table td{padding:10px 12px}.pb-card,.pb-testi{padding:22px}}
+.pb-buttons.full .btn{width:100%}.pb-table th,.pb-table td{padding:10px 12px}.pb-card,.pb-testi{padding:22px}
+.pb-gallery,.pb-gallery.cols-3,.pb-gallery.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}.pb-callout{padding:14px 16px}}
 `.replace(/\n/g, "");
 /** Editor-only additions (placeholders, drop markers, selection) — injected by the preview bridge, never served publicly. */
 export const EDITOR_CSS = `
@@ -992,6 +1116,7 @@ export function fontsHref(blocks) {
 const FULL_WIDTH = new Set(["section", "hero", "cta"]);
 /** <main> inner HTML: full-width blocks stand alone; runs of other top-level blocks are wrapped in a centred container. */
 export function renderMain(blocks, ctx = {}) {
+  if (ctx.toc === undefined) ctx = { ...ctx, toc: buildToc(blocks) };
   const out = [];
   let run = [];
   const flush = () => { if (run.length) out.push('<div class="pb-flow"><div class="pb-in">' + renderBlocks(run, ctx) + "</div></div>"); run = []; };
@@ -1068,7 +1193,8 @@ export const TEMPLATES = {
 /** The small per-page summary kept in pages:index (the list screen and sitemap read only this). */
 export function indexEntry(doc) {
   return { id: doc.id, title: doc.title, slug: doc.slug, status: doc.status, publishedSlug: doc.publishedSlug || "", changed: doc.status === "published" && doc.version !== doc.publishedVersion,
-    blocks: countBlocks(doc.blocks), noindex: !!(doc.seo && doc.seo.noindex), updatedAt: doc.updatedAt, publishedAt: doc.publishedAt || null, version: doc.version };
+    blocks: countBlocks(doc.blocks), noindex: !!(doc.seo && doc.seo.noindex), updatedAt: doc.updatedAt, publishedAt: doc.publishedAt || null, version: doc.version,
+    media: [...mediaRefs([doc.seo, doc.blocks])] }; // Phase 4: media library "used by"
 }
 /** The published snapshot stored at pub:<slug> (what the site renders). */
 export function publishedSnapshot(doc, now) {

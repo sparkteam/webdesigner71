@@ -3,13 +3,14 @@
  * Google sign-in  ->  email approval by ADMIN_EMAIL  ->  session token.
  *
  * Bindings (see wrangler.jsonc):
- *   KV:      USERS, CONTENT (homepage CMS: sections + settings; Phase 3 pages), MEDIA (uploaded images; KV until R2 is enabled)
+ *   KV:      USERS, CONTENT (homepage CMS: sections + settings; Phase 3 pages; Phase 4 posts), MEDIA (uploaded images; KV until R2 is enabled)
  *   vars:    ADMIN_EMAIL, GOOGLE_CLIENT_ID, EMAIL_FROM, ALLOWED_ORIGINS
  *   secrets: SESSION_SECRET, APPROVAL_SECRET, RESEND_API_KEY (optional: logs instead of sending)
  */
 
 import * as CMS from "./cms-model.js";
 import * as PG from "./cms-pages.js";
+import * as PO from "./cms-posts.js";
 
 const GOOGLE_JWKS_URL = "https://www.googleapis.com/oauth2/v3/certs";
 const GOOGLE_ISSUERS = ["accounts.google.com", "https://accounts.google.com"];
@@ -128,6 +129,33 @@ async function route(request, env, ctx, url) {
       if (act === "unpublish") return unpublishPage(request, env, me, id);
       if (act === "duplicate") return duplicatePage(request, env, me, id);
       return undoPage(request, env, me, id);
+    }
+    throw new HttpError(405, "method_not_allowed");
+  }
+  /* ---------- Posts / blog (Phase 4, docs/cms-phase4.md) ---------- */
+  if (p === "/admin/posts" && m === "GET") { await requireAdmin(request, env); return listPosts(env); } // drafts are admin-only
+  if (p === "/admin/posts" && m === "POST") return createPost(request, env, await requireAdmin(request, env));
+  if (p === "/admin/posts/bulk" && m === "POST") return bulkPosts(request, env, await requireAdmin(request, env));
+  if (p === "/admin/posts/terms" && m === "POST") return createTerm(request, env, await requireAdmin(request, env));
+  const tm = p.match(/^\/admin\/posts\/terms\/([^/]+)$/);
+  if (tm) {
+    if (!PO.TERM_ID_RE.test(tm[1])) throw new HttpError(404, "not_found");
+    if (m === "PUT") return updateTerm(request, env, await requireAdmin(request, env), tm[1]);
+    if (m === "DELETE") return deleteTerm(request, env, await requireAdmin(request, env), tm[1]);
+    throw new HttpError(405, "method_not_allowed");
+  }
+  const qm = p.match(/^\/admin\/posts\/([^/]+)(?:\/(publish|unpublish|trash|restore|duplicate|undo))?$/);
+  if (qm) {
+    if (!PO.POST_ID_RE.test(qm[1])) throw new HttpError(404, "not_found");
+    const id = qm[1], act = qm[2];
+    if (!act && m === "GET") { await requireAdmin(request, env); const [post, terms] = await Promise.all([loadPost(env, id), readTerms(env)]); return json({ post, terms }); }
+    if (!act && m === "PUT") return putPost(request, env, await requireAdmin(request, env), id);
+    if (!act && m === "DELETE") return deletePost(request, env, await requireAdmin(request, env), id);
+    if (act && m === "POST") {
+      const me = await requireAdmin(request, env);
+      if (act === "duplicate") return duplicatePost(request, env, me, id);
+      if (act === "undo") return undoPost(request, env, me, id);
+      return postActionEndpoint(request, env, me, id, act);
     }
     throw new HttpError(405, "method_not_allowed");
   }
@@ -562,15 +590,16 @@ function mediaUsage(doc, url) {
   for (const s of doc.sections) { walk(s.fields, s.id); walk(s.extra, s.id + ".extra"); }
   return used;
 }
-function publicMedia(key, meta, doc) {
+function publicMedia(key, meta, doc, users) {
   const url = "/media/" + key;
-  return { key, url, contentType: meta.contentType || "", size: Number(meta.size) || 0, alt: meta.alt || "", name: meta.name || "", uploadedAt: meta.uploadedAt || null, uploadedBy: meta.uploadedBy || null, usedIn: mediaUsage(doc, url) };
+  return { key, url, contentType: meta.contentType || "", size: Number(meta.size) || 0, alt: meta.alt || "", name: meta.name || "", uploadedAt: meta.uploadedAt || null, uploadedBy: meta.uploadedBy || null, usedIn: mediaUsage(doc, url),
+    usedBy: (users && users.get(url)) || [] }; // Phase 4: pages + posts using the image
 }
 async function listMedia(request, env) {
   await requireSession(request, env);
   const store = mediaStore(env);
-  const [{ doc }, items] = await Promise.all([loadHomepage(env), store.list()]);
-  const media = items.map((i) => publicMedia(i.key, i.meta, doc)).sort((a, b) => String(b.uploadedAt).localeCompare(String(a.uploadedAt)));
+  const [{ doc }, items, users] = await Promise.all([loadHomepage(env), store.list(), mediaUsers(env)]);
+  const media = items.map((i) => publicMedia(i.key, i.meta, doc, users)).sort((a, b) => String(b.uploadedAt).localeCompare(String(a.uploadedAt)));
   return json({ storage: store.kind, maxBytes: CMS.MEDIA_MAX_BYTES, types: Object.keys(CMS.MEDIA_TYPES), items: media, builtin: CMS.BUILTIN_MEDIA });
 }
 async function uploadMedia(request, env, me) {
@@ -605,8 +634,8 @@ async function updateMedia(request, env, me, key) {
   if (!cur) throw new HttpError(404, "not_found");
   const meta = { ...cur.meta, alt: cut(body.alt, 150) };
   await store.put(key, cur.bytes, meta);
-  const { doc } = await loadHomepage(env);
-  return json({ ok: true, item: publicMedia(key, meta, doc) });
+  const [{ doc }, users] = await Promise.all([loadHomepage(env), mediaUsers(env)]);
+  return json({ ok: true, item: publicMedia(key, meta, doc, users) });
 }
 async function deleteMedia(request, env, me, key, url) {
   const store = mediaStore(env);
@@ -614,10 +643,336 @@ async function deleteMedia(request, env, me, key, url) {
   if (!cur) throw new HttpError(404, "not_found");
   const { doc } = await loadHomepage(env);
   const usedIn = mediaUsage(doc, "/media/" + key);
-  if (usedIn.length && url.searchParams.get("force") !== "1") return json({ error: "in_use", usedIn }, 409);
+  const usedBy = (await mediaUsers(env)).get("/media/" + key) || [];
+  if ((usedIn.length || usedBy.length) && url.searchParams.get("force") !== "1") return json({ error: "in_use", usedIn, usedBy }, 409);
   await store.delete(key);
-  log("media_deleted", { key, by: me.email, forced: usedIn.length > 0 });
+  log("media_deleted", { key, by: me.email, forced: usedIn.length + usedBy.length > 0 });
   return json({ ok: true, deleted: key });
+}
+
+/* ---------------- Posts / blog (Phase 4, docs/cms-phase4.md) ----------------
+ * KV (CONTENT):  post:<id> (+ :prev undo)   posts:index { posts:[indexEntry] } (admin list incl. drafts/trash)
+ *                postpub:<slug> snapshot     postredirect:<slug> { to, post }     posts:public { posts:[publicEntry] }
+ *                posts:terms { categories, tags, version }
+ * As with pages, the write order keeps the site on the old state if a request dies midway. */
+const POST_BODY_LIMIT = PG.LIMITS.bytes + 32 * 1024;
+const postEditable = (d) => ({ title: d.title, slug: d.slug, excerpt: d.excerpt, image: d.image, imageAlt: d.imageAlt, categories: d.categories, tags: d.tags,
+  author: d.author, date: d.date, seo: d.seo, blocks: d.blocks, version: d.version, updatedAt: d.updatedAt, updatedBy: d.updatedBy });
+const POST_EDIT_KEYS = ["title", "slug", "excerpt", "image", "imageAlt", "categories", "tags", "author", "date", "seo", "blocks"];
+function postInput(body, terms) {
+  let clean;
+  try { clean = PO.cleanPostInput(body); }
+  catch (e) { if (e instanceof PG.PageError) throw fieldError(e.field, e.reason); throw e; }
+  // a category/tag deleted while a post still referenced it is silently dropped instead of blocking the save
+  if (terms) {
+    const ids = new Set([...terms.categories, ...terms.tags].map((t) => t.id));
+    clean.categories = clean.categories.filter((id) => ids.has(id));
+    clean.tags = clean.tags.filter((id) => ids.has(id));
+  }
+  return clean;
+}
+const pickEditable = (d) => Object.fromEntries(POST_EDIT_KEYS.map((k) => [k, d[k]]));
+async function readPosts(env) {
+  const raw = await contentKV(env).get(PO.QKEYS.index, "json");
+  return raw && Array.isArray(raw.posts) ? raw.posts.filter((x) => x && PO.POST_ID_RE.test(x.id)) : [];
+}
+async function writePosts(env, posts) {
+  posts.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  if (!posts.length) await contentKV(env).delete(PO.QKEYS.index);
+  else await contentKV(env).put(PO.QKEYS.index, JSON.stringify({ posts, updatedAt: new Date().toISOString() }));
+}
+/** One read + one write for any number of changed docs (bulk actions). */
+async function syncPosts(env, docs, removeIds = []) {
+  const drop = new Set([...docs.map((d) => d.id), ...removeIds]);
+  const posts = (await readPosts(env)).filter((x) => !drop.has(x.id));
+  for (const d of docs) posts.push(PO.indexEntry(d));
+  await writePosts(env, posts);
+  return posts;
+}
+async function readPublicPosts(env) {
+  const raw = await contentKV(env).get(PO.QKEYS.list, "json");
+  return raw && Array.isArray(raw.posts) ? raw.posts.filter((x) => x && PO.POST_ID_RE.test(x.id)) : [];
+}
+async function syncPublicPosts(env, entries, removeIds = []) {
+  const drop = new Set([...entries.map((e) => e.id), ...removeIds]);
+  const list = (await readPublicPosts(env)).filter((x) => !drop.has(x.id)).concat(entries);
+  list.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  if (!list.length) await contentKV(env).delete(PO.QKEYS.list);
+  else await contentKV(env).put(PO.QKEYS.list, JSON.stringify({ posts: list, updatedAt: new Date().toISOString() }));
+}
+async function readTerms(env) { return PO.cleanTerms(await contentKV(env).get(PO.QKEYS.terms, "json")); }
+async function writeTerms(env, t) {
+  if (!t.categories.length && !t.tags.length) await contentKV(env).delete(PO.QKEYS.terms);
+  else await contentKV(env).put(PO.QKEYS.terms, JSON.stringify({ categories: t.categories, tags: t.tags, version: (t.version || 0) + 1, updatedAt: new Date().toISOString() }));
+}
+async function loadPost(env, id) {
+  const d = await contentKV(env).get(PO.QKEYS.post(id), "json");
+  if (!d || d.id !== id) throw new HttpError(404, "not_found");
+  return d;
+}
+async function writePost(env, doc) { await contentKV(env).put(PO.QKEYS.post(doc.id), JSON.stringify(doc)); }
+const postSlugTaken = (index, slug, selfId) => index.some((x) => x.id !== selfId && (x.slug === slug || x.publishedSlug === slug));
+function uniquePostSlug(index, base, copy) {
+  for (let i = 1; i < 200; i++) {
+    const tail = copy ? (i === 1 ? "-copy" : "-copy-" + i) : i === 1 ? "" : "-" + i;
+    const s = base.slice(0, PG.SLUG_MAX - tail.length).replace(/-+$/, "") + tail;
+    if (!postSlugTaken(index, s, null) && !PO.postSlugProblem(s)) return s;
+  }
+  throw new HttpError(409, "slug_exhausted");
+}
+const postConflict = (doc) => json({ error: "version_conflict", post: doc }, 409);
+function newPostDoc(index, clean, me) {
+  const now = new Date().toISOString();
+  let id; do { id = PO.newPostId(); } while (index.some((x) => x.id === id));
+  return { schema: PO.POST_SCHEMA, id, ...clean, status: "draft", version: 1, createdAt: now, updatedAt: now, updatedBy: me.email,
+    publishedAt: null, publishedVersion: 0, publishedSlug: "", redirects: [], trashedAt: "" };
+}
+
+async function listPosts(env) {
+  const [posts, terms] = await Promise.all([readPosts(env), readTerms(env)]);
+  return json({ posts, terms, limits: PO.POST_LIMITS, reserved: PO.RESERVED_POST_SLUGS, now: new Date().toISOString() });
+}
+async function createPost(request, env, me) {
+  const body = requireBodyObject(await readJsonBody(request, POST_BODY_LIMIT));
+  const [index, terms] = await Promise.all([readPosts(env), readTerms(env)]);
+  if (index.length >= PO.POST_LIMITS.posts) throw new HttpError(409, "too_many_posts");
+  const raw = { ...body };
+  const auto = raw.slug === undefined || raw.slug === "";
+  if (auto) raw.slug = uniquePostSlug(index, PO.slugify(typeof raw.title === "string" ? raw.title : "", "post-" + Date.now().toString(36)), false);
+  const clean = postInput(raw, terms);
+  if (postSlugTaken(index, clean.slug, null)) throw fieldError("slug", "taken");
+  const doc = newPostDoc(index, clean, me);
+  await writePost(env, doc);
+  await syncPosts(env, [doc]);
+  log("post_created", { post: doc.id, slug: doc.slug, by: me.email });
+  return json({ ok: true, post: doc }, 201);
+}
+async function putPost(request, env, me, id) {
+  const body = requireBodyObject(await readJsonBody(request, POST_BODY_LIMIT));
+  requireVersion(body);
+  const { version, ...rest } = body;
+  const [cur, terms] = await Promise.all([loadPost(env, id), readTerms(env)]);
+  const clean = postInput(rest, terms);
+  if (version !== cur.version) return postConflict(cur);
+  if (cur.status === "trash") throw new HttpError(409, "in_trash");
+  if (clean.slug !== cur.slug && postSlugTaken(await readPosts(env), clean.slug, id)) throw fieldError("slug", "taken");
+  const next = { ...cur, ...clean, version: cur.version + 1, updatedAt: new Date().toISOString(), updatedBy: me.email };
+  await contentKV(env).put(PO.QKEYS.prev(id), JSON.stringify(postEditable(cur)));
+  await writePost(env, next);
+  await syncPosts(env, [next]);
+  log("post_saved", { post: id, by: me.email, version: next.version });
+  return json({ ok: true, post: next });
+}
+async function undoPost(request, env, me, id) {
+  const body = await readJsonBody(request);
+  const kv = contentKV(env);
+  const [cur, prev, terms] = await Promise.all([loadPost(env, id), kv.get(PO.QKEYS.prev(id), "json"), readTerms(env)]);
+  if (!prev) throw new HttpError(404, "no_previous");
+  if (body.version !== undefined && body.version !== cur.version) return postConflict(cur);
+  if (cur.status === "trash") throw new HttpError(409, "in_trash");
+  let clean;
+  try { clean = postInput(pickEditable(prev), terms); } catch { throw new HttpError(409, "previous_invalid"); }
+  if (clean.slug !== cur.slug && postSlugTaken(await readPosts(env), clean.slug, id)) throw fieldError("slug", "taken");
+  const next = { ...cur, ...clean, version: cur.version + 1, updatedAt: new Date().toISOString(), updatedBy: me.email };
+  await kv.put(PO.QKEYS.prev(id), JSON.stringify(postEditable(cur)));
+  await writePost(env, next);
+  await syncPosts(env, [next]);
+  log("post_undo", { post: id, by: me.email, version: next.version });
+  return json({ ok: true, post: next });
+}
+async function ownedPostRedirect(env, slug, id) {
+  const r = await contentKV(env).get(PO.QKEYS.redirect(slug), "json");
+  return !!(r && r.post === id);
+}
+/** KV writes for publishing one post (not the index/public list). Throws HttpError on invalid content. */
+async function publishPostDoc(env, me, cur, index, terms) {
+  if (cur.status === "trash") throw new HttpError(409, "in_trash");
+  const clean = postInput(pickEditable(cur), terms);
+  if (postSlugTaken(index, clean.slug, cur.id)) throw fieldError("slug", "taken");
+  const kv = contentKV(env), now = new Date().toISOString();
+  const next = { ...cur, ...clean, date: clean.date || now, status: "published", version: cur.version + 1, updatedAt: now, updatedBy: me.email, publishedAt: now, publishedSlug: clean.slug };
+  next.publishedVersion = next.version;
+  let redirects = (cur.redirects || []).filter((s) => s !== clean.slug);
+  const old = cur.status === "published" && cur.publishedSlug && cur.publishedSlug !== clean.slug ? cur.publishedSlug : "";
+  if (old) redirects = [old, ...redirects.filter((s) => s !== old)];
+  const dropped = redirects.slice(PO.POST_LIMITS.redirects);
+  next.redirects = redirects.slice(0, PO.POST_LIMITS.redirects);
+  const snap = PO.publishedSnapshot(next, now);
+  await kv.put(PO.QKEYS.pub(clean.slug), JSON.stringify(snap));
+  await kv.delete(PO.QKEYS.redirect(clean.slug));
+  for (const s of next.redirects) await kv.put(PO.QKEYS.redirect(s), JSON.stringify({ to: clean.slug, post: cur.id }));
+  if (old) { const o = await kv.get(PO.QKEYS.pub(old), "json"); if (o && o.id === cur.id) await kv.delete(PO.QKEYS.pub(old)); }
+  for (const s of dropped) if (await ownedPostRedirect(env, s, cur.id)) await kv.delete(PO.QKEYS.redirect(s));
+  await writePost(env, next);
+  return { next, entry: PO.publicEntry(snap), movedFrom: old };
+}
+async function takeDownPost(env, doc) {
+  const kv = contentKV(env);
+  if (doc.publishedSlug) { const snap = await kv.get(PO.QKEYS.pub(doc.publishedSlug), "json"); if (snap && snap.id === doc.id) await kv.delete(PO.QKEYS.pub(doc.publishedSlug)); }
+  for (const s of doc.redirects || []) if (await ownedPostRedirect(env, s, doc.id)) await kv.delete(PO.QKEYS.redirect(s));
+}
+/** Single-post state changes shared by the per-post endpoints and bulk actions. Returns the new doc (or null when deleted). */
+async function postAction(env, me, act, cur, index, terms) {
+  const now = new Date().toISOString();
+  const bump = (o) => ({ ...cur, ...o, version: cur.version + 1, updatedAt: now, updatedBy: me.email });
+  if (act === "publish") return (await publishPostDoc(env, me, cur, index, terms)).next;
+  if (act === "unpublish") {
+    if (cur.status !== "published") throw new HttpError(409, "not_published");
+    await takeDownPost(env, cur);
+    const next = bump({ status: "draft", publishedSlug: "", redirects: [] });
+    await writePost(env, next);
+    return next;
+  }
+  if (act === "trash") {
+    if (cur.status === "trash") return cur;
+    if (cur.status === "published") await takeDownPost(env, cur);
+    const next = bump({ status: "trash", trashedAt: now, publishedSlug: "", redirects: [] });
+    await writePost(env, next);
+    return next;
+  }
+  if (act === "restore") {
+    if (cur.status !== "trash") throw new HttpError(409, "not_in_trash");
+    const next = bump({ status: "draft", trashedAt: "" });
+    if (postSlugTaken(index, next.slug, cur.id)) next.slug = uniquePostSlug(index, next.slug, true);
+    await writePost(env, next);
+    return next;
+  }
+  if (act === "delete") {
+    if (cur.status !== "trash") throw new HttpError(409, "not_in_trash");
+    const kv = contentKV(env);
+    await kv.delete(PO.QKEYS.prev(cur.id));
+    await kv.delete(PO.QKEYS.post(cur.id));
+    return null;
+  }
+  throw new HttpError(400, "invalid_action");
+}
+const PUB_CHANGE = new Set(["publish", "unpublish", "trash"]);
+async function postActionEndpoint(request, env, me, id, act) {
+  const body = requireBodyObject(await readJsonBody(request));
+  const cur = await loadPost(env, id);
+  if (act === "publish" || act === "unpublish") { requireVersion(body); }
+  if (body.version !== undefined && body.version !== cur.version) return postConflict(cur);
+  const [index, terms] = await Promise.all([readPosts(env), readTerms(env)]);
+  const wasLive = cur.status === "published";
+  const next = await postAction(env, me, act, cur, index, terms);
+  if (act === "publish") await syncPublicPosts(env, [PO.publicEntry(PO.publishedSnapshot(next, next.publishedAt))]);
+  else if (PUB_CHANGE.has(act) && wasLive) await syncPublicPosts(env, [], [id]);
+  await syncPosts(env, [next]);
+  log("post_" + act, { post: id, by: me.email, version: next.version, slug: next.slug });
+  return json({ ok: true, post: next });
+}
+async function deletePost(request, env, me, id) {
+  const cur = await loadPost(env, id);
+  const v = new URL(request.url).searchParams.get("version");
+  if (v !== null && Number(v) !== cur.version) return postConflict(cur);
+  await postAction(env, me, "delete", cur, [], null);
+  await syncPosts(env, [], [id]);
+  log("post_deleted", { post: id, slug: cur.slug, by: me.email });
+  return json({ ok: true, deleted: id });
+}
+async function duplicatePost(request, env, me, id) {
+  const [cur, index, terms] = await Promise.all([loadPost(env, id), readPosts(env), readTerms(env)]);
+  if (index.length >= PO.POST_LIMITS.posts) throw new HttpError(409, "too_many_posts");
+  const src = pickEditable(cur);
+  const clean = postInput({ ...src, title: [...(cur.title + " (কপি)")].slice(0, PO.POST_LIMITS.title).join(""), slug: uniquePostSlug(index, cur.slug, true), date: "", blocks: cur.blocks.map(PG.cloneBlock) }, terms);
+  const doc = newPostDoc(index, clean, me);
+  await writePost(env, doc);
+  await syncPosts(env, [doc]);
+  log("post_duplicated", { post: doc.id, from: id, by: me.email });
+  return json({ ok: true, post: doc }, 201);
+}
+const BULK_ACTIONS = ["publish", "unpublish", "trash", "restore", "delete"];
+async function bulkPosts(request, env, me) {
+  const body = requireBodyObject(await readJsonBody(request));
+  if (!BULK_ACTIONS.includes(body.action)) throw fieldError("action", "enum");
+  if (!Array.isArray(body.ids) || !body.ids.length || body.ids.length > 100 || body.ids.some((x) => typeof x !== "string" || !PO.POST_ID_RE.test(x))) throw fieldError("ids", "invalid");
+  const ids = [...new Set(body.ids)];
+  const [index, terms] = await Promise.all([readPosts(env), readTerms(env)]);
+  const changed = [], removed = [], pubAdd = [], pubDrop = [], failed = [];
+  for (const id of ids) {
+    try {
+      const cur = await loadPost(env, id);
+      const wasLive = cur.status === "published";
+      if (body.action === "unpublish" && !wasLive) { failed.push({ id, error: "not_published" }); continue; }
+      const next = await postAction(env, me, body.action, cur, index.filter((x) => x.id !== id).concat(changed.map(PO.indexEntry)), terms);
+      if (!next) removed.push(id);
+      else {
+        changed.push(next);
+        if (body.action === "publish") pubAdd.push(PO.publicEntry(PO.publishedSnapshot(next, next.publishedAt)));
+        else if (wasLive && PUB_CHANGE.has(body.action)) pubDrop.push(id);
+      }
+    } catch (e) { failed.push({ id, error: e instanceof HttpError ? e.message : "error", field: e.field }); }
+  }
+  if (pubAdd.length || pubDrop.length) await syncPublicPosts(env, pubAdd, pubDrop);
+  const posts = changed.length || removed.length ? await syncPosts(env, changed, removed) : index;
+  log("posts_bulk", { action: body.action, by: me.email, done: changed.length + removed.length, failed: failed.length });
+  return json({ ok: true, action: body.action, done: [...changed.map((d) => d.id), ...removed], failed, posts });
+}
+
+/* ---- categories & tags ---- */
+const termKind = (k) => (k === "category" ? "categories" : k === "tag" ? "tags" : null);
+const kindOfId = (id) => (id[0] === "c" ? "categories" : "tags");
+function termSlug(list, raw, name, selfId, kindWord) {
+  if (raw !== undefined && raw !== "") {
+    const s = typeof raw === "string" ? raw.trim().toLowerCase() : "";
+    const prob = PO.termSlugProblem(s);
+    if (prob) throw fieldError("slug", prob);
+    if (list.some((t) => t.slug === s && t.id !== selfId)) throw fieldError("slug", "taken");
+    return s;
+  }
+  const base = PO.slugify(name, kindWord + "-" + Date.now().toString(36).slice(-5)).slice(0, 36).replace(/-+$/, "");
+  for (let i = 1; i < 200; i++) { const s = i === 1 ? base : base + "-" + i; if (!PO.termSlugProblem(s) && !list.some((t) => t.slug === s && t.id !== selfId)) return s; }
+  throw new HttpError(409, "slug_exhausted");
+}
+function termName(v) { try { return PO.cleanTermName(v); } catch (e) { throw fieldError("name", e.reason || "invalid"); } }
+async function createTerm(request, env, me) {
+  const body = requireBodyObject(await readJsonBody(request));
+  const kind = termKind(body.kind);
+  if (!kind) throw fieldError("kind", "enum");
+  const terms = await readTerms(env);
+  const list = terms[kind];
+  if (list.length >= PO.POST_LIMITS[kind]) throw new HttpError(409, "too_many_terms");
+  const name = termName(body.name);
+  const dup = list.find((t) => t.name.toLowerCase() === name.toLowerCase());
+  if (dup) return json({ ok: true, term: dup, terms, existed: true });
+  let id; do { id = PO.newTermId(body.kind); } while (list.some((t) => t.id === id));
+  const term = { id, slug: termSlug(list, body.slug, name, null, body.kind), name };
+  list.push(term);
+  await writeTerms(env, terms);
+  log("term_created", { term: id, kind: body.kind, by: me.email });
+  return json({ ok: true, term, terms: await readTerms(env) }, 201);
+}
+async function updateTerm(request, env, me, id) {
+  const body = requireBodyObject(await readJsonBody(request));
+  for (const k of Object.keys(body)) if (k !== "name" && k !== "slug") throw fieldError(k, "unknown");
+  const terms = await readTerms(env);
+  const list = terms[kindOfId(id)];
+  const t = list.find((x) => x.id === id);
+  if (!t) throw new HttpError(404, "not_found");
+  if (body.name !== undefined) t.name = termName(body.name);
+  if (body.slug !== undefined) t.slug = termSlug(list, body.slug === "" ? undefined : body.slug, t.name, id, id[0] === "c" ? "category" : "tag");
+  await writeTerms(env, terms);
+  log("term_updated", { term: id, by: me.email });
+  return json({ ok: true, term: t, terms: await readTerms(env) });
+}
+async function deleteTerm(request, env, me, id) {
+  const terms = await readTerms(env);
+  const kind = kindOfId(id);
+  if (!terms[kind].some((x) => x.id === id)) throw new HttpError(404, "not_found");
+  terms[kind] = terms[kind].filter((x) => x.id !== id);
+  await writeTerms(env, terms);
+  const used = (await readPosts(env)).filter((p) => (p.categories || []).includes(id) || (p.tags || []).includes(id)).length;
+  log("term_deleted", { term: id, by: me.email, posts: used });
+  return json({ ok: true, deleted: id, posts: used, terms: await readTerms(env) });
+}
+/** Pages + posts that reference a media URL (from the index entries' media arrays — 2 KV reads, not one per doc). */
+async function mediaUsers(env) {
+  const [pages, posts] = await Promise.all([readIndex(env), readPosts(env)]);
+  const map = new Map();
+  const add = (kind, e) => { for (const u of e.media || []) { if (!map.has(u)) map.set(u, []); map.get(u).push({ kind, id: e.id, title: e.title, status: e.status }); } };
+  pages.forEach((e) => add("page", e));
+  posts.forEach((e) => add("post", e));
+  return map;
 }
 
 /* ---------------- Email (Resend) ---------------- */
