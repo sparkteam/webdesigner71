@@ -8,6 +8,7 @@ import { join } from "node:path";
 import http from "node:http";
 import { execFileSync } from "node:child_process";
 import * as M from "../src/cms-model.js";
+import * as PG from "../src/cms-pages.js";
 
 const PORT = 8799;
 const BASE = `http://localhost:${PORT}`;
@@ -63,6 +64,8 @@ const putLocalKV = (binding, key, obj) => {
   writeFileSync(f, JSON.stringify(obj));
   execFileSync("npx", ["wrangler", "kv", "key", "put", key, "--path", f, "--binding", binding, "--local", "--persist-to", persist, "--config", TEST_CONFIG], { stdio: "pipe" });
 };
+const listLocalKV = (binding, prefix = "") =>
+  JSON.parse(execFileSync("npx", ["wrangler", "kv", "key", "list", "--binding", binding, "--local", "--persist-to", persist, "--config", TEST_CONFIG, ...(prefix ? ["--prefix", prefix] : [])], { stdio: "pipe" }).toString()).map((k) => k.name);
 const login = (claims, opt) => api("/auth/google", { method: "POST", body: { credential: googleToken(claims, opt) } });
 
 try {
@@ -349,6 +352,150 @@ try {
   check("bad media key -> 404", r.status === 404);
   r = await api("/admin/media", { token: adminToken });
   check("library empty again", (await r.json()).items.length === 0);
+
+  // --- Pages (Phase 3)
+  {
+    const pg = (path, o = {}) => api("/admin/pages" + path, { token: adminToken, ...o });
+    const B = (type, extra = {}) => ({ id: "b" + randomBytes(5).toString("hex"), type, ...extra });
+    r = await api("/admin/pages");
+    check("pages: list without token -> 401", r.status === 401);
+    r = await api("/admin/pages", { token: userToken });
+    j = await r.json();
+    check("pages: approved user can list (empty)", r.status === 200 && Array.isArray(j.pages) && j.pages.length === 0 && j.limits.blocks === 200, JSON.stringify(j).slice(0, 200));
+    r = await api("/admin/pages", { method: "POST", token: userToken, body: { title: "x", slug: "x" } });
+    check("pages: non-admin create -> 403", r.status === 403);
+    const bad = async (body, field, reason, name) => {
+      const rr = await pg("", { method: "POST", body }); const jj = await rr.json();
+      check("pages: " + name + " -> 400 " + field + "/" + reason, rr.status === 400 && jj.field === field && jj.reason === reason, rr.status + " " + JSON.stringify(jj));
+    };
+    await bad({ title: "A", slug: "" }, "slug", "required", "empty slug");
+    await bad({ title: "A", slug: "Hello" }, "slug", "format", "uppercase slug");
+    await bad({ title: "A", slug: "a--b" }, "slug", "format", "double dash");
+    await bad({ title: "A", slug: "-a" }, "slug", "format", "leading dash");
+    await bad({ title: "A", slug: "a/b" }, "slug", "format", "slash");
+    await bad({ title: "A", slug: "a".repeat(61) }, "slug", "too_long", "61 chars");
+    for (const s of ["admin", "media", "cms", "old-homepage", "assets", "sitemap"]) await bad({ title: "A", slug: s }, "slug", "reserved", "reserved " + s);
+    await bad({ title: "", slug: "ok" }, "title", "required", "empty title");
+    await bad({ title: "A", slug: "ok", blocks: [B("nope")] }, "blocks.0.type", "enum", "unknown block type");
+    await bad({ title: "A", slug: "ok", blocks: [B("section", { children: [B("section")] })] }, "blocks.0.children.0.type", "not_allowed", "section in section");
+    await bad({ title: "A", slug: "ok", blocks: [B("buttons", { content: { buttons: [{ label: "x", href: "javascript:alert(1)" }] } })] }, "blocks.0.content.buttons.0.href", "url", "javascript: href");
+    await bad({ title: "A", slug: "ok", blocks: [B("image", { content: { src: "https://evil.example/x.png" } })] }, "blocks.0.content.src", "image", "external image");
+    await bad({ title: "A", slug: "ok", blocks: [B("heading", { content: { text: "t" }, style: { color: "red;}body{x" } })] }, "blocks.0.style.color", "color", "css injection in colour");
+    await bad({ title: "A", slug: "ok", blocks: [B("heading", { content: { text: "t" }, style: { pt: "10px;x" } })] }, "blocks.0.style.pt", "range", "css injection in spacing");
+    await bad({ title: "A", slug: "ok", blocks: [B("heading", { content: { text: "t" }, adv: { cls: "a\"><script>" } })] }, "blocks.0.adv.cls", "format", "class injection");
+    await bad({ title: "A", slug: "ok", blocks: [B("video", { content: { url: "https://evil.example/v.mp4" } })] }, "blocks.0.content.url", "video", "non-allow-listed video");
+    await bad({ title: "A", slug: "ok", blocks: Array.from({ length: 201 }, () => B("spacer")) }, "blocks", "too_many", "201 blocks");
+    const big = Array.from({ length: 45 }, () => B("text", { content: { html: "<p>" + "ক".repeat(2000) + "</p>" } }));
+    await bad({ title: "A", slug: "ok", blocks: big }, "blocks", "too_large", "over 256 KB");
+    r = await pg("", { method: "POST", body: { title: "A", slug: "ok", blocks: "x".repeat(300 * 1024) } });
+    check("pages: body over limit -> 413", r.status === 413, r.status);
+    r = await pg("", { method: "POST", body: { title: "A", slug: "ok", template: "evil" } });
+    check("pages: bad template -> 400", r.status === 400 && (await r.json()).field === "template");
+
+    // create (XSS payloads are stored as text and escaped on render)
+    const XSS = '<img src=x onerror=alert(1)>"\'</title><script>alert(1)</script>';
+    r = await pg("", { method: "POST", body: { title: "আমাদের সম্পর্কে " + XSS, slug: "amader-somporke", template: "about", seo: { title: "About " + XSS, description: "d", noindex: false } } });
+    j = await r.json();
+    const p1 = j.page;
+    check("pages: create from template -> 201 draft v1", r.status === 201 && p1.status === "draft" && p1.version === 1 && PG.PAGE_ID_RE.test(p1.id) && p1.blocks.length > 3, JSON.stringify(j).slice(0, 300));
+    r = await pg("", { method: "POST", body: { title: "Other", slug: "amader-somporke" } });
+    check("pages: duplicate slug -> 400 taken", r.status === 400 && (await r.json()).reason === "taken");
+    r = await pg("/" + p1.id, { token: userToken });
+    check("pages: get by id (session)", r.status === 200 && (await r.json()).page.id === p1.id);
+    r = await pg("/pxxxxxxxx");
+    check("pages: unknown id -> 404", r.status === 404);
+    r = await pg("/..%2Fusers");
+    check("pages: bad id -> 404", r.status === 404);
+    r = await api("/pages/amader-somporke");
+    check("pages: draft not public (404)", r.status === 404);
+    r = await pg("");
+    j = await r.json();
+    check("pages: index lists the page", j.pages.length === 1 && j.pages[0].slug === "amader-somporke" && j.pages[0].status === "draft" && j.pages[0].blocks === PG.countBlocks(p1.blocks));
+
+    // update + version conflicts
+    const edit = { title: p1.title, slug: p1.slug, seo: p1.seo, blocks: [B("heading", { content: { text: "Hello " + XSS, level: "h1" } }), ...p1.blocks] };
+    r = await pg("/" + p1.id, { method: "PUT", token: userToken, body: { ...edit, version: 1 } });
+    check("pages: non-admin PUT -> 403", r.status === 403);
+    r = await pg("/" + p1.id, { method: "PUT", body: edit });
+    check("pages: PUT without version -> 400", r.status === 400 && (await r.json()).field === "version");
+    r = await pg("/" + p1.id, { method: "PUT", body: { ...edit, version: 1 } });
+    j = await r.json();
+    check("pages: PUT -> v2", r.status === 200 && j.page.version === 2 && j.page.blocks[0].type === "heading", JSON.stringify(j).slice(0, 200));
+    r = await pg("/" + p1.id, { method: "PUT", body: { ...edit, version: 1 } });
+    j = await r.json();
+    check("pages: stale PUT -> 409 with current page", r.status === 409 && j.error === "version_conflict" && j.page.version === 2);
+    r = await pg("/" + p1.id, { method: "PUT", body: { ...edit, extra: 1, version: 2 } });
+    check("pages: unknown top-level key -> 400", r.status === 400);
+    r = await pg("/" + p1.id + "/undo", { method: "POST", body: { version: 2 } });
+    j = await r.json();
+    check("pages: undo -> v3 restores previous blocks", r.status === 200 && j.page.version === 3 && j.page.blocks.length === p1.blocks.length);
+    r = await pg("/" + p1.id + "/undo", { method: "POST", body: { version: 3 } });
+    j = await r.json();
+    check("pages: undo again = redo -> v4", r.status === 200 && j.page.version === 4 && j.page.blocks[0].type === "heading");
+
+    // publish
+    r = await pg("/" + p1.id + "/publish", { method: "POST", token: userToken, body: { version: 4 } });
+    check("pages: non-admin publish -> 403", r.status === 403);
+    r = await pg("/" + p1.id + "/publish", { method: "POST", body: { version: 3 } });
+    check("pages: stale publish -> 409", r.status === 409);
+    r = await pg("/" + p1.id + "/publish", { method: "POST", body: { version: 4 } });
+    j = await r.json();
+    check("pages: publish -> v5 published", r.status === 200 && j.page.status === "published" && j.page.version === 5 && j.page.publishedVersion === 5 && j.page.publishedSlug === "amader-somporke");
+    r = await api("/pages/amader-somporke");
+    j = await r.json();
+    check("pages: public GET /pages/:slug", r.status === 200 && j.page.slug === "amader-somporke" && !("updatedBy" in j.page) && j.page.blocks[0].content.text.startsWith("Hello "));
+    check("pages: pub key written", listLocalKV("CONTENT", "pub:").join() === "pub:amader-somporke");
+
+    // edit after publish → "changed"; slug move → 301 redirect
+    r = await pg("/" + p1.id, { method: "PUT", body: { ...edit, slug: "about-us", version: 5 } });
+    j = await r.json();
+    check("pages: draft slug change keeps live URL", r.status === 200 && j.page.slug === "about-us" && j.page.publishedSlug === "amader-somporke");
+    r = await pg("");
+    check("pages: index marks unpublished changes", (await r.json()).pages[0].changed === true);
+    r = await api("/pages/about-us");
+    check("pages: new slug not live before publish", r.status === 404);
+    r = await pg("/" + p1.id + "/publish", { method: "POST", body: { version: 6 } });
+    j = await r.json();
+    check("pages: republish with new slug -> redirects recorded", r.status === 200 && j.page.publishedSlug === "about-us" && j.page.redirects.join() === "amader-somporke");
+    check("pages: old pub key gone, redirect key set", listLocalKV("CONTENT", "pub:").join() === "pub:about-us" && listLocalKV("CONTENT", "redirect:").join() === "redirect:amader-somporke");
+    r = await pg("", { method: "POST", body: { title: "Clash", slug: "about-us" } });
+    check("pages: live slug of another page is taken", r.status === 400 && (await r.json()).reason === "taken");
+
+    // duplicate
+    r = await pg("/" + p1.id + "/duplicate", { method: "POST", body: {} });
+    j = await r.json();
+    const p2 = j.page;
+    const ids1 = new Set(); const walk = (l, set) => (l || []).forEach((b) => { set.add(b.id); walk(b.children, set); });
+    walk(edit.blocks, ids1); const ids2 = new Set(); walk(p2 && p2.blocks, ids2);
+    check("pages: duplicate -> 201 draft with new slug + fresh block ids", r.status === 201 && p2.status === "draft" && p2.slug === "about-us-copy" && p2.title.endsWith("(কপি)") && ![...ids2].some((x) => ids1.has(x)), JSON.stringify(j).slice(0, 200));
+    r = await pg("/" + p2.id + "/duplicate", { method: "POST", token: userToken, body: {} });
+    check("pages: non-admin duplicate -> 403", r.status === 403);
+
+    // unpublish / delete
+    r = await pg("/" + p2.id + "/unpublish", { method: "POST", body: { version: 1 } });
+    check("pages: unpublish a draft -> 409", r.status === 409);
+    r = await pg("/" + p1.id + "/unpublish", { method: "POST", body: { version: 7 } });
+    j = await r.json();
+    check("pages: unpublish -> draft, keys removed", r.status === 200 && j.page.status === "draft" && listLocalKV("CONTENT", "pub:").length === 0 && listLocalKV("CONTENT", "redirect:").length === 0, JSON.stringify(j).slice(0, 200));
+    r = await api("/pages/about-us");
+    check("pages: unpublished page not public", r.status === 404);
+    r = await pg("/" + p1.id + "/publish", { method: "POST", body: { version: 8 } });
+    check("pages: publish again", r.status === 200);
+    r = await pg("/" + p1.id, { method: "DELETE", token: userToken });
+    check("pages: non-admin delete -> 403", r.status === 403);
+    r = await pg("/" + p1.id + "?version=1", { method: "DELETE" });
+    check("pages: stale delete -> 409", r.status === 409);
+    r = await pg("/" + p1.id, { method: "DELETE" });
+    check("pages: delete published page", r.status === 200);
+    r = await pg("/" + p2.id, { method: "DELETE" });
+    check("pages: delete copy", r.status === 200);
+    r = await pg("/" + p2.id, { method: "DELETE" });
+    check("pages: delete again -> 404", r.status === 404);
+    const left = listLocalKV("CONTENT").filter((k) => /^(page:|pages:|pub:|redirect:)/.test(k));
+    check("pages: no page keys left after delete", left.length === 0, left.join());
+    r = await api("/admin/pages", { method: "PATCH", token: adminToken });
+    check("pages: wrong method -> 404/405", r.status === 404 || r.status === 405);
+  }
 
   // --- admin-only management
   r = await api("/admin/users/" + encodeURIComponent(ADMIN) + "/reject", { method: "POST", token: userToken });

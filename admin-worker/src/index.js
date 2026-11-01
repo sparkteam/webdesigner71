@@ -3,12 +3,13 @@
  * Google sign-in  ->  email approval by ADMIN_EMAIL  ->  session token.
  *
  * Bindings (see wrangler.jsonc):
- *   KV:      USERS, CONTENT (homepage CMS: sections + settings), MEDIA (uploaded images; KV until R2 is enabled)
+ *   KV:      USERS, CONTENT (homepage CMS: sections + settings; Phase 3 pages), MEDIA (uploaded images; KV until R2 is enabled)
  *   vars:    ADMIN_EMAIL, GOOGLE_CLIENT_ID, EMAIL_FROM, ALLOWED_ORIGINS
  *   secrets: SESSION_SECRET, APPROVAL_SECRET, RESEND_API_KEY (optional: logs instead of sending)
  */
 
 import * as CMS from "./cms-model.js";
+import * as PG from "./cms-pages.js";
 
 const GOOGLE_JWKS_URL = "https://www.googleapis.com/oauth2/v3/certs";
 const GOOGLE_ISSUERS = ["accounts.google.com", "https://accounts.google.com"];
@@ -33,7 +34,7 @@ export default {
     } catch (err) {
       const status = err instanceof HttpError ? err.status : 500;
       if (status === 500) console.error(JSON.stringify({ msg: "unhandled", error: String(err && err.stack || err) }));
-      const res = json({ error: err instanceof HttpError ? err.message : "server_error", ...(err && err.field ? { field: err.field } : {}) }, status);
+      const res = json({ error: err instanceof HttpError ? err.message : "server_error", ...(err && err.field ? { field: err.field } : {}), ...(err && err.reason ? { reason: err.reason } : {}) }, status);
       if (cors) for (const [k, v] of Object.entries(cors)) res.headers.set(k, v);
       return res;
     }
@@ -110,6 +111,28 @@ async function route(request, env, ctx, url) {
     if (!CMS.MEDIA_KEY_RE.test(key)) throw new HttpError(404, "not_found");
     return m === "DELETE" ? deleteMedia(request, env, me, key, url) : updateMedia(request, env, me, key);
   }
+
+  /* ---------- Pages (Phase 3, docs/cms-phase3.md) ---------- */
+  if (p === "/admin/pages" && m === "GET") { await requireSession(request, env); return listPages(env); }
+  if (p === "/admin/pages" && m === "POST") return createPage(request, env, await requireAdmin(request, env));
+  const pm = p.match(/^\/admin\/pages\/([^/]+)(?:\/(publish|unpublish|duplicate|undo))?$/);
+  if (pm) {
+    if (!PG.PAGE_ID_RE.test(pm[1])) throw new HttpError(404, "not_found");
+    const id = pm[1], act = pm[2];
+    if (!act && m === "GET") { await requireSession(request, env); return json({ page: await loadPage(env, id) }); }
+    if (!act && m === "PUT") return putPage(request, env, await requireAdmin(request, env), id);
+    if (!act && m === "DELETE") return deletePage(request, env, await requireAdmin(request, env), id);
+    if (act && m === "POST") {
+      const me = await requireAdmin(request, env);
+      if (act === "publish") return publishPage(request, env, me, id);
+      if (act === "unpublish") return unpublishPage(request, env, me, id);
+      if (act === "duplicate") return duplicatePage(request, env, me, id);
+      return undoPage(request, env, me, id);
+    }
+    throw new HttpError(405, "method_not_allowed");
+  }
+  const ps = p.match(/^\/pages\/([^/]+)$/);
+  if (ps && m === "GET") return publicPage(env, ps[1]);
   throw new HttpError(404, "not_found");
 }
 
@@ -347,9 +370,10 @@ function contentKV(env) {
   if (!env.CONTENT) throw new HttpError(500, "content_not_configured");
   return env.CONTENT;
 }
-function fieldError(field) {
+function fieldError(field, reason) {
   const e = new HttpError(400, "invalid_field");
   e.field = field;
+  if (reason) e.reason = reason;
   return e;
 }
 async function readJsonBody(request, limit = 16384) {
@@ -731,4 +755,194 @@ function b64urlDecode(str) {
   const s = str.replace(/-/g, "+").replace(/_/g, "/");
   const bin = atob(s + "===".slice((s.length + 3) % 4));
   return Uint8Array.from(bin, (c) => c.charCodeAt(0));
+}
+
+/* ---------------- Pages (Phase 3) ----------------
+ * KV (CONTENT):  page:<id>        full doc (draft + publish metadata)        page:<id>:prev  previous editable state (undo)
+ *                pages:index      { pages: [indexEntry…] } for the list screen + sitemap
+ *                pub:<slug>       published snapshot the site renders        redirect:<slug> { to, page } (301 after a slug move)
+ * Writes are not transactional (KV has none): order is chosen so a failure leaves the site serving the old state. */
+const PAGE_BODY_LIMIT = PG.LIMITS.bytes + 32 * 1024;
+const pageEditable = (d) => ({ title: d.title, slug: d.slug, seo: d.seo, blocks: d.blocks, version: d.version, updatedAt: d.updatedAt, updatedBy: d.updatedBy });
+const PAGE_INPUT_KEYS = new Set(["title", "slug", "seo", "blocks"]);
+function pageInput(body) {
+  for (const k of Object.keys(body)) if (!PAGE_INPUT_KEYS.has(k)) throw fieldError(k, "unknown");
+  try { return PG.cleanPageInput(body); }
+  catch (e) { if (e instanceof PG.PageError) throw fieldError(e.field, e.reason); throw e; }
+}
+function requireBodyObject(body) { if (!body || typeof body !== "object" || Array.isArray(body)) throw new HttpError(400, "invalid_json"); return body; }
+function requireVersion(body) { if (!Number.isInteger(body.version) || body.version < 0) throw fieldError("version", "required"); }
+async function readIndex(env) {
+  const raw = await contentKV(env).get(PG.PKEYS.index, "json");
+  return raw && Array.isArray(raw.pages) ? raw.pages.filter((x) => x && PG.PAGE_ID_RE.test(x.id)) : [];
+}
+async function writeIndex(env, pages) {
+  pages.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  if (!pages.length) await contentKV(env).delete(PG.PKEYS.index); // production ends with no pages → no index key either
+  else await contentKV(env).put(PG.PKEYS.index, JSON.stringify({ pages, updatedAt: new Date().toISOString() }));
+}
+async function syncIndex(env, doc, removeId) {
+  const pages = (await readIndex(env)).filter((x) => x.id !== (removeId || doc.id));
+  if (doc) pages.push(PG.indexEntry(doc));
+  await writeIndex(env, pages);
+}
+async function loadPage(env, id) {
+  const d = await contentKV(env).get(PG.PKEYS.page(id), "json");
+  if (!d || d.id !== id) throw new HttpError(404, "not_found");
+  return d;
+}
+async function writePage(env, doc) { await contentKV(env).put(PG.PKEYS.page(doc.id), JSON.stringify(doc)); }
+/** A slug is taken if another page uses it as its draft slug or its live URL. Old (redirect) slugs can be reused. */
+function slugTaken(index, slug, selfId) { return index.some((x) => x.id !== selfId && (x.slug === slug || x.publishedSlug === slug)); }
+function uniqueSlug(index, base) {
+  for (let i = 1; i < 100; i++) {
+    const tail = i === 1 ? "-copy" : "-copy-" + i;
+    const s = base.slice(0, PG.SLUG_MAX - tail.length).replace(/-+$/, "") + tail;
+    if (!slugTaken(index, s, null) && !PG.slugProblem(s)) return s;
+  }
+  throw new HttpError(409, "slug_exhausted");
+}
+function versionConflict(doc) { return json({ error: "version_conflict", page: doc }, 409); }
+
+async function listPages(env) {
+  return json({ pages: await readIndex(env), limits: PG.LIMITS, reserved: PG.RESERVED_SLUGS });
+}
+async function createPage(request, env, me) {
+  const body = requireBodyObject(await readJsonBody(request, PAGE_BODY_LIMIT));
+  let raw = body;
+  if (body.template !== undefined) {
+    if (typeof body.template !== "string" || !Object.prototype.hasOwnProperty.call(PG.TEMPLATES, body.template)) throw fieldError("template", "enum");
+    raw = { ...body, blocks: body.blocks !== undefined ? body.blocks : PG.TEMPLATES[body.template].build(typeof body.title === "string" ? body.title.trim() : "") };
+    delete raw.template;
+  }
+  const clean = pageInput(raw);
+  const index = await readIndex(env);
+  if (index.length >= PG.LIMITS.pages) throw new HttpError(409, "too_many_pages");
+  if (slugTaken(index, clean.slug, null)) throw fieldError("slug", "taken");
+  const now = new Date().toISOString();
+  let id; do { id = PG.newPageId(); } while (index.some((x) => x.id === id));
+  const doc = { schema: PG.PAGE_SCHEMA, id, ...clean, status: "draft", version: 1, createdAt: now, updatedAt: now, updatedBy: me.email,
+    publishedAt: null, publishedVersion: 0, publishedSlug: "", redirects: [] };
+  await writePage(env, doc);
+  await syncIndex(env, doc);
+  log("page_created", { page: id, slug: doc.slug, by: me.email });
+  return json({ ok: true, page: doc }, 201);
+}
+async function putPage(request, env, me, id) {
+  const body = requireBodyObject(await readJsonBody(request, PAGE_BODY_LIMIT));
+  requireVersion(body);
+  const { version, ...rest } = body;
+  const clean = pageInput(rest);
+  const cur = await loadPage(env, id);
+  if (version !== cur.version) return versionConflict(cur);
+  if (clean.slug !== cur.slug && slugTaken(await readIndex(env), clean.slug, id)) throw fieldError("slug", "taken");
+  const next = { ...cur, ...clean, version: cur.version + 1, updatedAt: new Date().toISOString(), updatedBy: me.email };
+  await contentKV(env).put(PG.PKEYS.prev(id), JSON.stringify(pageEditable(cur)));
+  await writePage(env, next);
+  await syncIndex(env, next);
+  log("page_saved", { page: id, by: me.email, version: next.version });
+  return json({ ok: true, page: next });
+}
+async function undoPage(request, env, me, id) {
+  const body = await readJsonBody(request);
+  const kv = contentKV(env);
+  const [cur, prev] = await Promise.all([loadPage(env, id), kv.get(PG.PKEYS.prev(id), "json")]);
+  if (!prev) throw new HttpError(404, "no_previous");
+  if (body.version !== undefined && body.version !== cur.version) return versionConflict(cur);
+  let clean;
+  try { clean = PG.cleanPageInput(prev); } catch { throw new HttpError(409, "previous_invalid"); }
+  if (clean.slug !== cur.slug && slugTaken(await readIndex(env), clean.slug, id)) throw fieldError("slug", "taken");
+  const next = { ...cur, ...clean, version: cur.version + 1, updatedAt: new Date().toISOString(), updatedBy: me.email };
+  await kv.put(PG.PKEYS.prev(id), JSON.stringify(pageEditable(cur)));
+  await writePage(env, next);
+  await syncIndex(env, next);
+  log("page_undo", { page: id, by: me.email, version: next.version });
+  return json({ ok: true, page: next });
+}
+async function ownedRedirect(env, slug, id) {
+  const r = await contentKV(env).get(PG.PKEYS.redirect(slug), "json");
+  return !!(r && r.page === id);
+}
+async function publishPage(request, env, me, id) {
+  const body = requireBodyObject(await readJsonBody(request));
+  requireVersion(body);
+  const kv = contentKV(env);
+  const cur = await loadPage(env, id);
+  if (body.version !== cur.version) return versionConflict(cur);
+  let clean;
+  try { clean = PG.cleanPageInput(cur); } catch (e) { if (e instanceof PG.PageError) throw fieldError(e.field, e.reason); throw e; }
+  const index = await readIndex(env);
+  if (slugTaken(index, clean.slug, id)) throw fieldError("slug", "taken");
+  const now = new Date().toISOString();
+  const next = { ...cur, ...clean, status: "published", version: cur.version + 1, updatedAt: now, updatedBy: me.email, publishedAt: now, publishedSlug: clean.slug };
+  next.publishedVersion = next.version;
+  let redirects = (cur.redirects || []).filter((s) => s !== clean.slug);
+  const old = cur.status === "published" && cur.publishedSlug && cur.publishedSlug !== clean.slug ? cur.publishedSlug : "";
+  if (old) redirects = [old, ...redirects.filter((s) => s !== old)];
+  const dropped = redirects.slice(PG.LIMITS.redirects);
+  next.redirects = redirects.slice(0, PG.LIMITS.redirects);
+  // 1) the new URL goes live, 2) old URLs 301 to it, 3) the old snapshot goes away, 4) doc + index
+  await kv.put(PG.PKEYS.pub(clean.slug), JSON.stringify(PG.publishedSnapshot(next, now)));
+  await kv.delete(PG.PKEYS.redirect(clean.slug));
+  for (const s of next.redirects) await kv.put(PG.PKEYS.redirect(s), JSON.stringify({ to: clean.slug, page: id }));
+  if (old) { const snap = await kv.get(PG.PKEYS.pub(old), "json"); if (snap && snap.id === id) await kv.delete(PG.PKEYS.pub(old)); }
+  for (const s of dropped) if (await ownedRedirect(env, s, id)) await kv.delete(PG.PKEYS.redirect(s));
+  await writePage(env, next);
+  await syncIndex(env, next);
+  log("page_published", { page: id, slug: clean.slug, by: me.email, version: next.version, movedFrom: old || undefined });
+  return json({ ok: true, page: next });
+}
+async function takeDown(env, doc) {
+  const kv = contentKV(env);
+  if (doc.publishedSlug) { const snap = await kv.get(PG.PKEYS.pub(doc.publishedSlug), "json"); if (snap && snap.id === doc.id) await kv.delete(PG.PKEYS.pub(doc.publishedSlug)); }
+  for (const s of doc.redirects || []) if (await ownedRedirect(env, s, doc.id)) await kv.delete(PG.PKEYS.redirect(s));
+}
+async function unpublishPage(request, env, me, id) {
+  const body = requireBodyObject(await readJsonBody(request));
+  requireVersion(body);
+  const cur = await loadPage(env, id);
+  if (body.version !== cur.version) return versionConflict(cur);
+  if (cur.status !== "published") throw new HttpError(409, "not_published");
+  await takeDown(env, cur);
+  const next = { ...cur, status: "draft", version: cur.version + 1, updatedAt: new Date().toISOString(), updatedBy: me.email, publishedSlug: "", redirects: [] };
+  await writePage(env, next);
+  await syncIndex(env, next);
+  log("page_unpublished", { page: id, by: me.email, version: next.version });
+  return json({ ok: true, page: next });
+}
+async function deletePage(request, env, me, id) {
+  const cur = await loadPage(env, id);
+  const v = new URL(request.url).searchParams.get("version");
+  if (v !== null && Number(v) !== cur.version) return versionConflict(cur);
+  await takeDown(env, cur);
+  await syncIndex(env, null, id);
+  const kv = contentKV(env);
+  await kv.delete(PG.PKEYS.prev(id));
+  await kv.delete(PG.PKEYS.page(id));
+  log("page_deleted", { page: id, slug: cur.slug, by: me.email });
+  return json({ ok: true, deleted: id });
+}
+async function duplicatePage(request, env, me, id) {
+  const cur = await loadPage(env, id);
+  const index = await readIndex(env);
+  if (index.length >= PG.LIMITS.pages) throw new HttpError(409, "too_many_pages");
+  const title = [...(cur.title + " (কপি)")].slice(0, 120).join("");
+  const clean = pageInput({ title, slug: uniqueSlug(index, cur.slug), seo: { ...cur.seo, noindex: cur.seo ? cur.seo.noindex : false }, blocks: cur.blocks.map(PG.cloneBlock) });
+  const now = new Date().toISOString();
+  let nid; do { nid = PG.newPageId(); } while (index.some((x) => x.id === nid));
+  const doc = { schema: PG.PAGE_SCHEMA, id: nid, ...clean, status: "draft", version: 1, createdAt: now, updatedAt: now, updatedBy: me.email,
+    publishedAt: null, publishedVersion: 0, publishedSlug: "", redirects: [] };
+  await writePage(env, doc);
+  await syncIndex(env, doc);
+  log("page_duplicated", { page: nid, from: id, by: me.email });
+  return json({ ok: true, page: doc }, 201);
+}
+/** Public read of a published page (JSON; drafts and unknown slugs are 404). */
+async function publicPage(env, slug) {
+  if (PG.slugProblem(slug)) throw new HttpError(404, "not_found");
+  const snap = await contentKV(env).get(PG.PKEYS.pub(slug), "json");
+  if (!snap) throw new HttpError(404, "not_found");
+  let clean;
+  try { clean = { title: snap.title, slug: PG.cleanSlug(snap.slug), seo: PG.cleanSeo(snap.seo), blocks: PG.cleanBlocks(snap.blocks) }; } catch { throw new HttpError(404, "not_found"); }
+  return json({ page: { ...clean, publishedAt: snap.publishedAt || null, version: snap.version } });
 }

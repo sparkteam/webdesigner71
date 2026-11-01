@@ -1,10 +1,11 @@
-// Local checks for the site Worker (CMS Phase 2). Run from the repo root with wrangler on PATH:  node site-worker/test/check.mjs
+// Local checks for the site Worker (CMS Phase 2 + Phase 3 pages). Run from the repo root with wrangler on PATH:  node site-worker/test/check.mjs
 // Uses `wrangler dev --local` with a throwaway KV store; never touches production.
 import { spawn, execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, rmSync, readdirSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import * as M from "../../public/cms/model.js";
+import * as PG from "../../public/cms/pages.js";
 
 const PORT = 8798;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -140,6 +141,133 @@ try {
     ({ r } = await get(p));
     check(`${p} -> 404`, r.status === 404, r.status);
   }
+
+  // 8. Phase 3 pages
+  check("public/cms/pages.js === admin-worker/src/cms-pages.js (byte-identical copies)", readFileSync("public/cms/pages.js", "utf8") === readFileSync("admin-worker/src/cms-pages.js", "utf8"));
+  const dirs = readdirSync("public").filter((d) => statSync(join("public", d)).isDirectory());
+  check("every public/ directory is a reserved slug", dirs.every((d) => PG.RESERVED_SLUGS.includes(d)), dirs.join());
+  const homeBefore = (await get("/")).t;
+  const statusBefore = {};
+  for (const p of ["/admin", "/admin/", "/old-homepage", "/old-homepage/", "/cms/", "/cms", "/media", "/assets/", "/index.html", "/CNAME"]) statusBefore[p] = (await get(p)).r.status;
+  // <meta content="..."> values are inert text (HTMLRewriter escapes the quote); drop only those before scanning for live markup
+  const noAttr = (html) => html.replace(/(<meta\b[^>]*?\scontent=)"[^"]*"/g, '$1""');
+  const XSS = '<img src=x onerror=alert(1)>"\'</title><script>alert(1)</script>';
+  const all = []; // one of every block type, each in a legal parent
+  for (const type of PG.BLOCK_TYPES) {
+    if (type === "column" || type === "columns") continue;
+    const b = PG.newBlock(type);
+    if (type === "section") b.children = [PG.newBlock("heading")];
+    all.push(b);
+  }
+  const colsB = PG.newBlock("columns", "1-1"); colsB.children[0].children.push(PG.newBlock("text")); colsB.children[1].children.push(PG.newBlock("image"));
+  all.push(colsB);
+  const h = PG.newBlock("heading"); h.content.text = "Hi " + XSS; h.style = { color: "accent", size: 40, m: { size: 28 } }; h.adv = { anchor: "intro", cls: "my-x" };
+  const btn = PG.newBlock("buttons"); btn.content.buttons[0].label = "<script>alert(1)</script>";
+  const vid = PG.newBlock("video"); vid.content.url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+  const hid = PG.newBlock("text"); hid.hidden = true; hid.content.html = "<p>SECRET-HIDDEN</p>";
+  all.unshift(h, btn); all.push(vid, hid);
+  const doc = { id: "ptest00001", slug: "all-blocks", title: "সব ব্লক " + XSS, seo: { title: "", description: "Desc " + XSS, image: "/assets/hero-illustration.svg", noindex: false }, blocks: all, version: 3 };
+  check("test page passes the server validator", (() => { try { PG.cleanPageInput(doc); return true; } catch (e) { console.log(e.field, e.reason); return false; } })());
+  putKV("pub:all-blocks", PG.publishedSnapshot(doc, "2026-11-02T00:00:00.000Z"));
+  ({ r, t } = await get("/all-blocks"));
+  check("published page -> 200 html", r.status === 200 && /text\/html/.test(r.headers.get("content-type")), r.status);
+  const missing = PG.BLOCK_TYPES.filter((x) => !new RegExp('class="pb pb-' + x + '[ "]').test(t));
+  check("every block type rendered (pb-<type>)", missing.length === 0, missing.join());
+  check("page uses the site shell (header, footer, site CSS)", t.includes('data-cms="header.') && t.includes('data-cms-slot="footer"') && t.includes("--green:#0B3D2E") && t.includes('<style id="wd71-page">'));
+  check("homepage <main> content not on the page", !t.includes('id="packages"') && !t.includes('data-cms="hero.title"'));
+  check("title escaped + suffixed", t.includes("<title>সব ব্লক &lt;img src=x onerror=alert(1)&gt;\"'&lt;/title&gt;&lt;script&gt;alert(1)&lt;/script&gt; | WebDesigner71</title>"), (t.match(/<title>[^]*?<\/title>/) || [])[0]);
+  check("no raw XSS anywhere", !/<script>alert|<img src=x|onerror=alert\(1\)>/.test(noAttr(t)), ((m) => m && t.slice(Math.max(0, m.index - 200), m.index + 80))(t.match(/<script>alert|<img src=x|onerror=alert\(1\)>/)));
+  check("XSS text shown escaped in heading + button", (t.match(/&lt;script&gt;alert\(1\)&lt;\/script&gt;/g) || []).length >= 3);
+  check("canonical + og:url point at the page", t.includes('<link rel="canonical" href="http://127.0.0.1:' + PORT + '/all-blocks">'), (t.match(/<link rel="canonical"[^>]*>/) || [])[0]);
+  check("og:image absolute, description set", t.includes('og:image" content="http://127.0.0.1:' + PORT + '/assets/hero-illustration.svg"') && t.includes('name="description" content="Desc <img src=x onerror=alert(1)>&quot;'), (t.match(/og:image[^>]*>/)||[])[0] + " " + (t.match(/name="description"[^>]*>/)||[])[0]);
+  check("header in-page anchors point back to the homepage", t.includes('href="/#packages"') && !/<header[^]*?href="#packages"[^]*?<\/header>/.test(t));
+  check("hidden blocks are not rendered publicly", !t.includes("SECRET-HIDDEN"));
+  check("anchor id + extra class + style rules", t.includes('id="intro"') && t.includes("my-x") && new RegExp("\\.pb\\.b-" + h.id + "\\{[^}]*font-size:40px").test(t) && t.includes("@media (max-width:767px)"));
+  check("video embedded from youtube-nocookie only", t.includes("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ") && !t.includes("youtube.com/watch"));
+  check("editor-only markup absent publicly", !t.includes("pb-ph") && !t.includes("pb-drop") && !t.includes("page-bridge"));
+  ({ r, t } = await get("/all-blocks/"));
+  check("trailing slash -> same page, canonical without slash", r.status === 200 && t.includes("/all-blocks\">") && !t.includes("/all-blocks/\""));
+  ({ r, t } = await get("/all-blocks", {}, "HEAD"));
+  check("HEAD page -> 200", r.status === 200);
+
+  // tampered KV snapshots are re-validated: unsafe content never renders
+  const bad = (mut) => { const d = JSON.parse(JSON.stringify(doc)); mut(d); return PG.publishedSnapshot(d, "2026-11-02T00:00:00.000Z"); };
+  const cases = [
+    ["javascript: href", (d) => { d.blocks[1].content.buttons[0].href = "javascript:alert(1)"; }],
+    ["data: image", (d) => { d.blocks.find((b) => b.type === "image").content.src = "data:image/svg+xml,<svg onload=alert(1)>"; }],
+    ["external image", (d) => { d.blocks.find((b) => b.type === "image").content.src = "https://evil.example/a.png"; }],
+    ["css injection", (d) => { d.blocks[0].style.color = "red}</style><script>alert(1)</script>"; }],
+    ["raw html in rich text", (d) => { d.blocks.find((b) => b.type === "text").content.html = "<p onclick=x>ok</p><script>alert(1)</script>"; }],
+    ["iframe video from elsewhere", (d) => { d.blocks.find((b) => b.type === "video").content.url = "https://evil.example/embed"; }],
+  ];
+  for (const [name, mut] of cases) {
+    putKV("pub:tamper", bad(mut));
+    ({ r, t } = await get("/tamper"));
+    const ok = (r.status === 404 && t.includes("pb-404")) || (r.status === 200 && !/<script>alert|onclick=|javascript:|evil\.example|data:image/.test(noAttr(t)));
+    check("tampered KV (" + name + ") never renders unsafe", ok, r.status + " " + ((m) => m ? t.slice(Math.max(0, m.index - 150), m.index + 80) : "")(t.match(/<script>alert|onclick=|javascript:|evil\.example|data:image/)));
+  }
+  delKV("pub:tamper");
+
+  // drafts, unknown slugs, styled 404
+  putKV("page:pdraft0001", { ...doc, id: "pdraft0001", slug: "draft-page", status: "draft" });
+  ({ r, t } = await get("/draft-page"));
+  check("draft page (doc only, no pub key) -> styled 404", r.status === 404 && t.includes("pb-404") && t.includes('data-cms-slot="footer"'), r.status);
+  check("404 page noindex", t.includes('<meta name="robots" content="noindex">') && r.headers.get("x-robots-tag") === "noindex");
+  for (const p of ["/nope", "/a/b", "/Upper", "/a--b", "/" + "a".repeat(61)]) { ({ r, t } = await get(p)); check(`${p} -> styled 404`, r.status === 404 && t.includes("pb-404"), r.status); }
+  ({ r, t } = await get("/missing.png"));
+  check("/missing.png -> plain asset 404 (not the HTML page)", r.status === 404 && !t.includes("pb-404"), r.status);
+  ({ r } = await get("/nope", {}, "HEAD"));
+  check("HEAD unknown -> 404", r.status === 404);
+  ({ r, t } = await get("/all-blocks", {}, "POST"));
+  check("POST to a page path -> not rendered", !t.includes("pb-root"), r.status);
+
+  // reserved paths keep priority even with a (forged) pub key of the same name
+  for (const k of ["admin", "old-homepage", "cms", "media", "assets", "index"]) putKV("pub:" + k, { ...PG.publishedSnapshot(doc, "x"), slug: k });
+  for (const [p, st] of Object.entries(statusBefore)) { ({ r, t } = await get(p)); check(`${p} unchanged by pages (${st})`, r.status === st && !t.includes("pb-root"), r.status + " vs " + st); }
+  ({ r, t } = await get("/admin/"));
+  check("/admin/ still the admin app", t === readFileSync("public/admin/index.html", "utf8"));
+  for (const k of ["admin", "old-homepage", "cms", "media", "assets", "index"]) delKV("pub:" + k);
+
+  // redirects
+  putKV("redirect:old-slug", { to: "all-blocks", page: "ptest00001" });
+  ({ r } = await get("/old-slug"));
+  check("moved slug -> 301 to new slug", r.status === 301 && r.headers.get("location") === "/all-blocks", r.status + " " + r.headers.get("location"));
+  putKV("redirect:evil", { to: "//evil.example" });
+  ({ r } = await get("/evil"));
+  check("redirect to a non-slug target refused -> 404", r.status === 404, r.status);
+  delKV("redirect:evil");
+  putKV("pub:old-slug", PG.publishedSnapshot({ ...doc, slug: "old-slug" }, "x"));
+  ({ r } = await get("/old-slug"));
+  check("a live page wins over a stale redirect", r.status === 200, r.status);
+  delKV("pub:old-slug"); delKV("redirect:old-slug");
+
+  // sitemap
+  putKV("pages:index", { pages: [
+    PG.indexEntry({ ...doc, status: "published", publishedSlug: "all-blocks", updatedAt: "2026-11-02T00:00:00Z", publishedAt: "2026-11-02T01:00:00Z" }),
+    PG.indexEntry({ ...doc, id: "phidden001", status: "published", publishedSlug: "hidden-page", seo: { noindex: true } }),
+    PG.indexEntry({ ...doc, id: "pdraft0001", slug: "draft-page", status: "draft" }),
+    { id: "pbadxx0001", status: "published", publishedSlug: "<script>" },
+  ] });
+  ({ r, t } = await get("/sitemap.xml"));
+  check("sitemap.xml: xml, home + published indexable pages only", r.status === 200 && /xml/.test(r.headers.get("content-type")) && t.includes("/all-blocks</loc><lastmod>2026-11-02</lastmod>") && !t.includes("hidden-page") && !t.includes("draft-page") && !t.includes("script") && (t.match(/<url>/g) || []).length === 2, t);
+
+  // editor preview shell
+  ({ r, t } = await get("/__page-preview"));
+  check("/__page-preview: empty shell + bridge, noindex, no-store, same-origin frames only",
+    r.status === 200 && t.includes('src="/cms/page-bridge.js"') && t.includes('<div class="pb-root"></div>') && r.headers.get("cache-control") === "no-store" && /frame-ancestors 'self'/.test(r.headers.get("content-security-policy") || "") && t.includes('content="noindex"'), r.status);
+  ({ r, t } = await get("/cms/page-bridge.js"));
+  check("/cms/page-bridge.js served as a static file", r.status === 200 && t === readFileSync("public/cms/page-bridge.js", "utf8"));
+
+  // homepage byte-identical with pages present, and after they are gone
+  ({ t } = await get("/"));
+  check("homepage byte-identical while pages exist", t === homeBefore);
+  delKV("pub:all-blocks"); delKV("page:pdraft0001"); delKV("pages:index");
+  ({ r, t } = await get("/"));
+  check("homepage byte-identical after pages removed", t === homeBefore);
+  ({ r } = await get("/all-blocks"));
+  check("deleted page -> 404", r.status === 404);
+  ({ r, t } = await get("/sitemap.xml"));
+  check("sitemap with no pages = homepage only", (t.match(/<url>/g) || []).length === 1);
 } catch (e) {
   fail++; console.error("ERROR", e, logs.slice(-1500));
 } finally {

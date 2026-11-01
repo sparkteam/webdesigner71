@@ -1,8 +1,14 @@
 /**
- * WebDesigner71 site Worker (CMS Phase 2).
+ * WebDesigner71 site Worker (CMS Phase 2 + Phase 3 pages).
  *
- * Serves the static site from ./public (binding ASSETS). Only "/", "/index.html" and "/media/*" run this
- * script (wrangler.jsonc → assets.run_worker_first); every other path is served straight from assets.
+ * Serves the static site from ./public (binding ASSETS). "/", "/index.html" and "/media/*" always run this
+ * script (wrangler.jsonc → assets.run_worker_first). Every other path is served straight from assets when a
+ * file exists — so /admin/, /old-homepage/, /cms/, /assets/ can never be shadowed — and only reaches this
+ * script when NO asset matches. Those requests are handled by servePage (Phase 3, docs/cms-phase3.md):
+ *   /<slug> and /<slug>/   published page from KV "pub:<slug>" inside the site's header/footer/CSS
+ *   /sitemap.xml           homepage + published, indexable pages (from "pages:index")
+ *   /__page-preview        empty editor shell for the admin page builder (noindex, no-store, same-origin frames only)
+ *   anything else          styled 404 ("redirect:<slug>" → 301 first). KV errors → the original asset 404.
  *
  * Homepage: reads KV CONTENT "content:homepage:v2" (+ "settings:site"; falls back to the Phase 1 key
  * "content:homepage" through migrateV1) and applies the shared plan from public/cms/model.js with HTMLRewriter.
@@ -13,6 +19,7 @@
  * /media/<key>: uploaded images from the MEDIA binding (Workers KV today; an R2 bucket also works — see
  * serveMedia). Long immutable cache; only image/jpeg|png|webp|gif is ever served.
  */
+import * as PG from "../../public/cms/pages.js";
 import { KEYS, cleanDoc, cleanSettings, migrateV1, seedDoc, DEFAULT_SETTINGS, plan, toHtml, cssText, MEDIA_KEY_RE, MEDIA_TYPES } from "../../public/cms/model.js";
 
 export default {
@@ -21,7 +28,8 @@ export default {
     const get = request.method === "GET" || request.method === "HEAD";
     if (get && url.pathname.startsWith("/media/")) return serveMedia(request, env, url);
     const isHome = url.pathname === "/" || url.pathname === "/index.html";
-    if (!isHome || !get) return env.ASSETS.fetch(request);
+    if (!get) return env.ASSETS.fetch(request);
+    if (!isHome) return servePage(request, env, url);
 
     // Always fetch the full page: a 304 for the static file would hide a KV content change.
     const headers = new Headers(request.headers);
@@ -73,6 +81,11 @@ export default {
 
 /** Reads KV and returns pre-rendered edits, or null when there is nothing stored. Throws on bad data. */
 export async function buildEdits(env) {
+  const cms = await loadCms(env);
+  return cms ? editsFrom(cms.doc, cms.settings) : null;
+}
+/** { doc, settings } from KV (Phase 1 fallback included), or null when nothing is stored. Throws on bad data. */
+export async function loadCms(env) {
   const opt = { type: "json", cacheTtl: 60 };
   const [rawDoc, rawSettings] = await Promise.all([env.CONTENT.get(KEYS.doc, opt), env.CONTENT.get(KEYS.settings, opt)]);
   let doc, settings = null;
@@ -84,15 +97,18 @@ export async function buildEdits(env) {
     else return null;
   }
   settings = rawSettings ? cleanSettings(rawSettings) : settings || DEFAULT_SETTINGS;
+  return { doc, settings };
+}
+export function editsFrom(doc, settings) {
   const ops = [];
   let css = "";
   for (const o of plan(doc, settings)) {
     if (o.op === "css") css = cssText(o.vars);
     else if (o.op === "restore") continue;
-    else if (o.op === "attr") ops.push({ sel: o.sel, op: "attr", name: o.name, value: o.value });
-    else ops.push({ sel: o.sel, op: o.op, html: o.nodes ? toHtml(o.nodes) : "" });
+    else if (o.op === "attr") ops.push({ sel: o.sel, op: "attr", name: o.name, value: o.value, section: o.section });
+    else ops.push({ sel: o.sel, op: o.op, html: o.nodes ? toHtml(o.nodes) : "", section: o.section });
   }
-  return { ops, css };
+  return { ops, css, settings };
 }
 
 const MEDIA_HEADERS = {
@@ -133,4 +149,125 @@ async function serveMedia(request, env, url) {
   if (size) h.set("content-length", String(size));
   if (request.method === "HEAD") { if (body.cancel) body.cancel(); return new Response(null, { status: 200, headers: h }); }
   return new Response(body, { status: 200, headers: h });
+}
+
+/* ================================================================== Phase 3: pages */
+const SLUG_PATH = /^\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/;
+const APEX = "https://webdesigner71.com";
+const PAGE_KV = { type: "json", cacheTtl: 60 };
+const originFor = (url) => (/(^|\.)webdesigner71\.com$/.test(url.hostname) ? APEX : url.origin);
+const logErr = (msg, err) => console.error(JSON.stringify({ msg, error: String(err && err.message ? err.message : err), field: err && err.field }));
+
+async function servePage(request, env, url) {
+  const p = url.pathname;
+  if (p === "/sitemap.xml") return sitemap(request, env, url);
+  if (p === "/__page-preview") return previewShell(request, env, url);
+  const m = SLUG_PATH.exec(p);
+  // Reserved first segments keep their original behaviour exactly (assets decide; we never render there).
+  const first = p.split("/")[1] || "";
+  if (PG.RESERVED_SLUGS.includes(first) || p.startsWith("/media/") || p.startsWith("/cms/")) return env.ASSETS.fetch(request);
+  if (/\.[A-Za-z0-9]{1,8}$/.test(p)) return env.ASSETS.fetch(request); // missing files keep the plain asset 404
+  if (!m || m[1].length > PG.SLUG_MAX) return notFoundPage(request, env, url);
+  const slug = m[1];
+  let pub, redirect = null;
+  try {
+    pub = await env.CONTENT.get(PG.PKEYS.pub(slug), PAGE_KV);
+    if (!pub) redirect = await env.CONTENT.get(PG.PKEYS.redirect(slug), PAGE_KV);
+  } catch (err) { logErr("page_kv_error", err); return env.ASSETS.fetch(request); }
+  if (!pub) {
+    if (redirect && typeof redirect.to === "string" && !PG.slugProblem(redirect.to) && redirect.to !== slug)
+      return new Response(null, { status: 301, headers: { location: "/" + redirect.to + url.search, "cache-control": "public, max-age=300" } });
+    return notFoundPage(request, env, url);
+  }
+  let cms = null;
+  try { cms = await loadCms(env); } catch (err) { logErr("cms_render_error", err); }
+  let r;
+  try { r = PG.renderPage(pub, cms ? cms.settings : DEFAULT_SETTINGS); }
+  catch (err) { logErr("page_render_error", err); return notFoundPage(request, env, url); }
+  // Trailing slash: same page, one canonical URL (no slash).
+  return shell(request, env, url, r, { status: 200, canonical: originFor(url) + "/" + slug, cms, cache: "public, max-age=0, must-revalidate" });
+}
+
+async function notFoundPage(request, env, url) {
+  let cms = null;
+  try { cms = await loadCms(env); } catch (err) { logErr("cms_render_error", err); }
+  try { return await shell(request, env, url, PG.renderNotFound(), { status: 404, cms, cache: "public, max-age=60" }); }
+  catch (err) { logErr("notfound_error", err); return env.ASSETS.fetch(request); }
+}
+
+/** The site's own index.html with <main> replaced: same header, footer, fonts and CMS colours as the homepage. */
+async function shell(request, env, url, r, o) {
+  const asset = await env.ASSETS.fetch(new Request(new URL("/", url).toString(), { method: "GET" }));
+  const type = asset.headers.get("content-type") || "";
+  if (asset.status !== 200 || !type.includes("text/html")) throw new Error("shell_asset");
+  const headers = new Headers({ "content-type": "text/html; charset=utf-8", "cache-control": o.cache, "x-content-type-options": "nosniff" });
+  if (r.noindex || o.preview) headers.set("x-robots-tag", "noindex");
+  if (o.preview) headers.set("content-security-policy", "frame-ancestors 'self'");
+  const res = new Response(asset.body, { status: o.status, headers });
+  const fixHref = (h) => (h === "#top" || h === "#" ? "/" : h && h[0] === "#" ? "/" + h : h);
+  const rw = new HTMLRewriter();
+  // 1. header/footer edits from the homepage CMS (never anything inside <main>, never the homepage's title/description)
+  const edits = o.cms ? editsFrom(o.cms.doc, o.cms.settings) : null;
+  if (edits) for (const e of edits.ops) {
+    if (!["header", "footer", "settings"].includes(e.section) || e.sel === "head > title" || e.sel === 'meta[name="description"]') continue;
+    const html = (e.html || "").replace(/href="#([^"]*)"/g, (_, a) => 'href="' + fixHref("#" + a) + '"');
+    rw.on(e.sel, {
+      element(el) {
+        if (e.op === "inner") el.setInnerContent(html, { html: true });
+        else if (e.op === "replace") el.replace(html, { html: true });
+        else if (e.op === "remove") el.remove();
+        else if (e.op === "append") el.append(html, { html: true });
+        else if (e.op === "attr") el.setAttribute(e.name, e.name === "href" ? fixHref(e.value) : e.value);
+      },
+    });
+  }
+  // 2. in-page anchors of the homepage now point back to it
+  const anchors = { element(el) { const h = el.getAttribute("href"); if (h && h[0] === "#") el.setAttribute("href", fixHref(h)); } };
+  rw.on('header a[href^="#"]', anchors).on('footer a[href^="#"]', anchors).on('a.fab[href^="#"]', anchors);
+  // 3. head: title, description, social tags, canonical, fonts, styles
+  const title = r.title ? (r.title.includes("WebDesigner71") ? r.title : r.title + " | WebDesigner71") : "WebDesigner71";
+  rw.on("head > title", { element(el) { el.setInnerContent(title); } });
+  rw.on('meta[property="og:title"]', { element(el) { el.setAttribute("content", title); } });
+  if (r.description) {
+    rw.on('meta[name="description"]', { element(el) { el.setAttribute("content", r.description); } });
+    rw.on('meta[property="og:description"]', { element(el) { el.setAttribute("content", r.description); } });
+  }
+  rw.on('meta[property="og:url"]', { element(el) { if (o.canonical) el.setAttribute("content", o.canonical); else el.remove(); } });
+  const esc = PG.escHtml;
+  let head = "";
+  if (o.canonical) head += '<link rel="canonical" href="' + esc(o.canonical) + '">';
+  if (r.noindex || o.preview) head += '<meta name="robots" content="noindex">';
+  if (r.ogImage) head += '<meta property="og:image" content="' + esc(originFor(url) + r.ogImage) + '">';
+  head += '<link id="wd71-fonts" rel="stylesheet" href="' + esc(r.fontsHref || "") + '"' + (r.fontsHref ? "" : " disabled") + ">";
+  if (edits) head += '<style id="wd71-cms">' + edits.css + "</style>";
+  head += '<style id="wd71-page">' + r.css + "</style>";
+  if (o.preview) head += '<script type="module" src="/cms/page-bridge.js"></script>';
+  rw.on("head", { element(el) { el.append(head, { html: true }); } });
+  // 4. the page itself
+  rw.on("main#top", { element(el) { el.setInnerContent(r.main, { html: true }); el.setAttribute("class", "pb-page"); } });
+  const out = rw.transform(res);
+  if (request.method === "HEAD") return new Response(null, { status: out.status, headers: out.headers });
+  return out;
+}
+
+/** Editor canvas: empty page shell; public/cms/page-bridge.js renders drafts sent by the admin panel via postMessage. */
+async function previewShell(request, env, url) {
+  let cms = null;
+  try { cms = await loadCms(env); } catch (err) { logErr("cms_render_error", err); }
+  const r = { title: "প্রিভিউ", description: "", noindex: true, css: PG.BASE_CSS, fontsHref: "", main: '<div class="pb-root"></div>' };
+  return shell(request, env, url, r, { status: 200, cms, preview: true, cache: "no-store" });
+}
+
+async function sitemap(request, env, url) {
+  let index = null;
+  try { index = await env.CONTENT.get(PG.PKEYS.index, PAGE_KV); } catch (err) { logErr("sitemap_kv_error", err); }
+  const origin = originFor(url);
+  const urls = [{ loc: origin + "/", lastmod: null }];
+  for (const p of (index && Array.isArray(index.pages) ? index.pages : [])) {
+    if (p && p.status === "published" && !p.noindex && typeof p.publishedSlug === "string" && !PG.slugProblem(p.publishedSlug))
+      urls.push({ loc: origin + "/" + p.publishedSlug, lastmod: typeof p.publishedAt === "string" ? p.publishedAt.slice(0, 10) : null });
+  }
+  const body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    urls.map((u) => "  <url><loc>" + PG.escHtml(u.loc) + "</loc>" + (u.lastmod && /^\d{4}-\d\d-\d\d$/.test(u.lastmod) ? "<lastmod>" + u.lastmod + "</lastmod>" : "") + "</url>").join("\n") + "\n</urlset>\n";
+  return new Response(request.method === "HEAD" ? null : body, { status: 200, headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=300" } });
 }
