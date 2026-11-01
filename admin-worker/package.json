@@ -1,0 +1,13 @@
+{
+  "name": "wd71-admin-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --local",
+    "deploy": "wrangler deploy",
+    "test": "node test/e2e.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.156.0"
+  }
+}

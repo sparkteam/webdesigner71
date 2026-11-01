@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>অ্যাডমিন প্যানেল — WebDesigner71</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  /* ================= CONFIG — edit these two lines ================= */
+  const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+  const API_BASE = "https://api.webdesigner71.com"; // or https://wd71-admin-api.<your-subdomain>.workers.dev
+  /* ================================================================= */
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root{--green:#0B3D2E;--green2:#145a44;--gold:#D4A017;--gold2:#f3d77a;--cream:#faf7ef;--ink:#1d2b26;--muted:#6b7a74;--line:#e7e1d1;--red:#b42318;--radius:16px}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:'Hind Siliguri',system-ui,sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  button{font-family:inherit}
+  .topbar{background:var(--green);color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 2px 14px rgba(0,0,0,.12)}
+  .topbar .in{max-width:1100px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
+  .brand{font-weight:700;font-size:20px;text-decoration:none;letter-spacing:.2px}
+  .brand span{color:var(--gold)}
+  .tag{font-size:12px;background:rgba(212,160,23,.18);color:var(--gold2);border:1px solid rgba(212,160,23,.45);padding:2px 10px;border-radius:99px}
+  .sp{flex:1}
+  .toplink{font-size:14px;opacity:.85;text-decoration:none}
+  .toplink:hover{opacity:1;color:var(--gold2)}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:10px;padding:9px 16px;font-weight:600;font-size:14px;cursor:pointer;transition:transform .08s,filter .15s,background .15s}
+  .btn:active{transform:translateY(1px)}
+  .btn-gold{background:var(--gold);color:var(--green)}
+  .btn-gold:hover{filter:brightness(1.06)}
+  .btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35)}
+  .btn-ghost:hover{background:rgba(255,255,255,.08)}
+  .btn-sm{padding:6px 11px;font-size:13px;border-radius:8px}
+  .b-ok{background:#e6f3ee;color:var(--green)} .b-ok:hover{background:#d3ebe1}
+  .b-no{background:#fff4e5;color:#9a5b00} .b-no:hover{background:#ffe9c7}
+  .b-del{background:#fdecea;color:var(--red)} .b-del:hover{background:#fbd9d5}
+  .btn[disabled]{opacity:.5;cursor:not-allowed}
+  main{max-width:1100px;margin:0 auto;padding:28px 20px 60px}
+  .hidden{display:none!important}
+
+  /* auth screens */
+  .auth{min-height:calc(100vh - 64px);display:grid;place-items:center;padding:30px 16px;
+    background:radial-gradient(1000px 500px at 85% -10%,rgba(212,160,23,.18),transparent 60%),radial-gradient(800px 500px at -10% 110%,rgba(11,61,46,.12),transparent 60%)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 18px 50px rgba(11,61,46,.10)}
+  .auth .card{width:100%;max-width:440px;padding:36px 32px;text-align:center;position:relative;overflow:hidden}
+  .auth .card:before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:linear-gradient(90deg,var(--green),var(--gold))}
+  .lock{width:64px;height:64px;border-radius:18px;margin:4px auto 14px;display:grid;place-items:center;background:var(--green);color:var(--gold);box-shadow:0 8px 20px rgba(11,61,46,.25)}
+  .auth h1{font-size:26px;margin:0 0 6px;color:var(--green)}
+  .auth p.sub{margin:0 0 24px;color:var(--muted)}
+  #gbtn{display:flex;justify-content:center;min-height:44px}
+  .steps{margin:26px 0 0;padding:16px 0 0;border-top:1px dashed var(--line);text-align:left;display:grid;gap:10px;font-size:14px;color:#3b4a44}
+  .steps div{display:flex;gap:10px;align-items:flex-start}
+  .steps b{flex:0 0 24px;height:24px;border-radius:50%;background:var(--gold);color:var(--green);display:grid;place-items:center;font-size:13px}
+  .msg{margin-top:16px;padding:10px 12px;border-radius:10px;font-size:14px}
+  .msg.err{background:#fdecea;color:var(--red)}
+  .msg.warn{background:#fff7e0;color:#7a5600;border:1px solid #f1dc9c}
+  .state-ic{width:72px;height:72px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-size:34px}
+  .state-ic.wait{background:#fff4d6;color:#a67a00;animation:pulse 2s infinite}
+  .state-ic.no{background:#fdecea;color:var(--red)}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(212,160,23,.45)}50%{box-shadow:0 0 0 12px rgba(212,160,23,0)}}
+  .linkbtn{background:none;border:0;color:var(--green);text-decoration:underline;cursor:pointer;font-size:14px;margin-top:18px}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:18px}
+
+  /* dashboard */
+  .welcome{display:flex;gap:20px;align-items:center;padding:24px;background:linear-gradient(120deg,var(--green) 0%,var(--green2) 100%);color:#fff;border:0;position:relative;overflow:hidden}
+  .welcome:after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(212,160,23,.18)}
+  .avatar{width:72px;height:72px;border-radius:50%;border:3px solid var(--gold);object-fit:cover;background:#e9efe9;flex:0 0 auto;display:grid;place-items:center;font-weight:700;font-size:28px;color:var(--green)}
+  .welcome h2{margin:0;font-size:24px}
+  .welcome .em{opacity:.85;font-size:14.5px;word-break:break-all}
+  .pill{display:inline-block;font-size:12.5px;font-weight:600;padding:2px 10px;border-radius:99px}
+  .pill.approved{background:#e6f3ee;color:var(--green)} .pill.pending{background:#fff4d6;color:#8a6400} .pill.rejected{background:#fdecea;color:var(--red)}
+  .pill.admin{background:var(--gold);color:var(--green)}
+  .welcome .pills{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+  .stat{padding:18px 20px;display:flex;align-items:center;gap:14px}
+  .stat .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px}
+  .stat .n{font-size:26px;font-weight:700;line-height:1}
+  .stat .l{color:var(--muted);font-size:14px}
+  .panel{padding:0;overflow:hidden}
+  .panel-h{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .panel-h h3{margin:0;font-size:18px;color:var(--green)}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .tab{border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px 12px;font-size:13.5px;cursor:pointer;color:#3b4a44}
+  .tab.on{background:var(--green);border-color:var(--green);color:#fff}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:12px 20px;border-bottom:1px solid #f0ebdd;font-size:14.5px;vertical-align:middle}
+  th{font-size:13px;color:var(--muted);font-weight:600;background:#fcfaf4}
+  tr:last-child td{border-bottom:0}
+  .u{display:flex;gap:10px;align-items:center}
+  .u img,.u .ph{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#e9efe9;display:grid;place-items:center;font-weight:700;color:var(--green);flex:0 0 auto}
+  .u .nm{font-weight:600}
+  .u .ml{color:var(--muted);font-size:13px;word-break:break-all}
+  .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .empty{padding:36px;text-align:center;color:var(--muted)}
+  .info{padding:22px 24px;margin-top:20px}
+  .info h3{margin:0 0 6px;color:var(--green)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;padding:10px 18px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.2);opacity:0;transition:.25s;z-index:50;font-size:14.5px}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  .spinner{width:36px;height:36px;border:4px solid #e7e1d1;border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  @media (max-width:720px){
+    .topbar .in{padding:10px 14px}
+    .tag,.toplink{display:none}
+    main{padding:18px 14px 50px}
+    .welcome{padding:18px;gap:14px}
+    .avatar{width:56px;height:56px;font-size:22px}
+    .welcome h2{font-size:20px}
+    .grid{grid-template-columns:repeat(3,1fr);gap:10px}
+    .stat{flex-direction:column;align-items:flex-start;gap:8px;padding:14px}
+    .stat .ic{width:36px;height:36px;font-size:17px}
+    .stat .n{font-size:22px}
+    .stat .l{font-size:12.5px}
+    thead{display:none}
+    table,tbody,tr,td{display:block;width:100%}
+    tr{padding:14px 16px;border-bottom:1px solid #f0ebdd}
+    td{border:0;padding:4px 0}
+    td.c-date{font-size:13px;color:var(--muted)}
+    .acts{justify-content:flex-start;margin-top:6px}
+    .auth .card{padding:30px 22px}
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="in">
+    <a class="brand" href="/">WebDesigner<span>71</span></a>
+    <span class="tag">অ্যাডমিন প্যানেল</span>
+    <div class="sp"></div>
+    <a class="toplink" href="/">← মূল সাইট</a>
+    <button id="logoutBtn" class="btn btn-ghost btn-sm hidden" type="button">লগআউট</button>
+  </div>
+</header>
+
+<!-- Loading -->
+<section id="v-loading" class="auth"><div class="spinner"></div></section>
+
+<!-- Login / Sign up -->
+<section id="v-login" class="auth hidden">
+  <div class="card">
+    <div class="lock"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+    <h1>অ্যাডমিন প্যানেল</h1>
+    <p class="sub">আপনার Gmail অ্যাকাউন্ট দিয়ে সাইন আপ বা লগইন করুন</p>
+    <div id="gbtn"></div>
+    <div id="loginMsg" class="msg hidden"></div>
+    <div class="steps">
+      <div><b>১</b><span>Google দিয়ে সাইন আপ করুন</span></div>
+      <div><b>২</b><span>অ্যাডমিন ইমেইলে আপনার অনুরোধ অনুমোদন করবেন</span></div>
+      <div><b>৩</b><span>অনুমোদনের পর একই বাটনে লগইন করুন</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Pending -->
+<section id="v-pending" class="auth hidden">
+  <div class="card">
+    <div class="state-ic wait">⏳</div>
+    <h1>আপনার অ্যাকাউন্ট অনুমোদনের অপেক্ষায় আছে</h1>
+    <p class="sub">অ্যাডমিনকে ইমেইলে জানানো হয়েছে। অনুমোদন পেলে আবার Google দিয়ে লগইন করুন।</p>
+    <div class="u" style="justify-content:center" id="pendingWho"></div>
+    <button class="linkbtn" type="button" data-back>অন্য অ্যাকাউন্ট দিয়ে চেষ্টা করুন</button>
+  </div>
+</section>
+
+<!-- Rejected -->
+<section id="v-rejected" class="auth hidden">
+  <div class="card">
+    <div class="state-ic no">✕</div>
+    <h1>অনুরোধ গ্রহণ করা হয়নি</h1>
+    <p class="sub">দুঃখিত, এই অ্যাকাউন্টটি অ্যাডমিন প্যানেলে প্রবেশের অনুমতি পায়নি।</p>
+    <button class="linkbtn" type="button" data-back>অন্য অ্যাকাউন্ট দিয়ে চেষ্টা করুন</button>
+  </div>
+</section>
+
+<!-- Dashboard -->
+<main id="v-dash" class="hidden">
+  <div class="card welcome">
+    <div id="meAvatar" class="avatar"></div>
+    <div style="position:relative;z-index:1;min-width:0">
+      <div style="opacity:.8;font-size:14px">স্বাগতম 👋</div>
+      <h2 id="meName"></h2>
+      <div class="em" id="meEmail"></div>
+      <div class="pills" id="mePills"></div>
+    </div>
+  </div>
+
+  <div id="adminArea" class="hidden">
+    <div class="grid">
+      <div class="card stat"><div class="ic" style="background:#fff4d6;color:#8a6400">⏳</div><div><div class="n" id="cPending">০</div><div class="l">অপেক্ষমাণ</div></div></div>
+      <div class="card stat"><div class="ic" style="background:#e6f3ee;color:var(--green)">✓</div><div><div class="n" id="cApproved">০</div><div class="l">অনুমোদিত</div></div></div>
+      <div class="card stat"><div class="ic" style="background:#fdecea;color:var(--red)">✕</div><div><div class="n" id="cRejected">০</div><div class="l">প্রত্যাখ্যাত</div></div></div>
+    </div>
+    <div class="card panel">
+      <div class="panel-h">
+        <h3>ইউজার তালিকা</h3>
+        <div class="sp"></div>
+        <div class="tabs" id="tabs">
+          <button class="tab on" data-f="all" type="button">সব</button>
+          <button class="tab" data-f="pending" type="button">অপেক্ষমাণ</button>
+          <button class="tab" data-f="approved" type="button">অনুমোদিত</button>
+          <button class="tab" data-f="rejected" type="button">প্রত্যাখ্যাত</button>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>ইউজার</th><th>অবস্থা</th><th>যোগদান</th><th style="text-align:right">অ্যাকশন</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div id="emptyRows" class="empty hidden">এই তালিকায় কোনো ইউজার নেই</div>
+    </div>
+  </div>
+
+  <div id="memberArea" class="card info hidden">
+    <h3>আপনি লগইন করেছেন ✓</h3>
+    <p style="margin:0;color:var(--muted)">আপনার অ্যাকাউন্ট অনুমোদিত। ইউজার ব্যবস্থাপনা শুধু মূল অ্যাডমিন করতে পারেন।</p>
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+  const TOKEN_KEY = "wd71_admin_token";
+  const $ = (id) => document.getElementById(id);
+  const views = ["v-loading", "v-login", "v-pending", "v-rejected", "v-dash"];
+  const bnNum = (n) => String(n).replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[d]);
+  const STATUS = { pending: "অপেক্ষমাণ", approved: "অনুমোদিত", rejected: "প্রত্যাখ্যাত" };
+  let me = null, users = [], filter = "all";
+
+  function show(id) {
+    views.forEach((v) => $(v).classList.toggle("hidden", v !== id));
+    $("logoutBtn").classList.toggle("hidden", id !== "v-dash");
+  }
+  function toast(t) {
+    const el = $("toast"); el.textContent = t; el.classList.add("show");
+    clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove("show"), 2600);
+  }
+  function loginMsg(text, kind) {
+    const el = $("loginMsg"); el.textContent = text || "";
+    el.className = "msg " + (kind || "err") + (text ? "" : " hidden");
+  }
+  function fmtDate(iso) {
+    if (!iso) return "—";
+    try { return new Date(iso).toLocaleDateString("bn-BD", { day: "numeric", month: "short", year: "numeric" }); } catch { return iso; }
+  }
+  function avatarEl(user, cls) {
+    if (user.picture && /^https:\/\//.test(user.picture)) {
+      const img = document.createElement("img");
+      img.src = user.picture; img.alt = ""; img.referrerPolicy = "no-referrer";
+      if (cls) img.className = cls;
+      return img;
+    }
+    const d = document.createElement("div");
+    d.className = cls || "ph";
+    d.textContent = (user.name || user.email || "?").trim().charAt(0).toUpperCase();
+    return d;
+  }
+
+  async function api(path, opts = {}) {
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    const res = await fetch(API_BASE + path, {
+      method: opts.method || "GET",
+      headers: Object.assign({ "content-type": "application/json" }, token ? { authorization: "Bearer " + token } : {}),
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+    });
+    let data = {};
+    try { data = await res.json(); } catch {}
+    if (res.status === 401 && token && path !== "/auth/google") { logout(true); throw new Error("session"); }
+    if (!res.ok) { const e = new Error(data.error || "http_" + res.status); e.status = res.status; throw e; }
+    return data;
+  }
+
+  /* ---------- Google sign-in ---------- */
+  function initGoogle() {
+    if (GOOGLE_CLIENT_ID.startsWith("YOUR_GOOGLE_CLIENT_ID")) {
+      loginMsg("সেটআপ বাকি: admin/index.html-এ GOOGLE_CLIENT_ID বসান।", "warn");
+    }
+    const tryInit = () => {
+      if (!window.google || !google.accounts || !google.accounts.id) return setTimeout(tryInit, 150);
+      google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onCredential, ux_mode: "popup", auto_select: false, context: "signin" });
+      google.accounts.id.renderButton($("gbtn"), { theme: "filled_black", size: "large", shape: "pill", text: "continue_with", locale: "bn", width: 280 });
+    };
+    tryInit();
+  }
+
+  async function onCredential(resp) {
+    loginMsg("");
+    try {
+      const data = await api("/auth/google", { method: "POST", body: { credential: resp.credential } });
+      if (data.status === "approved") {
+        sessionStorage.setItem(TOKEN_KEY, data.token);
+        me = data.user; enterDash();
+      } else if (data.status === "pending") {
+        const who = $("pendingWho"); who.innerHTML = "";
+        try {
+          const p = JSON.parse(atob(resp.credential.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+          const t = document.createElement("div"); t.className = "ml"; t.textContent = p.email; who.append(t);
+        } catch {}
+        show("v-pending");
+      } else if (data.status === "rejected") {
+        show("v-rejected");
+      }
+    } catch (e) {
+      loginMsg(e.message === "Failed to fetch" ? "সার্ভারে সংযোগ করা যাচ্ছে না। পরে আবার চেষ্টা করুন।" : "লগইন ব্যর্থ হয়েছে (" + e.message + ")।");
+    }
+  }
+
+  /* ---------- Dashboard ---------- */
+  function enterDash() {
+    show("v-dash");
+    const av = $("meAvatar"); av.replaceWith(Object.assign(avatarEl(me, "avatar"), { id: "meAvatar" }));
+    $("meName").textContent = me.name || me.email.split("@")[0];
+    $("meEmail").textContent = me.email;
+    const pills = $("mePills"); pills.innerHTML = "";
+    const s = document.createElement("span"); s.className = "pill approved"; s.textContent = "✓ " + STATUS.approved; pills.append(s);
+    if (me.isAdmin) { const a = document.createElement("span"); a.className = "pill admin"; a.textContent = "★ মূল অ্যাডমিন"; pills.append(a); }
+    $("adminArea").classList.toggle("hidden", !me.isAdmin);
+    $("memberArea").classList.toggle("hidden", !!me.isAdmin);
+    if (me.isAdmin) loadUsers();
+  }
+
+  async function loadUsers() {
+    try { users = (await api("/admin/users")).users || []; render(); }
+    catch (e) { if (e.message !== "session") toast("ইউজার তালিকা লোড হয়নি"); }
+  }
+
+  function render() {
+    const count = (st) => users.filter((u) => u.status === st).length;
+    $("cPending").textContent = bnNum(count("pending"));
+    $("cApproved").textContent = bnNum(count("approved"));
+    $("cRejected").textContent = bnNum(count("rejected"));
+    const list = users.filter((u) => filter === "all" || u.status === filter)
+      .sort((a, b) => (a.status === "pending" ? -1 : 0) - (b.status === "pending" ? -1 : 0));
+    const tb = $("rows"); tb.innerHTML = "";
+    $("emptyRows").classList.toggle("hidden", list.length > 0);
+    for (const u of list) {
+      const tr = document.createElement("tr");
+      const td1 = document.createElement("td");
+      const box = document.createElement("div"); box.className = "u";
+      box.append(avatarEl(u));
+      const txt = document.createElement("div"); txt.style.minWidth = "0";
+      const nm = document.createElement("div"); nm.className = "nm"; nm.textContent = u.name || "—";
+      const ml = document.createElement("div"); ml.className = "ml"; ml.textContent = u.email;
+      txt.append(nm, ml); box.append(txt); td1.append(box);
+      const td2 = document.createElement("td");
+      const pill = document.createElement("span"); pill.className = "pill " + u.status; pill.textContent = STATUS[u.status] || u.status;
+      td2.append(pill);
+      if (u.isAdmin) { const a = document.createElement("span"); a.className = "pill admin"; a.style.marginLeft = "6px"; a.textContent = "অ্যাডমিন"; td2.append(a); }
+      const td3 = document.createElement("td"); td3.className = "c-date"; td3.textContent = fmtDate(u.createdAt);
+      const td4 = document.createElement("td");
+      const acts = document.createElement("div"); acts.className = "acts";
+      if (!u.isAdmin) {
+        if (u.status !== "approved") acts.append(actBtn("✓ অনুমোদন", "b-ok", u, "approve"));
+        if (u.status !== "rejected") acts.append(actBtn("✕ প্রত্যাখ্যান", "b-no", u, "reject"));
+        acts.append(actBtn("মুছুন", "b-del", u, "delete"));
+      }
+      td4.append(acts);
+      tr.append(td1, td2, td3, td4); tb.append(tr);
+    }
+  }
+
+  function actBtn(label, cls, u, action) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "btn btn-sm " + cls; b.textContent = label;
+    b.onclick = async () => {
+      if (action === "delete" && !confirm(u.email + " — এই ইউজারকে মুছে ফেলবেন?")) return;
+      b.disabled = true;
+      try {
+        await api("/admin/users/" + encodeURIComponent(u.email) + "/" + action, { method: "POST" });
+        toast({ approve: "অনুমোদন করা হয়েছে", reject: "প্রত্যাখ্যান করা হয়েছে", delete: "মুছে ফেলা হয়েছে" }[action]);
+        loadUsers();
+      } catch (e) { b.disabled = false; if (e.message !== "session") toast("ব্যর্থ হয়েছে: " + e.message); }
+    };
+    return b;
+  }
+
+  $("tabs").addEventListener("click", (e) => {
+    const t = e.target.closest(".tab"); if (!t) return;
+    filter = t.dataset.f;
+    document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("on", x === t));
+    render();
+  });
+
+  function logout(expired) {
+    sessionStorage.removeItem(TOKEN_KEY); me = null; users = [];
+    try { google.accounts.id.disableAutoSelect(); } catch {}
+    show("v-login");
+    if (expired === true) loginMsg("সেশন শেষ হয়ে গেছে, আবার লগইন করুন।", "warn");
+  }
+  $("logoutBtn").onclick = () => { logout(); toast("লগআউট করা হয়েছে"); };
+  document.querySelectorAll("[data-back]").forEach((b) => (b.onclick = () => show("v-login")));
+
+  /* ---------- Boot ---------- */
+  (async function boot() {
+    initGoogle();
+    if (sessionStorage.getItem(TOKEN_KEY)) {
+      try { me = (await api("/me")).user; return enterDash(); } catch {}
+    }
+    show("v-login");
+  })();
+})();
+</script>
+</body>
+</html>
