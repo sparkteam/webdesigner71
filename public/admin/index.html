@@ -106,6 +106,87 @@
   .spinner{width:36px;height:36px;border:4px solid #e7e1d1;border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
   @keyframes spin{to{transform:rotate(360deg)}}
 
+  /* ---------- CMS Phase 1: content card ---------- */
+  .btn-green{background:var(--green);color:#fff} .btn-green:hover{background:var(--green2)}
+  .btn-line{background:#fff;color:var(--green);border:1px solid var(--line)} .btn-line:hover{background:#f7f3e8}
+  .cms{margin-top:20px;padding:0;overflow:hidden}
+  .cms-body{padding:18px 20px;display:grid;gap:14px}
+  .cms-hero{background:linear-gradient(120deg,var(--green),var(--green2));color:#fff;border-radius:14px;padding:20px 22px;position:relative;overflow:hidden}
+  .cms-hero:after{content:"";position:absolute;right:-40px;bottom:-60px;width:160px;height:160px;border-radius:50%;background:rgba(212,160,23,.14)}
+  .cms-hero .t{font-size:22px;font-weight:700;line-height:1.35;margin:0;position:relative;z-index:1;word-break:break-word}
+  .cms-hero .t em{font-style:normal;color:var(--cms-gold2,#E9B930)}
+  .cms-hero .s{opacity:.88;margin:6px 0 0;position:relative;z-index:1;word-break:break-word}
+  .cms-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+  .swatch{width:26px;height:26px;border-radius:8px;box-shadow:0 0 0 1px var(--line),inset 0 0 0 2px #fff;flex:0 0 auto}
+  .cms-row code{font-size:13.5px;background:#f7f3e8;padding:2px 8px;border-radius:6px;color:var(--ink)}
+  .cms-foot{padding:12px 20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);background:#fcfaf4}
+
+  /* ---------- Reusable modal system (native <dialog>) ---------- */
+  dialog.mdl{border:0;padding:0;background:transparent;max-width:none;max-height:none;overflow:visible;color:var(--ink)}
+  dialog.mdl::backdrop{background:rgba(11,61,46,.45);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  .mbox{background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(11,61,46,.35);width:min(520px,94vw);max-height:min(88vh,900px);display:flex;flex-direction:column;overflow:hidden;animation:mIn .16s ease-out}
+  .mdl.small .mbox{width:min(420px,94vw)}
+  .mdl.wide .mbox{width:min(1200px,96vw);height:min(88vh,860px)}
+  @keyframes mIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+  @keyframes sheetIn{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+  .mhead{display:flex;align-items:center;gap:10px;padding:14px 18px 14px 20px;border-bottom:1px solid var(--line)}
+  .mhead h3{margin:0;font-size:18px;color:var(--green);flex:1;line-height:1.35}
+  .mx{width:36px;height:36px;border-radius:10px;border:0;background:#f3efe3;color:var(--green);font-size:17px;cursor:pointer;flex:0 0 auto}
+  .mx:hover{background:#ebe5d3}
+  .mtabs{display:none;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:#fcfaf4}
+  .mtabs button{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px;font-size:14.5px;font-weight:600;color:#3b4a44;cursor:pointer}
+  .mtabs button.on{background:var(--green);border-color:var(--green);color:#fff}
+  .mmain{flex:1;min-height:0;display:flex}
+  .mbody{flex:1;overflow:auto;padding:18px 20px}
+  .mbody p.msgtxt{margin:0;color:#3b4a44;word-break:break-word}
+  .mdl.wide .mbody{flex:0 0 380px;border-right:1px solid var(--line)}
+  .mfoot{display:flex;gap:10px;justify-content:flex-end;align-items:center;padding:12px 20px;border-top:1px solid var(--line);background:#fff}
+  .mfoot .btn{padding:10px 18px;font-size:15px}
+  .btn-danger{background:var(--red);color:#fff} .btn-danger:hover{filter:brightness(1.08)}
+  .mbanner{margin:0 0 14px;padding:10px 12px;border-radius:10px;font-size:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .mbanner span{flex:1;min-width:160px}
+  .mbanner.err{background:#fdecea;color:var(--red)}
+  .mbanner.warn{background:#fff7e0;color:#7a5600;border:1px solid #f1dc9c}
+  .bspin{width:16px;height:16px;border:2px solid rgba(11,61,46,.25);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+  /* fields: floating labels, counters, inline errors */
+  .fld{margin-bottom:14px}
+  .fl{position:relative;flex:1;min-width:0}
+  .fl input,.fl textarea{width:100%;font:inherit;font-size:15.5px;line-height:1.5;padding:22px 14px 8px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s}
+  .fl textarea{min-height:104px;resize:vertical;display:block}
+  .fl label{position:absolute;left:15px;top:15px;font-size:15px;color:var(--muted);pointer-events:none;transition:top .15s,font-size .15s,color .15s;background:transparent}
+  .fl input:focus+label,.fl input:not(:placeholder-shown)+label,.fl textarea:focus+label,.fl textarea:not(:placeholder-shown)+label{top:5px;font-size:12px;font-weight:600;color:var(--green)}
+  .fl input:focus,.fl textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,160,23,.2)}
+  .fld.bad .fl input,.fld.bad .fl textarea{border-color:var(--red);box-shadow:0 0 0 3px rgba(180,35,24,.12)}
+  .fld.bad .fl label{color:var(--red)}
+  .fmeta{display:flex;gap:8px;font-size:12.5px;margin-top:4px;min-height:18px;align-items:flex-start}
+  .ferr{color:var(--red);flex:1}
+  .fhint{color:var(--muted);flex:1}
+  .fld.bad .fhint{display:none}
+  .fcnt{color:var(--muted);margin-left:auto;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .fcnt.over{color:var(--red);font-weight:600}
+  .crow{display:flex;gap:10px;align-items:stretch}
+  .cpick{width:58px;min-height:52px;border:1.5px solid var(--line);border-radius:12px;padding:4px;background:#fff;cursor:pointer;flex:0 0 auto}
+  .presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .pre{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:99px;padding:3px 10px 3px 4px;font-size:12.5px;cursor:pointer;color:#3b4a44}
+  .pre i{width:18px;height:18px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .pre.on{border-color:var(--green);box-shadow:0 0 0 2px rgba(11,61,46,.15)}
+  /* live preview pane */
+  .mpv{flex:1;min-width:0;display:flex;flex-direction:column;background:#efeadb}
+  .pvbar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);background:#fff;flex-wrap:wrap}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{border:0;background:#fff;padding:6px 12px;font-size:13.5px;cursor:pointer;color:#3b4a44}
+  .seg button.on{background:var(--green);color:#fff}
+  .pvbadge{margin-left:auto;font-size:12.5px;font-weight:600;background:#fff4d6;color:#8a6400;border:1px solid #f1dc9c;padding:3px 10px;border-radius:99px;white-space:nowrap}
+  .pvstage{flex:1;min-height:0;position:relative;overflow:hidden}
+  .pvwrap{position:absolute;left:50%;top:14px;transform-origin:top center;box-shadow:0 12px 34px rgba(11,61,46,.22);border-radius:12px;overflow:hidden;background:#fff}
+  .pvwrap iframe{border:0;display:block;width:100%;height:100%;background:#fff}
+  .pvmock{position:absolute;inset:14px;border-radius:12px;background:linear-gradient(135deg,#0B3D2E,#12543F);color:#fff;padding:40px 32px;overflow:auto}
+  .pvmock h1{font-size:30px;line-height:1.3;margin:0 0 10px}
+  .pvmock h1 em{font-style:normal;color:var(--gold-2)}
+  .pvmock p{opacity:.9;margin:0 0 18px}
+  .pvmock .b{display:inline-block;background:var(--gold);color:#0B3D2E;font-weight:700;padding:10px 20px;border-radius:12px}
+  .pvmock small{display:block;margin-top:24px;opacity:.7}
+
   @media (max-width:720px){
     .topbar .in{padding:10px 14px}
     .tag,.toplink{display:none}
@@ -125,6 +206,25 @@
     td.c-date{font-size:13px;color:var(--muted)}
     .acts{justify-content:flex-start;margin-top:6px}
     .auth .card{padding:30px 22px}
+  }
+  @media (max-width:720px){
+    /* modal → bottom sheet; content modal → full-height sheet with ফর্ম | প্রিভিউ tabs */
+    dialog.mdl{margin:auto 0 0;width:100%;max-width:100%}
+    .mbox,.mdl.small .mbox,.mdl.wide .mbox{width:100%;max-height:calc(100dvh - 24px);border-radius:18px 18px 0 0;animation:sheetIn .2s ease-out}
+    .mdl.wide .mbox,.mdl.sheet .mbox{height:calc(100dvh - 8px);max-height:none}
+    .mdl.wide .mtabs{display:flex}
+    .mdl.wide .mbody{flex:1;border-right:0}
+    .mdl.wide[data-tab="form"] .mpv{display:none}
+    .mdl.wide[data-tab="preview"] .mbody{display:none}
+    .mfoot{padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
+    .mfoot .btn{flex:1;justify-content:center}
+    .pvbadge{margin-left:0}
+    .cms-hero .t{font-size:19px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .mbox,.mdl .mbox{animation:none!important}
+    .toast,.fl input,.fl textarea,.fl label{transition:none!important}
+    .bspin,.spinner{animation-duration:2.5s}
   }
 </style>
 </head>
@@ -192,6 +292,20 @@
   </div>
 
   <div id="adminArea" class="hidden">
+    <!-- CMS Phase 1: homepage hero content -->
+    <div class="card cms" id="cmsCard">
+      <div class="panel-h">
+        <h3>হোমপেজ কনটেন্ট</h3>
+        <div class="sp"></div>
+        <button class="btn btn-sm btn-line" id="cmsUndo" type="button">↶ আগের ভার্সনে ফিরুন</button>
+        <button class="btn btn-sm btn-gold" id="cmsEdit" type="button">✎ এডিট করুন</button>
+      </div>
+      <div class="cms-body">
+        <div class="cms-hero"><p class="t" id="cmsTitle">…</p><p class="s" id="cmsSub"></p></div>
+        <div class="cms-row"><span>অ্যাকসেন্ট রং:</span><span class="swatch" id="cmsSwatch"></span><code id="cmsHex"></code></div>
+      </div>
+      <div class="cms-foot" id="cmsFoot">লোড হচ্ছে…</div>
+    </div>
     <div class="grid">
       <div class="card stat"><div class="ic" style="background:#fff4d6;color:#8a6400">⏳</div><div><div class="n" id="cPending">০</div><div class="l">অপেক্ষমাণ</div></div></div>
       <div class="card stat"><div class="ic" style="background:#e6f3ee;color:var(--green)">✓</div><div><div class="n" id="cApproved">০</div><div class="l">অনুমোদিত</div></div></div>
@@ -238,9 +352,9 @@
     views.forEach((v) => $(v).classList.toggle("hidden", v !== id));
     $("logoutBtn").classList.toggle("hidden", id !== "v-dash");
   }
-  function toast(t) {
+  function toast(t, ms) {
     const el = $("toast"); el.textContent = t; el.classList.add("show");
-    clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove("show"), 2600);
+    clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove("show"), ms || 2600);
   }
   function loginMsg(text, kind) {
     const el = $("loginMsg"); el.textContent = text || "";
@@ -273,7 +387,7 @@
     let data = {};
     try { data = await res.json(); } catch {}
     if (res.status === 401 && token && path !== "/auth/google") { logout(true); throw new Error("session"); }
-    if (!res.ok) { const e = new Error(data.error || "http_" + res.status); e.status = res.status; throw e; }
+    if (!res.ok) { const e = new Error(data.error || "http_" + res.status); e.status = res.status; if (data.field) e.field = data.field; throw e; }
     return data;
   }
 
@@ -323,7 +437,7 @@
     if (me.isAdmin) { const a = document.createElement("span"); a.className = "pill admin"; a.textContent = "★ মূল অ্যাডমিন"; pills.append(a); }
     $("adminArea").classList.toggle("hidden", !me.isAdmin);
     $("memberArea").classList.toggle("hidden", !!me.isAdmin);
-    if (me.isAdmin) loadUsers();
+    if (me.isAdmin) { loadUsers(); refreshContentCard(); }
   }
 
   async function loadUsers() {
@@ -366,11 +480,17 @@
     }
   }
 
+  const USER_CONFIRM = {
+    approve: (u) => ({ title: "ইউজার অনুমোদন করবেন?", message: u.email + " অ্যাডমিন প্যানেলে লগইন করতে পারবেন।", okText: "✓ অনুমোদন করুন" }),
+    reject: (u) => ({ title: "ইউজার প্রত্যাখ্যান করবেন?", message: u.email + " আর লগইন করতে পারবেন না।", okText: "✕ প্রত্যাখ্যান করুন", danger: true }),
+    delete: (u) => ({ title: "ইউজার মুছে ফেলবেন?", message: u.email + " — এই ইউজারকে মুছে ফেলবেন? এটি আর ফেরানো যাবে না।", okText: "মুছে ফেলুন", danger: true }),
+  };
   function actBtn(label, cls, u, action) {
     const b = document.createElement("button");
     b.type = "button"; b.className = "btn btn-sm " + cls; b.textContent = label;
     b.onclick = async () => {
-      if (action === "delete" && !confirm(u.email + " — এই ইউজারকে মুছে ফেলবেন?")) return;
+      const ok = await confirmModal(Object.assign({ message: "" }, USER_CONFIRM[action](u)));
+      if (!ok) return;
       b.disabled = true;
       try {
         await api("/admin/users/" + encodeURIComponent(u.email) + "/" + action, { method: "POST" });
@@ -381,6 +501,419 @@
     return b;
   }
 
+  /* ======================================================================
+     CMS Phase 1 — homepage hero content (title, highlight, sub line, accent)
+     ====================================================================== */
+/* CMS_TARGETS:BEGIN — field → element mapping. Keep identical to the copy in public/admin/index.html. */
+const CMS_TARGETS = {
+  heroTitle: { selector: "#hero-title", part: "text" },
+  heroHighlight: { selector: "#hero-title", part: "em" },
+  heroSub: { selector: "#hero-sub", fallback: ".hero .sub", part: "text" },
+  accentColor: { cssVar: "--gold", lightVar: "--gold-2", flash: ".hero .btn-gold" },
+};
+const CMS_DEFAULT_ACCENT = "#D4A017";
+const CMS_DEFAULT_ACCENT_LIGHT = "#E9B930";
+// --gold-2 is the lighter hover/highlight shade: the site's original pair for the default, else 10% toward white.
+function cmsLightShade(hex) {
+  if (String(hex).toUpperCase() === CMS_DEFAULT_ACCENT) return CMS_DEFAULT_ACCENT_LIGHT;
+  const n = parseInt(String(hex).slice(1), 16);
+  const ch = (s) => Math.round(((n >> s) & 255) + (255 - ((n >> s) & 255)) * 0.1);
+  return "#" + [16, 8, 0].map((s) => ch(s).toString(16).padStart(2, "0")).join("").toUpperCase();
+}
+/* CMS_TARGETS:END */
+  const CMS_COLOR_RE = /^#[0-9A-Fa-f]{6}$/;
+  const CMS_DEFAULTS = {
+    heroTitle: "আপনার ব্যবসার ওয়েবসাইট, মাত্র", heroHighlight: "৩৯০০ টাকায়",
+    heroSub: "ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে", accentColor: CMS_DEFAULT_ACCENT, version: 0,
+  };
+  const CMS_PRESETS = [
+    ["#D4A017", "ডিফল্ট"], ["#E8833A", "কমলা"], ["#C0392B", "লাল"],
+    ["#1E88E5", "নীল"], ["#2E9E6B", "সবুজ"], ["#8E44AD", "বেগুনি"],
+  ];
+  const CONTENT_FIELDS = [
+    { name: "heroTitle", label: "শিরোনাম", type: "text", min: 1, max: 120, emptyMsg: "শিরোনাম খালি রাখা যাবে না" },
+    { name: "heroHighlight", label: "হাইলাইট অংশ", type: "text", min: 0, max: 40, hint: "সোনালি রঙে দেখাবে · ঐচ্ছিক" },
+    { name: "heroSub", label: "সাব-টেক্সট", type: "textarea", min: 0, max: 300 },
+    { name: "accentColor", label: "অ্যাকসেন্ট রং", type: "color", presets: CMS_PRESETS },
+  ];
+  let content = null;
+
+  function h(tag, props, ...kids) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (v == null || v === false) continue;
+      if (k === "class") e.className = v;
+      else if (k === "text") e.textContent = v;
+      else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+      else if (k === "style") e.style.cssText = v;
+      else e.setAttribute(k, v === true ? "" : v);
+    }
+    for (const c of kids) if (c != null) e.append(c);
+    return e;
+  }
+  const isMobile = () => window.matchMedia("(max-width:720px)").matches;
+  const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const cleanText = (v) => String(v == null ? "" : v).replace(/[\u0000-\u001f\u007f]+/g, " ").trim();
+  const charLen = (s) => [...s].length;
+  function fmtDateTime(iso) {
+    try { return new Date(iso).toLocaleString("bn-BD", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" }); } catch { return iso; }
+  }
+
+  function makeDialog(cls) {
+    const d = h("dialog", { class: "mdl " + (cls || "") });
+    let downOnBackdrop = false;
+    d.addEventListener("pointerdown", (e) => { downOnBackdrop = e.target === d; });
+    d.addEventListener("click", (e) => {
+      if (e.target === d && downOnBackdrop) d.dispatchEvent(new CustomEvent("backdrop"));
+      downOnBackdrop = false;
+    });
+    d.addEventListener("close", () => d.remove());
+    document.body.append(d);
+    return d;
+  }
+
+  /* confirmModal({title, message, danger}) → Promise<boolean> */
+  function confirmModal({ title, message, danger = false, okText, cancelText }) {
+    return new Promise((resolve) => {
+      const d = makeDialog("small");
+      let done = false;
+      const finish = (v) => { if (done) return; done = true; d.close(); resolve(v); };
+      const ok = h("button", { type: "button", class: "btn " + (danger ? "btn-danger" : "btn-green"), text: okText || "হ্যাঁ", onclick: () => finish(true) });
+      const cancel = h("button", { type: "button", class: "btn btn-line", text: cancelText || "বাতিল", onclick: () => finish(false) });
+      d.append(h("div", { class: "mbox", role: "alertdialog", "aria-label": title },
+        h("div", { class: "mhead" }, h("h3", { text: title }), h("button", { type: "button", class: "mx", "aria-label": "বন্ধ করুন", text: "✕", onclick: () => finish(false) })),
+        h("div", { class: "mbody" }, h("p", { class: "msgtxt", text: message || "" })),
+        h("div", { class: "mfoot" }, cancel, ok)));
+      d.addEventListener("cancel", (e) => { e.preventDefault(); finish(false); });
+      d.addEventListener("backdrop", () => finish(false));
+      d.showModal();
+      (danger ? cancel : ok).focus();
+    });
+  }
+
+  /* openModal({title, fields, values, onSave, preview, reload, successText}) */
+  function openModal(opts) {
+    const fields = opts.fields;
+    const d = makeDialog(opts.preview ? "wide" : "");
+    d.dataset.tab = "form";
+    let initial = {}, current = {}, touched = {}, serverErr = {}, saving = false, closed = false, pv = null;
+    const ui = {};
+
+    const norm = (f, v) => (f.type === "color" ? cleanText(v).toUpperCase() : cleanText(v));
+    const values = () => Object.fromEntries(fields.map((f) => [f.name, norm(f, current[f.name])]));
+    const isDirty = () => fields.some((f) => norm(f, current[f.name]) !== norm(f, initial[f.name]));
+    function errorOf(f) {
+      if (serverErr[f.name]) return serverErr[f.name];
+      const v = norm(f, current[f.name]);
+      if (f.type === "color") return CMS_COLOR_RE.test(v) ? "" : "সঠিক হেক্স রং দিন, যেমন #D4A017";
+      const n = charLen(v);
+      if (n < (f.min || 0)) return f.emptyMsg || "এই ঘর খালি রাখা যাবে না";
+      if (f.max && n > f.max) return "সর্বোচ্চ " + bnNum(f.max) + " অক্ষর দেওয়া যাবে";
+      return "";
+    }
+
+    // --- header, tabs, body, footer
+    const titleEl = h("h3", { text: opts.title });
+    const head = h("div", { class: "mhead" }, titleEl, h("button", { type: "button", class: "mx", "aria-label": "বন্ধ করুন", text: "✕", onclick: () => attemptClose() }));
+    const tabForm = h("button", { type: "button", class: "on", text: "ফর্ম", onclick: () => setTab("form") });
+    const tabPv = h("button", { type: "button", text: "প্রিভিউ", onclick: () => setTab("preview") });
+    const tabs = opts.preview ? h("div", { class: "mtabs", role: "tablist" }, tabForm, tabPv) : null;
+    function setTab(t) { d.dataset.tab = t; tabForm.classList.toggle("on", t === "form"); tabPv.classList.toggle("on", t === "preview"); if (pv && pv.relayout) requestAnimationFrame(pv.relayout); }
+
+    const banner = h("div", { class: "mbanner hidden", role: "alert" });
+    const form = h("form", { novalidate: true, autocomplete: "off" }, banner);
+    form.addEventListener("submit", (e) => { e.preventDefault(); save(); });
+    const body = h("div", { class: "mbody" }, form);
+
+    for (const f of fields) {
+      const id = "f_" + f.name + "_" + Math.random().toString(36).slice(2, 7);
+      const errEl = h("span", { class: "ferr", id: id + "_e", "aria-live": "polite" });
+      const hintEl = f.hint ? h("span", { class: "fhint", text: f.hint }) : null;
+      const cntEl = f.max ? h("span", { class: "fcnt", "aria-hidden": "true" }) : null;
+      const wrap = h("div", { class: "fld", "data-field": f.name });
+      let input, picker = null, presetBtns = [];
+      if (f.type === "textarea") {
+        input = h("textarea", { id, placeholder: " ", rows: 4, "aria-describedby": id + "_e" });
+        input.addEventListener("keydown", (e) => { if (e.key === "Enter") e.preventDefault(); });
+      } else {
+        input = h("input", { id, type: "text", placeholder: " ", "aria-describedby": id + "_e", spellcheck: f.type === "color" ? "false" : null, maxlength: f.type === "color" ? 7 : null });
+      }
+      const fl = h("div", { class: "fl" }, input, h("label", { for: id, text: f.label }));
+      if (f.type === "color") {
+        picker = h("input", { type: "color", class: "cpick", "aria-label": f.label + " বাছাই করুন" });
+        picker.addEventListener("input", () => setValue(f.name, picker.value.toUpperCase(), true));
+        const pres = h("div", { class: "presets" });
+        for (const [hex, name] of f.presets || []) {
+          const b = h("button", { type: "button", class: "pre", title: hex, "data-hex": hex, onclick: () => setValue(f.name, hex, true) }, h("i", { style: "--c:" + hex }), name);
+          presetBtns.push(b); pres.append(b);
+        }
+        wrap.append(h("div", { class: "crow" }, picker, fl), pres, h("div", { class: "fmeta" }, errEl));
+      } else {
+        wrap.append(fl, h("div", { class: "fmeta" }, errEl, hintEl, cntEl));
+      }
+      input.addEventListener("input", () => setValue(f.name, input.value, false));
+      input.addEventListener("blur", () => { touched[f.name] = true; refresh(); });
+      ui[f.name] = { f, wrap, input, errEl, cntEl, picker, presetBtns };
+      form.append(wrap);
+    }
+
+    const saveBtn = h("button", { type: "button", class: "btn btn-gold", text: opts.saveText || "সেভ করুন", onclick: () => save() });
+    const cancelBtn = h("button", { type: "button", class: "btn btn-line", text: "বাতিল", onclick: () => attemptClose() });
+    const foot = h("div", { class: "mfoot" }, cancelBtn, saveBtn);
+    const pvPane = opts.preview ? h("div", { class: "mpv" }) : null;
+    d.append(h("div", { class: "mbox", role: "dialog", "aria-modal": "true", "aria-label": opts.title }, head, tabs, h("div", { class: "mmain" }, body, pvPane), foot));
+
+    function setValue(name, v, fromOutside) {
+      const u = ui[name];
+      current[name] = v;
+      if (fromOutside) u.input.value = v;
+      if (u.f.type === "color") touched[name] = true;
+      delete serverErr[name];
+      refresh();
+      if (pv) pv.update(values(), name);
+    }
+    function setAll(vals) {
+      for (const f of fields) {
+        current[f.name] = vals[f.name] == null ? "" : String(vals[f.name]);
+        ui[f.name].input.value = current[f.name];
+      }
+      touched = {}; serverErr = {};
+      refresh();
+      if (pv) pv.update(values(), null);
+    }
+    function refresh() {
+      let valid = true;
+      for (const f of fields) {
+        const u = ui[f.name], err = errorOf(f), v = norm(f, current[f.name]);
+        if (err) valid = false;
+        const showErr = !!err && (touched[f.name] || serverErr[f.name]);
+        u.wrap.classList.toggle("bad", showErr);
+        u.errEl.textContent = showErr ? err : "";
+        u.input.setAttribute("aria-invalid", showErr ? "true" : "false");
+        if (u.cntEl) { const n = charLen(v); u.cntEl.textContent = bnNum(n) + "/" + bnNum(f.max); u.cntEl.classList.toggle("over", n > f.max); }
+        if (u.picker && CMS_COLOR_RE.test(v)) u.picker.value = v.toLowerCase();
+        u.presetBtns.forEach((b) => b.classList.toggle("on", b.dataset.hex === v));
+      }
+      saveBtn.disabled = saving || !valid || !isDirty();
+      cancelBtn.disabled = saving;
+    }
+    function showBanner(kind, text, actionText, action) {
+      banner.className = "mbanner " + kind; banner.textContent = "";
+      banner.append(h("span", { text }));
+      if (actionText) banner.append(h("button", { type: "button", class: "btn btn-sm " + (kind === "err" ? "btn-danger" : "btn-gold"), text: actionText, onclick: action }));
+      if (isMobile()) setTab("form");
+      body.scrollTop = 0;
+    }
+    const hideBanner = () => { banner.className = "mbanner hidden"; banner.textContent = ""; };
+    function setSaving(on) {
+      saving = on;
+      saveBtn.textContent = "";
+      if (on) saveBtn.append(h("span", { class: "bspin", "aria-hidden": "true" }), "সেভ হচ্ছে…");
+      else saveBtn.textContent = opts.saveText || "সেভ করুন";
+      refresh();
+    }
+
+    async function save() {
+      if (saving || closed) return;
+      fields.forEach((f) => (touched[f.name] = true));
+      refresh();
+      if (saveBtn.disabled) return;
+      hideBanner(); setSaving(true);
+      try {
+        await opts.onSave(values());
+        setSaving(false); close();
+        toast(opts.successText || "সেভ হয়েছে", 3600);
+      } catch (e) {
+        setSaving(false);
+        if (e.message === "session") return close();
+        if (e.status === 400 && e.field && ui[e.field]) {
+          serverErr[e.field] = "সার্ভার এই মানটি গ্রহণ করেনি — ঠিক করে আবার দিন";
+          touched[e.field] = true; refresh();
+          if (isMobile()) setTab("form");
+          ui[e.field].input.focus();
+        } else if (e.status === 409) {
+          showBanner("warn", "অন্য কোথাও এডিট হয়েছে, নতুন ডেটা লোড করুন", "রিলোড", reloadData);
+        } else if (!e.status) {
+          showBanner("err", "সংযোগ ব্যর্থ হয়েছে — আপনার পরিবর্তন রাখা আছে। ইন্টারনেট দেখে আবার চেষ্টা করুন।", "আবার চেষ্টা", () => save());
+        } else if (e.status === 403) {
+          showBanner("err", "এই কাজের অনুমতি আপনার নেই।");
+        } else {
+          showBanner("err", "সেভ হয়নি (" + e.message + "), আবার চেষ্টা করুন।", "আবার চেষ্টা", () => save());
+        }
+      }
+    }
+    async function reloadData() {
+      if (!opts.reload) return;
+      try { const fresh = await opts.reload(); initial = { ...fresh }; setAll(fresh); hideBanner(); toast("নতুন ডেটা লোড হয়েছে"); }
+      catch (e) { if (e.message === "session") return close(); showBanner("err", "লোড করা যায়নি, আবার চেষ্টা করুন।", "রিলোড", reloadData); }
+    }
+    async function attemptClose() {
+      if (saving || closed) return;
+      if (isDirty()) {
+        const ok = await confirmModal({ title: "পরিবর্তন বাদ দেবেন?", message: "আপনার সেভ না করা পরিবর্তনগুলো হারিয়ে যাবে।", okText: "বাদ দিন", cancelText: "এডিটে ফিরুন", danger: true });
+        if (!ok) return;
+      }
+      close();
+    }
+    function close() {
+      if (closed) return; closed = true;
+      if (pv && pv.destroy) pv.destroy();
+      d.close();
+    }
+    d.addEventListener("cancel", (e) => { e.preventDefault(); attemptClose(); });
+    d.addEventListener("backdrop", () => attemptClose());
+
+    initial = { ...opts.values };
+    d.showModal();
+    if (opts.preview) pv = opts.preview(pvPane, { getValues: values, reset: () => setAll(initial), isDirty });
+    setAll(initial);
+    setTimeout(() => { if (!isMobile()) ui[fields[0].name].input.focus(); }, 30);
+    return { dialog: d, close, setValues: setAll };
+  }
+
+  /* Live preview: same-origin iframe of /?cms_preview=1, updated with DOM methods only */
+  function applyCms(doc, v) {
+    const T = CMS_TARGETS;
+    const title = doc.querySelector(T.heroTitle.selector);
+    if (title) {
+      title.textContent = v.heroTitle + (v.heroHighlight ? " " : "");
+      if (v.heroHighlight) { const em = doc.createElement("em"); em.textContent = v.heroHighlight; title.append(em); }
+    }
+    const sub = doc.querySelector(T.heroSub.selector) || doc.querySelector(T.heroSub.fallback);
+    if (sub) sub.textContent = v.heroSub;
+    if (CMS_COLOR_RE.test(v.accentColor)) {
+      const root = doc.documentElement.style, c = v.accentColor.toUpperCase();
+      root.setProperty(T.accentColor.cssVar, c);
+      root.setProperty(T.accentColor.lightVar, cmsLightShade(c));
+    }
+  }
+  function flashTarget(doc, field) {
+    const T = CMS_TARGETS[field]; if (!T) return;
+    let el = null;
+    if (field === "accentColor") el = doc.querySelector(T.flash);
+    else if (T.part === "em") el = doc.querySelector(T.selector + " em") || doc.querySelector(T.selector);
+    else el = doc.querySelector(T.selector) || (T.fallback && doc.querySelector(T.fallback));
+    if (!el) return;
+    const win = doc.defaultView, r = el.getBoundingClientRect();
+    if (win && (r.top < 0 || r.bottom > win.innerHeight)) win.scrollTo({ top: Math.max(0, r.top + win.scrollY - 120), behavior: reducedMotion() ? "auto" : "smooth" });
+    el.style.outline = "2px dashed " + CMS_DEFAULT_ACCENT_LIGHT;
+    el.style.outlineOffset = "6px";
+    clearTimeout(el._cmsFlash);
+    el._cmsFlash = setTimeout(() => { el.style.outline = ""; el.style.outlineOffset = ""; }, 900);
+  }
+  function contentPreview(pane, ctx) {
+    let mode = isMobile() ? "mobile" : "desktop", doc = null, mock = null, last = ctx.getValues(), timer = 0;
+    const bDesk = h("button", { type: "button", class: mode === "desktop" ? "on" : null, text: "ডেস্কটপ", onclick: () => setMode("desktop") });
+    const bMob = h("button", { type: "button", class: mode === "mobile" ? "on" : null, text: "মোবাইল", onclick: () => setMode("mobile") });
+    const reset = h("button", { type: "button", class: "btn btn-sm btn-line", text: "↺ রিসেট", title: "সব পরিবর্তন বাদ দিয়ে শুরুর মানে ফিরুন", onclick: () => ctx.reset() });
+    const badge = h("span", { class: "pvbadge", text: "প্রিভিউ — এখনো সেভ হয়নি" });
+    const iframe = h("iframe", { src: "/?cms_preview=1", title: "হোমপেজ প্রিভিউ", sandbox: "allow-same-origin allow-scripts", loading: "eager" });
+    const wrap = h("div", { class: "pvwrap" }, iframe);
+    const stage = h("div", { class: "pvstage" }, wrap);
+    pane.append(h("div", { class: "pvbar" }, h("div", { class: "seg", role: "group", "aria-label": "প্রিভিউ সাইজ" }, bDesk, bMob), reset, badge), stage);
+
+    function useMock() {
+      wrap.style.display = "none";
+      if (mock) return;
+      mock = h("div", { class: "pvmock" }, h("h1"), h("p"), h("span", { class: "b", text: "এখনই অর্ডার করুন" }), h("small", { text: "লাইভ পেজ লোড করা যায়নি — সরল প্রিভিউ দেখানো হচ্ছে" }));
+      stage.append(mock);
+    }
+    function apply(changed) {
+      if (doc) { try { applyCms(doc, last); if (changed) flashTarget(doc, changed); } catch {} }
+      else if (mock) {
+        const t = mock.querySelector("h1"); t.textContent = last.heroTitle + (last.heroHighlight ? " " : "");
+        if (last.heroHighlight) t.append(h("em", { text: last.heroHighlight }));
+        mock.querySelector("p").textContent = last.heroSub;
+        if (CMS_COLOR_RE.test(last.accentColor)) { mock.style.setProperty("--gold", last.accentColor); mock.style.setProperty("--gold-2", cmsLightShade(last.accentColor)); }
+      }
+    }
+    iframe.addEventListener("load", () => {
+      try {
+        const dd = iframe.contentDocument;
+        if (!dd || !dd.querySelector(CMS_TARGETS.heroTitle.selector)) throw new Error("no hero");
+        doc = dd;
+      } catch { doc = null; useMock(); }
+      apply(null);
+    });
+    function relayout() {
+      const W = stage.clientWidth - 28, H = stage.clientHeight - 28;
+      if (W <= 0 || H <= 0) return;
+      let w, hh, s;
+      if (mode === "mobile") { w = 390; hh = 844; s = Math.min(1, W / w, H / hh); }
+      else { w = 1280; s = Math.min(1, W / w); hh = H / s; }
+      wrap.style.width = w + "px"; wrap.style.height = hh + "px";
+      wrap.style.transform = "translateX(-50%) scale(" + s + ")";
+      wrap.style.borderRadius = mode === "mobile" ? "28px" : "12px";
+    }
+    function setMode(m) { mode = m; bDesk.classList.toggle("on", m === "desktop"); bMob.classList.toggle("on", m === "mobile"); relayout(); }
+    const ro = new ResizeObserver(relayout); ro.observe(stage);
+    requestAnimationFrame(relayout);
+    return {
+      update(v, changed) { last = v; clearTimeout(timer); timer = setTimeout(() => apply(changed), 40); },
+      relayout,
+      destroy() { ro.disconnect(); clearTimeout(timer); },
+    };
+  }
+
+  /* Dashboard content card */
+  const pickContent = (c) => ({ heroTitle: c.heroTitle, heroHighlight: c.heroHighlight, heroSub: c.heroSub, accentColor: c.accentColor });
+  async function loadContent() {
+    const r = await api("/content");
+    content = r && r.content ? r.content : { ...CMS_DEFAULTS };
+    renderContentCard();
+    return content;
+  }
+  function renderContentCard() {
+    if (!content) return;
+    const t = $("cmsTitle"); t.textContent = content.heroTitle + (content.heroHighlight ? " " : "");
+    if (content.heroHighlight) t.append(h("em", { text: content.heroHighlight }));
+    $("cmsSub").textContent = content.heroSub || "";
+    $("cmsSwatch").style.background = content.accentColor;
+    $("cmsCard").style.setProperty("--cms-gold2", cmsLightShade(content.accentColor));
+    $("cmsHex").textContent = content.accentColor;
+    const parts = [];
+    if (content.updatedAt) parts.push("সর্বশেষ আপডেট: " + fmtDateTime(content.updatedAt));
+    if (content.updatedBy) parts.push(content.updatedBy === "seed" ? "প্রাথমিক কনটেন্ট" : content.updatedBy);
+    $("cmsFoot").textContent = parts.length ? parts.join(" · ") : "এখনো কোনো পরিবর্তন সেভ হয়নি — সাইটের মূল লেখা দেখানো হচ্ছে";
+  }
+  async function refreshContentCard() {
+    try { await loadContent(); }
+    catch (e) { if (e.message !== "session") $("cmsFoot").textContent = "কনটেন্ট লোড হয়নি — পেজ রিফ্রেশ করে দেখুন"; }
+  }
+  $("cmsEdit").onclick = async () => {
+    const b = $("cmsEdit"); b.disabled = true;
+    try { await loadContent(); }
+    catch (e) { if (e.message !== "session") toast("কনটেন্ট লোড হয়নি, আবার চেষ্টা করুন"); return; }
+    finally { b.disabled = false; }
+    openModal({
+      title: "হোমপেজ হিরো সেকশন এডিট",
+      fields: CONTENT_FIELDS,
+      values: pickContent(content),
+      preview: contentPreview,
+      successText: "সেভ হয়েছে — ১ মিনিটের মধ্যে লাইভ হবে",
+      onSave: async (vals) => {
+        const r = await api("/admin/content", { method: "PUT", body: Object.assign({}, vals, { version: content.version || 0 }) });
+        content = r.content; renderContentCard();
+      },
+      reload: async () => pickContent(await loadContent()),
+    });
+  };
+  $("cmsUndo").onclick = async () => {
+    const ok = await confirmModal({ title: "আগের ভার্সনে ফিরবেন?", message: "হোমপেজের হিরো সেকশন শেষ সেভের আগের অবস্থায় ফিরে যাবে। দরকার হলে আবার এই বোতামে চাপ দিয়ে বর্তমান ভার্সনে ফেরা যাবে।", okText: "হ্যাঁ, ফিরুন" });
+    if (!ok) return;
+    const b = $("cmsUndo"); b.disabled = true;
+    try {
+      const r = await api("/admin/content/undo", { method: "POST", body: content && content.version ? { version: content.version } : {} });
+      content = r.content; renderContentCard();
+      toast("আগের ভার্সনে ফেরানো হয়েছে — ১ মিনিটের মধ্যে লাইভ হবে", 3600);
+    } catch (e) {
+      if (e.message === "session") return;
+      if (e.status === 404) toast("ফেরার মতো আগের কোনো ভার্সন নেই");
+      else if (e.status === 409) { toast("অন্য কোথাও এডিট হয়েছে — নতুন ডেটা লোড করা হলো"); refreshContentCard(); }
+      else toast("ব্যর্থ হয়েছে: " + e.message);
+    } finally { b.disabled = false; }
+  };
+
   $("tabs").addEventListener("click", (e) => {
     const t = e.target.closest(".tab"); if (!t) return;
     filter = t.dataset.f;
@@ -389,7 +922,8 @@
   });
 
   function logout(expired) {
-    sessionStorage.removeItem(TOKEN_KEY); me = null; users = [];
+    sessionStorage.removeItem(TOKEN_KEY); me = null; users = []; content = null;
+    document.querySelectorAll("dialog.mdl").forEach((d) => d.close());
     try { google.accounts.id.disableAutoSelect(); } catch {}
     show("v-login");
     if (expired === true) loginMsg("সেশন শেষ হয়ে গেছে, আবার লগইন করুন।", "warn");
