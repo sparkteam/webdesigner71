@@ -37,7 +37,7 @@ Status: implemented. Last updated 2026-11-02. Builds on [Phase 3](cms-phase3.md)
   - `/blog/<slug>`: article with meta, TOC anchors, prev/next, three related posts (shared categories/tags), share links (Facebook, WhatsApp, X, LinkedIn, email), canonical, Open Graph / Twitter meta and BlogPosting JSON-LD
   - `/blog/category/<slug>` and `/blog/tag/<slug>`, both paginated
   - `/blog/feed.xml`: RSS 2.0 with the latest 20 posts
-  - `/sitemap.xml` now includes posts (noindex posts are excluded) along with /blog and the archives
+  - `/sitemap.xml` now lists `/blog` and every visible post once at least one is published (noindex posts are excluded)
   - an old slug redirects 301 to the new one (up to 10 old slugs per post)
   - unknown and scheduled posts get the styled 404
 - **Media library**:

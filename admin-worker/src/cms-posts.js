@@ -379,9 +379,9 @@ export function renderFeed(list, terms, origin) {
   const items = list.slice(0, POST_LIMITS.feed).map((e) => "<item><title>" + x(e.title) + "</title><link>" + x(origin + postUrl(e.slug)) + '</link><guid isPermaLink="true">' + x(origin + postUrl(e.slug)) +
     "</guid><pubDate>" + new Date(e.date).toUTCString() + "</pubDate>" + (e.author ? "<dc:creator>" + x(e.author) + "</dc:creator>" : "") +
     catsOf(e, m).map((c) => "<category>" + x(c.name) + "</category>").join("") + "<description>" + x(e.excerpt || "") + "</description></item>").join("");
-  const last = list[0] ? new Date(list[0].date).toUTCString() : new Date(0).toUTCString();
+  const last = list[0] ? "<lastBuildDate>" + new Date(list[0].date).toUTCString() + "</lastBuildDate>" : ""; // empty blog: no fake 1970 date
   return '<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>WebDesigner71 ব্লগ</title><link>' + x(origin + "/blog") +
-    "</link><description>ওয়েবসাইট, ডিজাইন আর অনলাইন ব্যবসা নিয়ে সহজ বাংলায় লেখা</description><language>bn</language><lastBuildDate>" + last + '</lastBuildDate><atom:link href="' + x(origin + "/blog/feed.xml") + '" rel="self" type="application/rss+xml"/>' + items + "</channel></rss>\n";
+    "</link><description>ওয়েবসাইট, ডিজাইন আর অনলাইন ব্যবসা নিয়ে সহজ বাংলায় লেখা</description><language>bn</language>" + last + '<atom:link href="' + x(origin + "/blog/feed.xml") + '" rel="self" type="application/rss+xml"/>' + items + "</channel></rss>\n";
 }
 
 /* ------------------------------------------------------------------ blog CSS (Bengali-first typography) */
