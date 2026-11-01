@@ -3,10 +3,12 @@
  * Google sign-in  ->  email approval by ADMIN_EMAIL  ->  session token.
  *
  * Bindings (see wrangler.jsonc):
- *   KV:      USERS, CONTENT (homepage CMS, Phase 1)
+ *   KV:      USERS, CONTENT (homepage CMS: sections + settings), MEDIA (uploaded images; KV until R2 is enabled)
  *   vars:    ADMIN_EMAIL, GOOGLE_CLIENT_ID, EMAIL_FROM, ALLOWED_ORIGINS
  *   secrets: SESSION_SECRET, APPROVAL_SECRET, RESEND_API_KEY (optional: logs instead of sending)
  */
+
+import * as CMS from "./cms-model.js";
 
 const GOOGLE_JWKS_URL = "https://www.googleapis.com/oauth2/v3/certs";
 const GOOGLE_ISSUERS = ["accounts.google.com", "https://accounts.google.com"];
@@ -14,14 +16,6 @@ const SESSION_TTL = 12 * 60 * 60; // 12h
 const APPROVAL_TTL = 7 * 24 * 60 * 60; // 7 days
 const RENOTIFY_AFTER = 60 * 60; // 1h
 const CLOCK_SKEW = 60;
-const CONTENT_KEY = "content:homepage";
-const CONTENT_PREV_KEY = "content:homepage:prev";
-const CONTENT_RULES = {
-  heroTitle: { min: 1, max: 120 },
-  heroHighlight: { min: 0, max: 40 },
-  heroSub: { min: 0, max: 300 },
-};
-const COLOR_RE = /^#[0-9A-Fa-f]{6}$/;
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
@@ -88,17 +82,33 @@ async function route(request, env, ctx, url) {
     return json({ ok: true, user: publicUser(user, env) });
   }
 
-  /* ---------- CMS Phase 1: homepage content ---------- */
-  if (p === "/content" && m === "GET") return getContent(request, env);
-  if (p === "/admin/content" && m === "PUT") {
-    const me = await requireSession(request, env);
-    if (!isAdmin(me.email, env)) throw new HttpError(403, "admin_only");
-    return putContent(request, env, me);
+  /* ---------- CMS (Phase 2) ---------- */
+  if (p === "/content" && m === "GET") return getContentV1(request, env); // Phase 1 read, derived from v2
+  if ((p === "/admin/content" && m === "PUT") || (p === "/admin/content/undo" && m === "POST")) {
+    // Phase 1 writes are superseded by per-section endpoints (hero = sections/hero; accent colour = settings).
+    return json({ error: "superseded", use: p.endsWith("/undo") ? "POST /admin/content/homepage/sections/hero/undo" : "PUT /admin/content/homepage/sections/hero" }, 410);
   }
-  if (p === "/admin/content/undo" && m === "POST") {
-    const me = await requireSession(request, env);
-    if (!isAdmin(me.email, env)) throw new HttpError(403, "admin_only");
-    return undoContent(request, env, me);
+  if (p === "/content/homepage" && m === "GET") return getHomepage(request, env);
+  const sm = p.match(/^\/admin\/content\/homepage\/sections\/([a-z]+)(\/undo)?$/);
+  if (sm && ((m === "PUT" && !sm[2]) || (m === "POST" && sm[2]))) {
+    const me = await requireAdmin(request, env);
+    return sm[2] ? undoSection(request, env, me, sm[1]) : putSection(request, env, me, sm[1]);
+  }
+  if (p === "/admin/settings" && m === "GET") {
+    await requireSession(request, env);
+    return json({ settings: (await loadHomepage(env)).settings });
+  }
+  if (p === "/admin/settings" && m === "PUT") return putSettings(request, env, await requireAdmin(request, env));
+  if (p === "/admin/settings/undo" && m === "POST") return undoSettings(request, env, await requireAdmin(request, env));
+  if (p === "/admin/media" && m === "GET") return listMedia(request, env);
+  if (p === "/admin/media" && m === "POST") return uploadMedia(request, env, await requireAdmin(request, env));
+  const mm = p.match(/^\/admin\/media\/([^/]+)$/);
+  if (mm && (m === "DELETE" || m === "PUT")) {
+    const me = await requireAdmin(request, env);
+    let key;
+    try { key = decodeURIComponent(mm[1]); } catch { throw new HttpError(404, "not_found"); }
+    if (!CMS.MEDIA_KEY_RE.test(key)) throw new HttpError(404, "not_found");
+    return m === "DELETE" ? deleteMedia(request, env, me, key, url) : updateMedia(request, env, me, key);
   }
   throw new HttpError(404, "not_found");
 }
@@ -329,103 +339,261 @@ async function approvalLink(request, env, url, action) {
   return page(`${bn} সম্পন্ন ✓`, `<p><b>${esc(user.email)}</b> ${action === "approve" ? "এখন অ্যাডমিন প্যানেলে লগইন করতে পারবেন।" : "লগইন করতে পারবেন না।"}</p><p class="en">User ${user.status}.</p>`);
 }
 
-/* ---------------- CMS content (Phase 1) ---------------- */
+/* ---------------- CMS (Phase 2): homepage sections, settings, media ---------------- */
+// Model, validation and defaults live in ./cms-model.js — a byte-identical copy of public/cms/model.js,
+// which the site Worker renders with and the admin panel previews with.
 
 function contentKV(env) {
   if (!env.CONTENT) throw new HttpError(500, "content_not_configured");
   return env.CONTENT;
-}
-
-const charLen = (s) => [...s].length;
-
-// Returns the clean content fields, or throws 400 {error:"invalid_field", field}.
-function validateContent(body) {
-  if (!body || typeof body !== "object" || Array.isArray(body)) throw new HttpError(400, "invalid_json");
-  const out = {};
-  for (const [name, rule] of Object.entries(CONTENT_RULES)) {
-    const v = body[name] === undefined && rule.min === 0 ? "" : body[name];
-    if (typeof v !== "string") throw fieldError(name);
-    const t = v.trim();
-    // plain text only: no control characters (incl. newlines); output is always escaped
-    if (/[\u0000-\u001f\u007f]/.test(t)) throw fieldError(name);
-    const n = charLen(t);
-    if (n < rule.min || n > rule.max) throw fieldError(name);
-    out[name] = t;
-  }
-  if (typeof body.accentColor !== "string" || !COLOR_RE.test(body.accentColor)) throw fieldError("accentColor");
-  out.accentColor = body.accentColor.toUpperCase();
-  return out;
 }
 function fieldError(field) {
   const e = new HttpError(400, "invalid_field");
   e.field = field;
   return e;
 }
-
-function publicContent(c, withMeta) {
-  if (!c) return null;
-  const out = {
-    heroTitle: c.heroTitle, heroHighlight: c.heroHighlight, heroSub: c.heroSub,
-    accentColor: c.accentColor, version: c.version, updatedAt: c.updatedAt,
-  };
-  if (withMeta) out.updatedBy = c.updatedBy;
-  return out;
-}
-
-async function readJsonBody(request) {
+async function readJsonBody(request, limit = 16384) {
   const len = Number(request.headers.get("content-length") || 0);
-  if (len > 16384) throw new HttpError(413, "too_large");
+  if (len > limit) throw new HttpError(413, "too_large");
   const text = await request.text();
-  if (text.length > 16384) throw new HttpError(413, "too_large");
+  if (text.length > limit) throw new HttpError(413, "too_large");
   if (!text) return {};
   try { return JSON.parse(text); } catch { throw new HttpError(400, "invalid_json"); }
 }
-
-async function getContent(request, env) {
-  const c = await contentKV(env).get(CONTENT_KEY, "json");
-  // updatedBy is only shown to a signed-in, approved user; never 401 here (public endpoint)
-  let withMeta = false;
-  if (c && (request.headers.get("authorization") || "").startsWith("Bearer ")) {
-    try { await requireSession(request, env); withMeta = true; } catch {}
-  }
-  return json({ content: publicContent(c, withMeta) });
+async function hasSession(request, env) {
+  if (!(request.headers.get("authorization") || "").startsWith("Bearer ")) return false;
+  try { await requireSession(request, env); return true; } catch { return false; }
+}
+async function requireAdmin(request, env) {
+  const me = await requireSession(request, env);
+  if (!isAdmin(me.email, env)) throw new HttpError(403, "admin_only");
+  return me;
 }
 
-async function putContent(request, env, me) {
-  const body = await readJsonBody(request);
-  const fields = validateContent(body);
-  if (!Number.isInteger(body.version) || body.version < 0) throw fieldError("version");
+/** Current homepage doc + settings: v2 key, else migrated Phase 1 key, else defaults (version 0). */
+async function loadHomepage(env) {
   const kv = contentKV(env);
-  const cur = await kv.get(CONTENT_KEY, "json");
-  const curVersion = cur ? Number(cur.version) || 0 : 0;
-  if (body.version !== curVersion) {
-    return json({ error: "version_conflict", content: publicContent(cur, true) }, 409);
+  const [rawDoc, rawSettings] = await Promise.all([kv.get(CMS.KEYS.doc, "json"), kv.get(CMS.KEYS.settings, "json")]);
+  let doc, settings = null, source = "v2";
+  if (rawDoc) doc = CMS.cleanDoc(rawDoc);
+  else {
+    const v1 = await kv.get(CMS.KEYS.v1, "json");
+    if (v1) { ({ doc, settings } = CMS.migrateV1(v1)); source = "v1"; }
+    else { doc = CMS.cleanDoc({ schema: CMS.SCHEMA, sections: [] }); source = "defaults"; }
   }
-  const next = { ...fields, updatedAt: new Date().toISOString(), updatedBy: me.email, version: curVersion + 1 };
-  if (cur) await kv.put(CONTENT_PREV_KEY, JSON.stringify(cur));
-  await kv.put(CONTENT_KEY, JSON.stringify(next));
-  log("content_saved", { by: me.email, version: next.version });
-  return json({ ok: true, content: publicContent(next, true) });
+  const s = rawSettings ? { ...CMS.cleanSettings(rawSettings), version: rawSettings.version || 0, updatedAt: rawSettings.updatedAt || null, updatedBy: rawSettings.updatedBy || null }
+    : { ...(settings || CMS.DEFAULT_SETTINGS), version: 0, updatedAt: null, updatedBy: null };
+  return { doc, settings: s, source };
+}
+const stripMeta = (o, withMeta) => { if (withMeta) return o; const { updatedBy, ...rest } = o; return rest; };
+
+async function getHomepage(request, env) {
+  const { doc, settings, source } = await loadHomepage(env);
+  const withMeta = await hasSession(request, env);
+  return json({ schema: CMS.SCHEMA, source, sections: doc.sections.map((s) => stripMeta(s, withMeta)), settings: stripMeta(settings, withMeta) });
 }
 
-async function undoContent(request, env, me) {
-  const body = await readJsonBody(request);
+/** Phase 1 read endpoint, kept working: the hero title/sub + accent colour derived from the v2 model. */
+async function getContentV1(request, env) {
   const kv = contentKV(env);
-  const [cur, prev] = await Promise.all([kv.get(CONTENT_KEY, "json"), kv.get(CONTENT_PREV_KEY, "json")]);
-  if (!prev) throw new HttpError(404, "no_previous");
-  const curVersion = cur ? Number(cur.version) || 0 : 0;
-  if (body.version !== undefined && body.version !== curVersion) {
-    return json({ error: "version_conflict", content: publicContent(cur, true) }, 409);
-  }
-  // Swap: previous becomes live (with a new, higher version so open editors get a 409), live becomes previous.
-  const next = {
-    heroTitle: prev.heroTitle, heroHighlight: prev.heroHighlight, heroSub: prev.heroSub, accentColor: prev.accentColor,
-    updatedAt: new Date().toISOString(), updatedBy: me.email, version: curVersion + 1,
+  const [d, s, v1] = await Promise.all([kv.get(CMS.KEYS.doc), kv.get(CMS.KEYS.settings), kv.get(CMS.KEYS.v1)]);
+  if (!d && !s && !v1) return json({ content: null });
+  const { doc, settings } = await loadHomepage(env);
+  const hero = doc.sections.find((x) => x.id === "hero");
+  const c = {
+    heroTitle: hero.fields.title.text, heroHighlight: hero.fields.title.highlight, heroSub: hero.fields.sub.text,
+    accentColor: settings.accentColor, version: hero.version, updatedAt: hero.updatedAt,
   };
-  if (cur) await kv.put(CONTENT_PREV_KEY, JSON.stringify(cur));
-  await kv.put(CONTENT_KEY, JSON.stringify(next));
-  log("content_undo", { by: me.email, version: next.version });
-  return json({ ok: true, content: publicContent(next, true) });
+  if (await hasSession(request, env)) c.updatedBy = hero.updatedBy;
+  return json({ content: c });
+}
+
+async function writeDoc(env, doc) {
+  const out = { schema: CMS.SCHEMA, sections: doc.sections, updatedAt: new Date().toISOString() };
+  await contentKV(env).put(CMS.KEYS.doc, JSON.stringify(out));
+}
+const sectionPayload = (s) => ({ id: s.id, hidden: s.hidden, fields: s.fields, extra: s.extra });
+
+async function putSection(request, env, me, id) {
+  if (!CMS.sectionDef(id)) throw new HttpError(404, "unknown_section");
+  const body = await readJsonBody(request, 65536);
+  if (!body || typeof body !== "object" || Array.isArray(body)) throw new HttpError(400, "invalid_json");
+  if (!Number.isInteger(body.version) || body.version < 0) throw fieldError("version");
+  let clean;
+  try { clean = CMS.cleanSection(id, body); } catch (e) { if (e instanceof CMS.CmsError) throw fieldError(e.field); throw e; }
+  const { doc } = await loadHomepage(env);
+  const i = doc.sections.findIndex((s) => s.id === id);
+  const cur = doc.sections[i];
+  if (body.version !== cur.version) return json({ error: "version_conflict", section: cur }, 409);
+  const next = { ...clean, version: cur.version + 1, updatedAt: new Date().toISOString(), updatedBy: me.email };
+  await contentKV(env).put(CMS.KEYS.prev(id), JSON.stringify(cur));
+  doc.sections[i] = next;
+  await writeDoc(env, doc);
+  log("section_saved", { section: id, by: me.email, version: next.version });
+  return json({ ok: true, section: next });
+}
+
+async function undoSection(request, env, me, id) {
+  if (!CMS.sectionDef(id)) throw new HttpError(404, "unknown_section");
+  const body = await readJsonBody(request);
+  const kv = contentKV(env);
+  const [{ doc }, prev] = await Promise.all([loadHomepage(env), kv.get(CMS.KEYS.prev(id), "json")]);
+  if (!prev) throw new HttpError(404, "no_previous");
+  const i = doc.sections.findIndex((s) => s.id === id);
+  const cur = doc.sections[i];
+  if (body.version !== undefined && body.version !== cur.version) return json({ error: "version_conflict", section: cur }, 409);
+  let clean;
+  try { clean = CMS.cleanSection(id, prev); } catch { throw new HttpError(409, "previous_invalid"); }
+  // Swap: previous becomes live (with a new, higher version so open editors get a 409), live becomes previous.
+  const next = { ...clean, version: cur.version + 1, updatedAt: new Date().toISOString(), updatedBy: me.email };
+  await kv.put(CMS.KEYS.prev(id), JSON.stringify(cur));
+  doc.sections[i] = next;
+  await writeDoc(env, doc);
+  log("section_undo", { section: id, by: me.email, version: next.version });
+  return json({ ok: true, section: next });
+}
+
+async function putSettings(request, env, me) {
+  const body = await readJsonBody(request);
+  if (!body || typeof body !== "object" || Array.isArray(body)) throw new HttpError(400, "invalid_json");
+  if (!Number.isInteger(body.version) || body.version < 0) throw fieldError("version");
+  let clean;
+  try { clean = CMS.cleanSettings(body); } catch (e) { if (e instanceof CMS.CmsError) throw fieldError(e.field); throw e; }
+  const { settings: cur } = await loadHomepage(env);
+  if (body.version !== cur.version) return json({ error: "version_conflict", settings: cur }, 409);
+  const next = { ...clean, version: cur.version + 1, updatedAt: new Date().toISOString(), updatedBy: me.email };
+  const kv = contentKV(env);
+  await kv.put(CMS.KEYS.settingsPrev, JSON.stringify(cur));
+  await kv.put(CMS.KEYS.settings, JSON.stringify(next));
+  log("settings_saved", { by: me.email, version: next.version });
+  return json({ ok: true, settings: next });
+}
+async function undoSettings(request, env, me) {
+  const body = await readJsonBody(request);
+  const kv = contentKV(env);
+  const [{ settings: cur }, prev] = await Promise.all([loadHomepage(env), kv.get(CMS.KEYS.settingsPrev, "json")]);
+  if (!prev) throw new HttpError(404, "no_previous");
+  if (body.version !== undefined && body.version !== cur.version) return json({ error: "version_conflict", settings: cur }, 409);
+  let clean;
+  try { clean = CMS.cleanSettings(prev); } catch { throw new HttpError(409, "previous_invalid"); }
+  const next = { ...clean, version: cur.version + 1, updatedAt: new Date().toISOString(), updatedBy: me.email };
+  await kv.put(CMS.KEYS.settingsPrev, JSON.stringify(cur));
+  await kv.put(CMS.KEYS.settings, JSON.stringify(next));
+  log("settings_undo", { by: me.email, version: next.version });
+  return json({ ok: true, settings: next });
+}
+
+/* ----- media: MEDIA binding = Workers KV today (R2 not enabled); an R2 bucket binding also works ----- */
+function mediaStore(env) {
+  const b = env.MEDIA;
+  if (!b) throw new HttpError(503, "media_not_configured");
+  const r2 = typeof b.head === "function";
+  return {
+    kind: r2 ? "r2" : "kv",
+    async list() {
+      const out = [];
+      let cursor;
+      do {
+        if (r2) {
+          const res = await b.list({ cursor, include: ["customMetadata", "httpMetadata"], limit: 1000 });
+          for (const o of res.objects) out.push({ key: o.key, meta: { ...(o.customMetadata || {}), contentType: o.httpMetadata && o.httpMetadata.contentType, size: o.size } });
+          cursor = res.truncated ? res.cursor : null;
+        } else {
+          const res = await b.list({ cursor, limit: 1000 });
+          for (const k of res.keys) out.push({ key: k.name, meta: k.metadata || {} });
+          cursor = res.list_complete ? null : res.cursor;
+        }
+      } while (cursor);
+      return out;
+    },
+    async get(key) {
+      if (r2) { const o = await b.get(key); return o ? { bytes: await o.arrayBuffer(), meta: { ...(o.customMetadata || {}), contentType: o.httpMetadata.contentType, size: o.size } } : null; }
+      const { value, metadata } = await b.getWithMetadata(key, { type: "arrayBuffer" });
+      return value ? { bytes: value, meta: metadata || {} } : null;
+    },
+    async put(key, bytes, meta) {
+      if (r2) { const { contentType, ...custom } = meta; await b.put(key, bytes, { httpMetadata: { contentType, cacheControl: "public, max-age=31536000, immutable" }, customMetadata: Object.fromEntries(Object.entries(custom).map(([k, v]) => [k, String(v)])) }); }
+      else await b.put(key, bytes, { metadata: meta });
+    },
+    delete: (key) => b.delete(key),
+  };
+}
+function sniffImage(u8) {
+  const at = (i, ...b) => b.every((x, j) => u8[i + j] === x);
+  if (u8.length > 3 && at(0, 0xff, 0xd8, 0xff)) return "image/jpeg";
+  if (u8.length > 8 && at(0, 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a)) return "image/png";
+  if (u8.length > 6 && (at(0, 0x47, 0x49, 0x46, 0x38, 0x37, 0x61) || at(0, 0x47, 0x49, 0x46, 0x38, 0x39, 0x61))) return "image/gif";
+  if (u8.length > 12 && at(0, 0x52, 0x49, 0x46, 0x46) && at(8, 0x57, 0x45, 0x42, 0x50)) return "image/webp";
+  return null;
+}
+const cut = (s, n) => [...String(s || "")].slice(0, n).join("").replace(/[\u0000-\u001f\u007f]/g, "").trim();
+/** Where a /media/<key> URL is used in the homepage doc (field paths), so delete can warn. */
+function mediaUsage(doc, url) {
+  const used = [];
+  const walk = (v, path) => {
+    if (typeof v === "string") { if (v === url) used.push(path); return; }
+    if (Array.isArray(v)) v.forEach((x, i) => walk(x, path + "." + (x && x.id ? x.id : i)));
+    else if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) walk(x, path ? path + "." + k : k);
+  };
+  for (const s of doc.sections) { walk(s.fields, s.id); walk(s.extra, s.id + ".extra"); }
+  return used;
+}
+function publicMedia(key, meta, doc) {
+  const url = "/media/" + key;
+  return { key, url, contentType: meta.contentType || "", size: Number(meta.size) || 0, alt: meta.alt || "", name: meta.name || "", uploadedAt: meta.uploadedAt || null, uploadedBy: meta.uploadedBy || null, usedIn: mediaUsage(doc, url) };
+}
+async function listMedia(request, env) {
+  await requireSession(request, env);
+  const store = mediaStore(env);
+  const [{ doc }, items] = await Promise.all([loadHomepage(env), store.list()]);
+  const media = items.map((i) => publicMedia(i.key, i.meta, doc)).sort((a, b) => String(b.uploadedAt).localeCompare(String(a.uploadedAt)));
+  return json({ storage: store.kind, maxBytes: CMS.MEDIA_MAX_BYTES, types: Object.keys(CMS.MEDIA_TYPES), items: media, builtin: CMS.BUILTIN_MEDIA });
+}
+async function uploadMedia(request, env, me) {
+  const store = mediaStore(env);
+  const len = Number(request.headers.get("content-length") || 0);
+  if (len > CMS.MEDIA_MAX_BYTES + 64 * 1024) throw new HttpError(413, "too_large");
+  if (!(request.headers.get("content-type") || "").startsWith("multipart/form-data")) throw new HttpError(415, "multipart_required");
+  let form;
+  try { form = await request.formData(); } catch { throw new HttpError(400, "invalid_form"); }
+  const file = form.get("file");
+  if (!file || typeof file === "string") throw fieldError("file");
+  if (file.size > CMS.MEDIA_MAX_BYTES) throw new HttpError(413, "too_large");
+  if (file.size === 0) throw fieldError("file");
+  const bytes = await file.arrayBuffer();
+  const type = sniffImage(new Uint8Array(bytes, 0, Math.min(16, bytes.byteLength)));
+  if (!type) throw new HttpError(415, "unsupported_type");
+  const alt = form.get("alt");
+  if (alt !== null && (typeof alt !== "string" || [...alt].length > 150)) throw fieldError("alt");
+  const now = new Date();
+  const rand = b64urlEncode(crypto.getRandomValues(new Uint8Array(9))).replace(/[^A-Za-z0-9]/g, "x");
+  const key = now.toISOString().slice(0, 7) + "-" + rand + "." + CMS.MEDIA_TYPES[type];
+  const meta = { contentType: type, size: bytes.byteLength, alt: cut(alt, 150), name: cut(file.name, 60), uploadedAt: now.toISOString(), uploadedBy: me.email };
+  await store.put(key, bytes, meta);
+  log("media_uploaded", { key, type, size: bytes.byteLength, by: me.email });
+  return json({ ok: true, item: publicMedia(key, meta, { sections: [] }) }, 201);
+}
+async function updateMedia(request, env, me, key) {
+  const body = await readJsonBody(request);
+  if (typeof body.alt !== "string" || [...body.alt].length > 150 || /[\u0000-\u001f\u007f]/.test(body.alt)) throw fieldError("alt");
+  const store = mediaStore(env);
+  const cur = await store.get(key);
+  if (!cur) throw new HttpError(404, "not_found");
+  const meta = { ...cur.meta, alt: cut(body.alt, 150) };
+  await store.put(key, cur.bytes, meta);
+  const { doc } = await loadHomepage(env);
+  return json({ ok: true, item: publicMedia(key, meta, doc) });
+}
+async function deleteMedia(request, env, me, key, url) {
+  const store = mediaStore(env);
+  const cur = await store.get(key);
+  if (!cur) throw new HttpError(404, "not_found");
+  const { doc } = await loadHomepage(env);
+  const usedIn = mediaUsage(doc, "/media/" + key);
+  if (usedIn.length && url.searchParams.get("force") !== "1") return json({ error: "in_use", usedIn }, 409);
+  await store.delete(key);
+  log("media_deleted", { key, by: me.email, forced: usedIn.length > 0 });
+  return json({ ok: true, deleted: key });
 }
 
 /* ---------------- Email (Resend) ---------------- */
@@ -513,7 +681,7 @@ function corsHeaders(request, env) {
   if (!ok) return null;
   return {
     "access-control-allow-origin": origin,
-    "access-control-allow-methods": "GET, POST, PUT, OPTIONS",
+    "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
     "access-control-allow-headers": "authorization, content-type",
     "access-control-max-age": "86400",
     vary: "Origin",

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 520 480" role="img" aria-labelledby="mk-title mk-desc" xmlns="http://www.w3.org/2000/svg">
+  <title id="mk-title">একটি আধুনিক ওয়েবসাইট হোমপেজের অ্যানোটেটেড ডিজাইন</title>
+  <desc id="mk-desc">ব্রাউজার ফ্রেমে একটি ওয়েবসাইটের হোমপেজ, যেখানে লোগো, মেনু, হিরো সেকশন, কল-টু-অ্যাকশন বাটন, ছবি/ব্যানার ও সার্ভিস সেকশন চিহ্নিত করা আছে।</desc>
+  <defs>
+    <marker id="mk-arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M1 1 L8 5 L1 9" fill="none" stroke="#E9B930" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <linearGradient id="mk-img" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1E6B52"/><stop offset="1" stop-color="#0B3D2E"/>
+    </linearGradient>
+    <linearGradient id="mk-hero" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFDF7"/><stop offset="1" stop-color="#F3EDDF"/>
+    </linearGradient>
+    <filter id="mk-shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#000" flood-opacity=".3"/>
+    </filter>
+  </defs>
+
+  <!-- Browser frame -->
+  <g filter="url(#mk-shadow)">
+    <rect x="30" y="44" width="460" height="380" rx="16" fill="#FAF7F0"/>
+  </g>
+  <path d="M46 44h428a16 16 0 0 1 16 16v10H30V60a16 16 0 0 1 16-16z" fill="#E7E0CF"/>
+  <circle cx="48" cy="57" r="4.5" fill="#E0685A"/><circle cx="62" cy="57" r="4.5" fill="#E9B930"/><circle cx="76" cy="57" r="4.5" fill="#5DBB7A"/>
+  <rect x="120" y="50" width="280" height="14" rx="7" fill="#FAF7F0"/>
+  <text x="260" y="61" text-anchor="middle" font-size="9" fill="#7A867F">yourbusiness.com</text>
+
+  <!-- Site header -->
+  <rect x="30" y="70" width="460" height="38" fill="#fff"/>
+  <circle cx="54" cy="89" r="9" fill="#0B3D2E"/><circle cx="54" cy="89" r="4" fill="#D4A017"/>
+  <text x="69" y="94" font-size="14" font-weight="700" fill="#0B3D2E">ব্র্যান্ড</text>
+  <g font-size="10.5" fill="#4A5A52" font-weight="500">
+    <text x="252" y="93">হোম</text><text x="285" y="93">পণ্য</text><text x="318" y="93">সার্ভিস</text><text x="361" y="93">যোগাযোগ</text>
+  </g>
+  <rect x="420" y="79" width="56" height="20" rx="10" fill="#0B3D2E"/>
+  <text x="448" y="93" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">অর্ডার</text>
+
+  <!-- Hero -->
+  <rect x="30" y="108" width="460" height="176" fill="url(#mk-hero)"/>
+  <rect x="50" y="136" width="70" height="12" rx="6" fill="#D4A017" opacity=".25"/>
+  <text x="50" y="170" font-size="17" font-weight="700" fill="#0B3D2E">আপনার ব্যবসা,</text>
+  <text x="50" y="192" font-size="17" font-weight="700" fill="#0B3D2E">এখন <tspan fill="#D4A017">অনলাইনে</tspan></text>
+  <rect x="50" y="202" width="180" height="6" rx="3" fill="#C9CFC9"/>
+  <rect x="50" y="213" width="140" height="6" rx="3" fill="#C9CFC9"/>
+  <rect x="50" y="228" width="96" height="26" rx="13" fill="#D4A017"/>
+  <text x="98" y="245" text-anchor="middle" font-size="11" font-weight="700" fill="#0B3D2E">এখনই কিনুন</text>
+  <rect x="154" y="228" width="72" height="26" rx="13" fill="none" stroke="#0B3D2E" stroke-width="1.5"/>
+  <text x="190" y="245" text-anchor="middle" font-size="10.5" font-weight="600" fill="#0B3D2E">আরও জানুন</text>
+  <!-- Hero image -->
+  <rect x="268" y="126" width="204" height="122" rx="12" fill="url(#mk-img)"/>
+  <circle cx="430" cy="156" r="13" fill="#E9B930"/>
+  <path d="M268 230 L320 184 L352 210 L392 172 L472 228 V236a12 12 0 0 1-12 12H280a12 12 0 0 1-12-12z" fill="#FAF7F0" opacity=".22"/>
+  <path d="M268 236 L304 206 L340 232 L380 198 L472 240 V236a12 12 0 0 1-12 12H280a12 12 0 0 1-12-12z" fill="#FAF7F0" opacity=".35"/>
+
+  <!-- Services -->
+  <text x="260" y="306" text-anchor="middle" font-size="12" font-weight="700" fill="#0B3D2E">আমাদের সার্ভিস</text>
+  <g>
+    <rect x="46" y="316" width="136" height="88" rx="10" fill="#fff" stroke="#EAE3D2"/>
+    <rect x="192" y="316" width="136" height="88" rx="10" fill="#fff" stroke="#EAE3D2"/>
+    <rect x="338" y="316" width="136" height="88" rx="10" fill="#fff" stroke="#EAE3D2"/>
+    <circle cx="70" cy="341" r="12" fill="#0B3D2E" opacity=".9"/><circle cx="216" cy="341" r="12" fill="#D4A017"/><circle cx="362" cy="341" r="12" fill="#0B3D2E" opacity=".9"/>
+    <g fill="#0B3D2E" opacity=".75">
+      <rect x="58" y="364" width="80" height="7" rx="3.5"/><rect x="204" y="364" width="80" height="7" rx="3.5"/><rect x="350" y="364" width="80" height="7" rx="3.5"/>
+    </g>
+    <g fill="#C9CFC9">
+      <rect x="58" y="378" width="108" height="5" rx="2.5"/><rect x="58" y="388" width="84" height="5" rx="2.5"/>
+      <rect x="204" y="378" width="108" height="5" rx="2.5"/><rect x="204" y="388" width="84" height="5" rx="2.5"/>
+      <rect x="350" y="378" width="108" height="5" rx="2.5"/><rect x="350" y="388" width="84" height="5" rx="2.5"/>
+    </g>
+  </g>
+
+  <!-- Annotations -->
+  <g class="mk-notes" fill="none" stroke="#E9B930" stroke-width="2" stroke-linecap="round">
+    <!-- hero outline -->
+    <rect x="38" y="116" width="444" height="160" rx="10" stroke-dasharray="6 5" stroke-width="1.6"/>
+    <!-- services outline -->
+    <rect x="40" y="292" width="440" height="120" rx="10" stroke-dasharray="6 5" stroke-width="1.6"/>
+    <!-- logo -->
+    <path d="M58 32 C 40 52, 40 66, 50 78" marker-end="url(#mk-arrow)"/>
+    <!-- menu -->
+    <path d="M440 32 C 420 58, 380 60, 340 80" marker-end="url(#mk-arrow)"/>
+    <!-- CTA -->
+    <path d="M146 266 C 118 274, 102 270, 98 259" marker-end="url(#mk-arrow)"/>
+    <!-- image -->
+    <path d="M452 238 C 456 220, 440 204, 414 198" marker-end="url(#mk-arrow)"/>
+    <!-- services -->
+    <path d="M260 436 C 262 426, 262 420, 260 414" marker-end="url(#mk-arrow)"/>
+  </g>
+  <g class="mk-dots" fill="#E9B930">
+    <circle cx="58" cy="32" r="3"/><circle cx="440" cy="32" r="3"/><circle cx="146" cy="266" r="3"/><circle cx="452" cy="238" r="3"/><circle cx="260" cy="436" r="3"/>
+  </g>
+  <g class="mk-labels" font-size="16.5" font-weight="700" text-anchor="middle">
+    <rect x="16" y="4" width="84" height="28" rx="14" fill="#D4A017"/><text x="58" y="23.5" fill="#0B3D2E">লোগো</text>
+    <rect x="402" y="4" width="76" height="28" rx="14" fill="#D4A017"/><text x="440" y="23.5" fill="#0B3D2E">মেনু</text>
+    <rect x="4" y="102" width="130" height="28" rx="14" fill="#D4A017"/><text x="69" y="121.5" fill="#0B3D2E">হিরো সেকশন</text>
+    <rect x="146" y="252" width="172" height="28" rx="14" fill="#D4A017"/><text x="232" y="271.5" fill="#0B3D2E">কল-টু-অ্যাকশন বাটন</text>
+    <rect x="386" y="238" width="130" height="28" rx="14" fill="#D4A017"/><text x="451" y="257.5" fill="#0B3D2E">ছবি / ব্যানার</text>
+    <rect x="184" y="436" width="152" height="28" rx="14" fill="#D4A017"/><text x="260" y="455.5" fill="#0B3D2E">সার্ভিস সেকশন</text>
+  </g>
+</svg>

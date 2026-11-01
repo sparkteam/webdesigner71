@@ -11,8 +11,11 @@
   // Create with: npx wrangler kv namespace create USERS   -> paste the id below
   "kv_namespaces": [
     { "binding": "USERS", "id": "4f8644922b684a2f9233b4f059f1898d" },
-    // CMS Phase 1 homepage content (shared with the `webdesigner71` site Worker)
-    { "binding": "CONTENT", "id": "3f74fcbc2ed24005b175a784968c3c3e" }
+    // CMS homepage content + settings (shared with the `webdesigner71` site Worker)
+    { "binding": "CONTENT", "id": "3f74fcbc2ed24005b175a784968c3c3e" },
+    // Uploaded images (KV fallback because R2 is not enabled on the account; shared with the site Worker).
+    // R2 later: replace with  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "webdesigner71-media" }]
+    { "binding": "MEDIA", "id": "51450a6f4dac48619c4c5ffa2764f1a4" }
   ],
 
   "vars": {

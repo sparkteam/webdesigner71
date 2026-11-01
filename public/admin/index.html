@@ -226,15 +226,177 @@
     .toast,.fl input,.fl textarea,.fl label{transition:none!important}
     .bspin,.spinner{animation-duration:2.5s}
   }
+
+  /* ================= CMS Phase 2: app shell (sidebar → drawer on mobile) ================= */
+  .topbar .in{max-width:none;padding:10px 20px}
+  .menu-btn{display:none;width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:19px;cursor:pointer;flex:0 0 auto}
+  .menu-btn:hover{background:rgba(255,255,255,.08)}
+  .shell{display:grid;grid-template-columns:268px minmax(0,1fr);min-height:calc(100vh - 60px)}
+  .side{background:linear-gradient(180deg,#0B3D2E 0%,#0a3228 100%);color:#efe9d8;padding:16px 12px 28px;position:sticky;top:60px;height:calc(100vh - 60px);overflow:auto;border-right:3px solid var(--gold)}
+  .side-h{display:none;align-items:center;gap:10px;padding:4px 6px 14px}
+  .side-h b{flex:1;font-size:18px} .side-h b span{color:var(--gold)}
+  .side-x{width:36px;height:36px;border-radius:10px;border:0;background:rgba(255,255,255,.1);color:#fff;font-size:16px;cursor:pointer}
+  .who{display:flex;gap:10px;align-items:center;padding:10px;border-radius:12px;background:rgba(255,255,255,.06);margin-bottom:14px;min-width:0}
+  .who .ph,.who img{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#e9efe9;display:grid;place-items:center;font-weight:700;color:var(--green);flex:0 0 auto;border:2px solid var(--gold)}
+  .who .nm{font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .who .rl{font-size:12px;color:var(--gold2)}
+  .nav-t{font-size:11.5px;letter-spacing:.6px;color:#a9b8ad;padding:10px 12px 4px;font-weight:600}
+  .nav-i{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;text-decoration:none;color:#efe9d8;font-weight:600;font-size:15px;margin:1px 0}
+  .nav-i:hover{background:rgba(255,255,255,.07)}
+  .nav-i:focus-visible,.nav-s:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+  .nav-i.on{background:var(--gold);color:var(--green)}
+  .nav-i.in:not(.on){background:rgba(212,160,23,.14)}
+  .nav-i .ni{width:24px;text-align:center;font-size:16px;flex:0 0 auto}
+  .nav-i .nb{margin-left:auto;font-size:11.5px;background:rgba(212,160,23,.2);color:var(--gold2);padding:1px 8px;border-radius:99px;font-weight:600}
+  .nav-i .nb.alert{background:#f3d77a;color:#0B3D2E}
+  .nav-i.on .nb{background:var(--green);color:#fff}
+  .nav-sub{margin:2px 0 8px 23px;padding-left:10px;border-left:2px solid rgba(212,160,23,.35);display:none}
+  .nav-g.open .nav-sub{display:block}
+  .nav-s{display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:8px;font-size:14px;color:#d7d0bd;text-decoration:none}
+  .nav-s:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav-s.on{color:var(--gold2);background:rgba(212,160,23,.16);font-weight:600}
+  .nav-s i{font-style:normal;width:18px;text-align:center;opacity:.85}
+  .nav-s .off{margin-left:auto;font-size:11px;opacity:.7}
+  .side-ov{display:none}
+  .page{padding:26px 28px 70px;max-width:1120px;width:100%;min-width:0}
+  .phead{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .phead .pico{width:46px;height:46px;border-radius:14px;background:var(--green);color:var(--gold);display:grid;place-items:center;font-size:21px;flex:0 0 auto}
+  .phead h2{margin:0;font-size:23px;color:var(--green);line-height:1.3}
+  .phead .crumb{font-size:13px;color:var(--muted)}
+  .phead .acts2{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:18px 0}
+  .stat a{color:inherit}
+  .stat .l2{color:var(--muted);font-size:12.5px;margin-top:4px}
+  .ql{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .qlink{display:flex;gap:12px;align-items:center;padding:14px 16px;text-decoration:none;transition:transform .1s,box-shadow .15s}
+  .qlink:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(11,61,46,.14)}
+  .qlink .ic{width:40px;height:40px;border-radius:12px;background:#fff4d6;color:#8a6400;display:grid;place-items:center;font-size:18px;flex:0 0 auto}
+  .qlink b{display:block;color:var(--green);font-size:15px}
+  .qlink small{color:var(--muted);font-size:12.5px}
+  .sec-h{font-size:16px;color:var(--green);margin:24px 0 10px}
+  .rows{padding:0;overflow:hidden}
+  .row{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid #f0ebdd;min-width:0}
+  .row:last-child{border-bottom:0}
+  .row .rl{flex:0 0 190px;font-weight:600;color:#3b4a44;font-size:14.5px}
+  .row .rv{flex:1;min-width:0;color:var(--muted);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .rv.off{text-decoration:line-through}
+  .row a.rl2{color:var(--green);font-weight:600;text-decoration:none}
+  .soon{padding:48px 24px;text-align:center}
+  .soon .big{font-size:44px}
+  .soon h3{margin:8px 0 4px;color:var(--green);font-size:22px}
+  .soon p{margin:0;color:var(--muted)}
+  .note2{font-size:13px;color:var(--muted);margin-top:10px}
+  .pill.hid{background:#eee9dc;color:#6b7a74}
+  /* section editor form */
+  .sform .fgroup{border:1px solid var(--line);border-radius:14px;padding:12px 12px 2px;margin-bottom:14px;background:#fdfbf6}
+  .fgroup>.gh{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-weight:700;color:var(--green);font-size:14.5px}
+  .fgroup>.gh .sp{flex:1}
+  .chk{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:#3b4a44;cursor:pointer;font-weight:500;user-select:none}
+  .chk input{width:16px;height:16px;accent-color:var(--green)}
+  .fmeta .chk{margin-left:8px}
+  .sel{width:100%;font:inherit;font-size:15px;padding:20px 12px 7px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);appearance:auto}
+  .flsel{position:relative;margin-bottom:14px}
+  .flsel label{position:absolute;left:13px;top:5px;font-size:12px;font-weight:600;color:var(--green);pointer-events:none}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .two>.fld,.two>.flsel{margin-bottom:14px}
+  .sectoggle{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#e6f3ee;color:var(--green);margin-bottom:14px;font-weight:600}
+  .sectoggle.off{background:#fff4e5;color:#9a5b00}
+  .rep{margin-bottom:12px}
+  .rep-top{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:6px}
+  .rep-top .ferr{flex:1}
+  .rep.bad>.rep-top .ferr{font-weight:600}
+  .rep-item{border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:8px}
+  .rep-item.bad{border-color:var(--red);box-shadow:0 0 0 3px rgba(180,35,24,.1)}
+  .rep-item.is-hidden{background:#f6f3ea}
+  .rep-item.is-hidden .rep-t{opacity:.6;text-decoration:line-through}
+  .rep-h{display:flex;align-items:center;gap:6px;padding:7px 8px 7px 10px;min-width:0}
+  .rep-t{flex:1;min-width:0;border:0;background:none;text-align:left;font:inherit;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;padding:4px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rep-t:before{content:"▸ ";color:var(--muted)}
+  .rep-item.open .rep-t:before{content:"▾ "}
+  .rep-item.compact .rep-t:before{content:""}
+  .rep-h .ferr{font-size:12px;flex:0 1 auto}
+  .ib{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:13px;color:#3b4a44;display:grid;place-items:center;flex:0 0 auto;padding:0}
+  .ib:hover{background:#f7f3e8}
+  .ib[disabled]{opacity:.35;cursor:not-allowed}
+  .ib.del:hover{background:#fdecea;color:var(--red)}
+  .ib[aria-pressed="true"]{background:#fff4e5;color:#9a5b00;border-color:#f1dc9c}
+  .rep-b{padding:4px 10px 0;display:none}
+  .rep-item.open .rep-b{display:block}
+  .rep-item.compact .rep-b{display:block;padding:0}
+  .rep-item.compact{border:0;background:transparent;margin-bottom:0}
+  .rep-item.compact .rep-h{padding:0}
+  .rep-item.compact .fld{flex:1;margin-bottom:8px}
+  .rep-add{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px}
+  .imgf{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+  .thumb{width:96px;height:72px;border-radius:10px;border:1px solid var(--line);background:#f3efe3 center/cover no-repeat;display:grid;place-items:center;color:var(--muted);font-size:12px;overflow:hidden;flex:0 0 auto}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .imgf .sp2{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+  .imgf .src{font-size:12px;color:var(--muted);word-break:break-all;width:100%}
+  .fld.bad .thumb{border-color:var(--red)}
+  .fstat{flex:1;font-size:13px;color:var(--muted)}
+  .fstat.err{color:var(--red);font-weight:600}
+  /* media library */
+  .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  .mcard{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+  .mcard .mimg{aspect-ratio:4/3;background:#f3efe3 repeating-conic-gradient(#efe9d8 0 25%,#f8f5ec 0 50%) 0 0/18px 18px;display:grid;place-items:center;overflow:hidden}
+  .mcard .mimg img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .mcard .minfo{padding:10px 12px;display:grid;gap:4px;flex:1}
+  .mcard .mname{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mcard .msub{font-size:12px;color:var(--muted)}
+  .mcard .malt{font-size:13px;color:#3b4a44;word-break:break-word}
+  .mcard .malt.none{color:#9a5b00}
+  .mcard .mused{display:flex;gap:4px;flex-wrap:wrap}
+  .mcard .mused .pill{font-size:11.5px;background:#e6f3ee;color:var(--green);padding:1px 8px;border-radius:99px}
+  .mcard .macts{display:flex;gap:6px;padding:0 12px 12px;flex-wrap:wrap}
+  .drop{border:2px dashed #e0d6bb;border-radius:16px;padding:16px;text-align:center;color:var(--muted);margin-bottom:16px;background:#fffdf7}
+  .drop.over{border-color:var(--gold);background:#fff7e0}
+  .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+  .ptile{border:2px solid var(--line);border-radius:12px;background:#f3efe3;padding:0;cursor:pointer;aspect-ratio:4/3;overflow:hidden;display:grid;place-items:center;position:relative}
+  .ptile img{max-width:100%;max-height:100%;object-fit:contain}
+  .ptile.on{border-color:var(--green);box-shadow:0 0 0 3px rgba(212,160,23,.45)}
+  .ptile.none{font-size:13px;color:var(--muted)}
+  .card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .card-h h2{margin:0}
+  .srow{display:flex;gap:12px;padding:11px 0;border-top:1px solid var(--line);align-items:center;flex-wrap:wrap}
+  .srow .k{flex:0 0 260px;max-width:100%;color:var(--muted);font-size:14px}
+  .srow .v{flex:1;min-width:0;word-break:break-word;display:flex;align-items:center;gap:8px}
+  .srow .v.muted{color:#9aa59f}
+  .srow .sw{width:22px;height:22px;border-radius:6px;background:var(--c);border:1px solid rgba(0,0,0,.15);flex:none}
+  .upv{max-width:100%;max-height:220px;border-radius:12px;display:block;margin:0 auto 14px;background:#f3efe3}
+  .swrow{display:flex;gap:8px;align-items:center}
+  @media (max-width:900px){
+    .menu-btn{display:inline-grid;place-items:center}
+    .shell{grid-template-columns:minmax(0,1fr)}
+    .side{position:fixed;top:0;left:0;bottom:0;height:100%;width:min(300px,86vw);z-index:40;transform:translateX(-105%);transition:transform .22s ease;box-shadow:12px 0 40px rgba(0,0,0,.25);visibility:hidden}
+    body.drawer-open .side{transform:none;visibility:visible}
+    .side-h{display:flex}
+    .side-ov{display:block;position:fixed;inset:0;background:rgba(11,61,46,.45);z-index:39;opacity:0;pointer-events:none;transition:opacity .2s}
+    body.drawer-open .side-ov{opacity:1;pointer-events:auto}
+    body.drawer-open{overflow:hidden}
+    .page{padding:18px 14px 60px}
+    .ql{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:720px){
+    .stats{grid-template-columns:1fr;gap:10px}
+    .ql{grid-template-columns:1fr}
+    .row{flex-wrap:wrap;gap:4px 10px}
+    .row .rl{flex:1 1 100%}
+    .two{grid-template-columns:1fr;gap:0}
+    .phead h2{font-size:20px}
+    .phead .acts2{margin-left:0;width:100%}
+    .mgrid{grid-template-columns:1fr 1fr;gap:10px}
+  }
+  @media (prefers-reduced-motion:reduce){ .side,.side-ov{transition:none!important} }
 </style>
 </head>
 <body>
 <header class="topbar">
   <div class="in">
+    <button id="menuBtn" class="menu-btn hidden" type="button" aria-label="মেনু খুলুন" aria-controls="sidebar" aria-expanded="false">☰</button>
     <a class="brand" href="/">WebDesigner<span>71</span></a>
     <span class="tag">অ্যাডমিন প্যানেল</span>
     <div class="sp"></div>
-    <a class="toplink" href="/">← মূল সাইট</a>
+    <a class="toplink" href="/" target="_blank" rel="noopener">← মূল সাইট</a>
     <button id="logoutBtn" class="btn btn-ghost btn-sm hidden" type="button">লগআউট</button>
   </div>
 </header>
@@ -279,64 +441,85 @@
   </div>
 </section>
 
-<!-- Dashboard -->
-<main id="v-dash" class="hidden">
-  <div class="card welcome">
-    <div id="meAvatar" class="avatar"></div>
-    <div style="position:relative;z-index:1;min-width:0">
-      <div style="opacity:.8;font-size:14px">স্বাগতম 👋</div>
-      <h2 id="meName"></h2>
-      <div class="em" id="meEmail"></div>
-      <div class="pills" id="mePills"></div>
-    </div>
-  </div>
+<!-- Signed in: sidebar + pages -->
+<div id="v-dash" class="shell hidden">
+  <aside id="sidebar" class="side" aria-label="অ্যাডমিন মেনু">
+    <div class="side-h"><b>WebDesigner<span>71</span></b><button class="side-x" id="sideClose" type="button" aria-label="মেনু বন্ধ করুন">✕</button></div>
+    <div class="who" id="sideWho"></div>
+    <nav id="sideNav"></nav>
+  </aside>
+  <div class="side-ov" id="sideOv"></div>
 
-  <div id="adminArea" class="hidden">
-    <!-- CMS Phase 1: homepage hero content -->
-    <div class="card cms" id="cmsCard">
-      <div class="panel-h">
-        <h3>হোমপেজ কনটেন্ট</h3>
-        <div class="sp"></div>
-        <button class="btn btn-sm btn-line" id="cmsUndo" type="button">↶ আগের ভার্সনে ফিরুন</button>
-        <button class="btn btn-sm btn-gold" id="cmsEdit" type="button">✎ এডিট করুন</button>
-      </div>
-      <div class="cms-body">
-        <div class="cms-hero"><p class="t" id="cmsTitle">…</p><p class="s" id="cmsSub"></p></div>
-        <div class="cms-row"><span>অ্যাকসেন্ট রং:</span><span class="swatch" id="cmsSwatch"></span><code id="cmsHex"></code></div>
-      </div>
-      <div class="cms-foot" id="cmsFoot">লোড হচ্ছে…</div>
-    </div>
-    <div class="grid">
-      <div class="card stat"><div class="ic" style="background:#fff4d6;color:#8a6400">⏳</div><div><div class="n" id="cPending">০</div><div class="l">অপেক্ষমাণ</div></div></div>
-      <div class="card stat"><div class="ic" style="background:#e6f3ee;color:var(--green)">✓</div><div><div class="n" id="cApproved">০</div><div class="l">অনুমোদিত</div></div></div>
-      <div class="card stat"><div class="ic" style="background:#fdecea;color:var(--red)">✕</div><div><div class="n" id="cRejected">০</div><div class="l">প্রত্যাখ্যাত</div></div></div>
-    </div>
-    <div class="card panel">
-      <div class="panel-h">
-        <h3>ইউজার তালিকা</h3>
-        <div class="sp"></div>
-        <div class="tabs" id="tabs">
-          <button class="tab on" data-f="all" type="button">সব</button>
-          <button class="tab" data-f="pending" type="button">অপেক্ষমাণ</button>
-          <button class="tab" data-f="approved" type="button">অনুমোদিত</button>
-          <button class="tab" data-f="rejected" type="button">প্রত্যাখ্যাত</button>
+  <div class="page">
+    <!-- Dashboard -->
+    <section data-page="dashboard">
+      <div class="card welcome">
+        <div id="meAvatar" class="avatar"></div>
+        <div style="position:relative;z-index:1;min-width:0">
+          <div style="opacity:.8;font-size:14px">স্বাগতম 👋</div>
+          <h2 id="meName"></h2>
+          <div class="em" id="meEmail"></div>
+          <div class="pills" id="mePills"></div>
         </div>
       </div>
-      <table>
-        <thead><tr><th>ইউজার</th><th>অবস্থা</th><th>যোগদান</th><th style="text-align:right">অ্যাকশন</th></tr></thead>
-        <tbody id="rows"></tbody>
-      </table>
-      <div id="emptyRows" class="empty hidden">এই তালিকায় কোনো ইউজার নেই</div>
-    </div>
-  </div>
+      <div id="dashAdmin" class="hidden"></div>
+      <div id="memberArea" class="card info hidden">
+        <h3>আপনি লগইন করেছেন ✓</h3>
+        <p style="margin:0;color:var(--muted)">আপনার অ্যাকাউন্ট অনুমোদিত। সাইটের কনটেন্ট ও ইউজার ব্যবস্থাপনা শুধু মূল অ্যাডমিন করতে পারেন।</p>
+      </div>
+    </section>
 
-  <div id="memberArea" class="card info hidden">
-    <h3>আপনি লগইন করেছেন ✓</h3>
-    <p style="margin:0;color:var(--muted)">আপনার অ্যাকাউন্ট অনুমোদিত। ইউজার ব্যবস্থাপনা শুধু মূল অ্যাডমিন করতে পারেন।</p>
-  </div>
-</main>
+    <!-- Homepage (overview + one page per section) -->
+    <section data-page="homepage" id="pHome" class="hidden"></section>
 
-<div id="toast" class="toast"></div>
+    <!-- Pages / Posts (placeholders) -->
+    <section data-page="pages" class="hidden">
+      <div class="phead"><div class="pico">▤</div><div><h2>পেজ</h2><div class="crumb">আলাদা পেজ তৈরি ও এডিট</div></div></div>
+      <div class="card soon"><div class="big">🚧</div><h3>শীঘ্রই আসছে</h3><p>নতুন পেজ (যেমন: আমাদের সম্পর্কে, শর্তাবলি) তৈরির সুবিধা পরের ধাপে যোগ হবে।</p></div>
+    </section>
+    <section data-page="posts" class="hidden">
+      <div class="phead"><div class="pico">✎</div><div><h2>পোস্ট</h2><div class="crumb">ব্লগ ও খবর</div></div></div>
+      <div class="card soon"><div class="big">🚧</div><h3>শীঘ্রই আসছে</h3><p>ব্লগ পোস্ট লেখা ও প্রকাশের সুবিধা পরের ধাপে যোগ হবে।</p></div>
+    </section>
+
+    <!-- Media -->
+    <section data-page="media" id="pMedia" class="hidden"></section>
+
+    <!-- Users (approval management) -->
+    <section data-page="users" class="hidden">
+      <div class="phead"><div class="pico">👥</div><div><h2>ইউজার</h2><div class="crumb">অ্যাডমিন প্যানেলে প্রবেশের অনুরোধ ও অনুমোদন</div></div></div>
+      <div class="grid">
+        <div class="card stat"><div class="ic" style="background:#fff4d6;color:#8a6400">⏳</div><div><div class="n" id="cPending">০</div><div class="l">অপেক্ষমাণ</div></div></div>
+        <div class="card stat"><div class="ic" style="background:#e6f3ee;color:var(--green)">✓</div><div><div class="n" id="cApproved">০</div><div class="l">অনুমোদিত</div></div></div>
+        <div class="card stat"><div class="ic" style="background:#fdecea;color:var(--red)">✕</div><div><div class="n" id="cRejected">০</div><div class="l">প্রত্যাখ্যাত</div></div></div>
+      </div>
+      <div class="card panel">
+        <div class="panel-h">
+          <h3>ইউজার তালিকা</h3>
+          <div class="sp"></div>
+          <div class="tabs" id="tabs">
+            <button class="tab on" data-f="all" type="button">সব</button>
+            <button class="tab" data-f="pending" type="button">অপেক্ষমাণ</button>
+            <button class="tab" data-f="approved" type="button">অনুমোদিত</button>
+            <button class="tab" data-f="rejected" type="button">প্রত্যাখ্যাত</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>ইউজার</th><th>অবস্থা</th><th>যোগদান</th><th style="text-align:right">অ্যাকশন</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div id="emptyRows" class="empty hidden">এই তালিকায় কোনো ইউজার নেই</div>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section data-page="settings" id="pSettings" class="hidden"></section>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<datalist id="anchors"><option value="#top"><option value="#packages"><option value="#work"><option value="#how"><option value="#faq"><option value="#contact"></datalist>
+
 
 <script>
 (function () {
@@ -351,6 +534,8 @@
   function show(id) {
     views.forEach((v) => $(v).classList.toggle("hidden", v !== id));
     $("logoutBtn").classList.toggle("hidden", id !== "v-dash");
+    $("menuBtn").classList.toggle("hidden", id !== "v-dash");
+    document.body.classList.remove("drawer-open");
   }
   function toast(t, ms) {
     const el = $("toast"); el.textContent = t; el.classList.add("show");
@@ -379,15 +564,16 @@
 
   async function api(path, opts = {}) {
     const token = sessionStorage.getItem(TOKEN_KEY);
+    const isForm = typeof FormData !== "undefined" && opts.body instanceof FormData;
     const res = await fetch(API_BASE + path, {
       method: opts.method || "GET",
-      headers: Object.assign({ "content-type": "application/json" }, token ? { authorization: "Bearer " + token } : {}),
-      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      headers: Object.assign(isForm ? {} : { "content-type": "application/json" }, token ? { authorization: "Bearer " + token } : {}),
+      body: opts.body ? (isForm ? opts.body : JSON.stringify(opts.body)) : undefined,
     });
     let data = {};
     try { data = await res.json(); } catch {}
     if (res.status === 401 && token && path !== "/auth/google") { logout(true); throw new Error("session"); }
-    if (!res.ok) { const e = new Error(data.error || "http_" + res.status); e.status = res.status; if (data.field) e.field = data.field; throw e; }
+    if (!res.ok) { const e = new Error(data.error || "http_" + res.status); e.status = res.status; if (data.field) e.field = data.field; e.data = data; throw e; }
     return data;
   }
 
@@ -427,7 +613,7 @@
   }
 
   /* ---------- Dashboard ---------- */
-  function enterDash() {
+  async function enterDash() {
     show("v-dash");
     const av = $("meAvatar"); av.replaceWith(Object.assign(avatarEl(me, "avatar"), { id: "meAvatar" }));
     $("meName").textContent = me.name || me.email.split("@")[0];
@@ -435,13 +621,20 @@
     const pills = $("mePills"); pills.innerHTML = "";
     const s = document.createElement("span"); s.className = "pill approved"; s.textContent = "✓ " + STATUS.approved; pills.append(s);
     if (me.isAdmin) { const a = document.createElement("span"); a.className = "pill admin"; a.textContent = "★ মূল অ্যাডমিন"; pills.append(a); }
-    $("adminArea").classList.toggle("hidden", !me.isAdmin);
-    $("memberArea").classList.toggle("hidden", !!me.isAdmin);
-    if (me.isAdmin) { loadUsers(); refreshContentCard(); }
+    $("sideWho").textContent = (me.name || me.email) + (me.isAdmin ? " · অ্যাডমিন" : "");
+    await modelReady;
+    if (!me) return;
+    buildNav();
+    if (!location.hash || location.hash === "#") history.replaceState(null, "", "#/dashboard");
+    if (me.isAdmin) loadUsers();
+    route();
   }
 
   async function loadUsers() {
-    try { users = (await api("/admin/users")).users || []; render(); }
+    try {
+      users = (await api("/admin/users")).users || []; render(); updatePendingBadge();
+      if (parseHash().page === "dashboard") renderDash();
+    }
     catch (e) { if (e.message !== "session") toast("ইউজার তালিকা লোড হয়নি"); }
   }
 
@@ -500,43 +693,6 @@
     };
     return b;
   }
-
-  /* ======================================================================
-     CMS Phase 1 — homepage hero content (title, highlight, sub line, accent)
-     ====================================================================== */
-/* CMS_TARGETS:BEGIN — field → element mapping. Keep identical to the copy in public/admin/index.html. */
-const CMS_TARGETS = {
-  heroTitle: { selector: "#hero-title", part: "text" },
-  heroHighlight: { selector: "#hero-title", part: "em" },
-  heroSub: { selector: "#hero-sub", fallback: ".hero .sub", part: "text" },
-  accentColor: { cssVar: "--gold", lightVar: "--gold-2", flash: ".hero .btn-gold" },
-};
-const CMS_DEFAULT_ACCENT = "#D4A017";
-const CMS_DEFAULT_ACCENT_LIGHT = "#E9B930";
-// --gold-2 is the lighter hover/highlight shade: the site's original pair for the default, else 10% toward white.
-function cmsLightShade(hex) {
-  if (String(hex).toUpperCase() === CMS_DEFAULT_ACCENT) return CMS_DEFAULT_ACCENT_LIGHT;
-  const n = parseInt(String(hex).slice(1), 16);
-  const ch = (s) => Math.round(((n >> s) & 255) + (255 - ((n >> s) & 255)) * 0.1);
-  return "#" + [16, 8, 0].map((s) => ch(s).toString(16).padStart(2, "0")).join("").toUpperCase();
-}
-/* CMS_TARGETS:END */
-  const CMS_COLOR_RE = /^#[0-9A-Fa-f]{6}$/;
-  const CMS_DEFAULTS = {
-    heroTitle: "আপনার ব্যবসার ওয়েবসাইট, মাত্র", heroHighlight: "৩৯০০ টাকায়",
-    heroSub: "ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে", accentColor: CMS_DEFAULT_ACCENT, version: 0,
-  };
-  const CMS_PRESETS = [
-    ["#D4A017", "ডিফল্ট"], ["#E8833A", "কমলা"], ["#C0392B", "লাল"],
-    ["#1E88E5", "নীল"], ["#2E9E6B", "সবুজ"], ["#8E44AD", "বেগুনি"],
-  ];
-  const CONTENT_FIELDS = [
-    { name: "heroTitle", label: "শিরোনাম", type: "text", min: 1, max: 120, emptyMsg: "শিরোনাম খালি রাখা যাবে না" },
-    { name: "heroHighlight", label: "হাইলাইট অংশ", type: "text", min: 0, max: 40, hint: "সোনালি রঙে দেখাবে · ঐচ্ছিক" },
-    { name: "heroSub", label: "সাব-টেক্সট", type: "textarea", min: 0, max: 300 },
-    { name: "accentColor", label: "অ্যাকসেন্ট রং", type: "color", presets: CMS_PRESETS },
-  ];
-  let content = null;
 
   function h(tag, props, ...kids) {
     const e = document.createElement(tag);
@@ -606,6 +762,7 @@ function cmsLightShade(hex) {
       if (serverErr[f.name]) return serverErr[f.name];
       const v = norm(f, current[f.name]);
       if (f.type === "color") return CMS_COLOR_RE.test(v) ? "" : "সঠিক হেক্স রং দিন, যেমন #D4A017";
+      if (f.validate) { const m = f.validate(v); if (m) return m; }
       const n = charLen(v);
       if (n < (f.min || 0)) return f.emptyMsg || "এই ঘর খালি রাখা যাবে না";
       if (f.max && n > f.max) return "সর্বোচ্চ " + bnNum(f.max) + " অক্ষর দেওয়া যাবে";
@@ -771,28 +928,274 @@ function cmsLightShade(hex) {
     return { dialog: d, close, setValues: setAll };
   }
 
-  /* Live preview: same-origin iframe of /?cms_preview=1, updated with DOM methods only */
-  function applyCms(doc, v) {
-    const T = CMS_TARGETS;
-    const title = doc.querySelector(T.heroTitle.selector);
-    if (title) {
-      title.textContent = v.heroTitle + (v.heroHighlight ? " " : "");
-      if (v.heroHighlight) { const em = doc.createElement("em"); em.textContent = v.heroHighlight; title.append(em); }
-    }
-    const sub = doc.querySelector(T.heroSub.selector) || doc.querySelector(T.heroSub.fallback);
-    if (sub) sub.textContent = v.heroSub;
-    if (CMS_COLOR_RE.test(v.accentColor)) {
-      const root = doc.documentElement.style, c = v.accentColor.toUpperCase();
-      root.setProperty(T.accentColor.cssVar, c);
-      root.setProperty(T.accentColor.lightVar, cmsLightShade(c));
+  /* ======================================================================
+     CMS Phase 2 — shared model (same file the site Worker renders with)
+     ====================================================================== */
+  let M = null;
+  const modelReady = import("/cms/model.js").then((m) => (M = m)).catch(() => null);
+  let cms = null;      // { sections: [...], settings: {...}, source }
+  let media = null;    // { items, builtin, storage, maxBytes, types }
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const plain = (s) => String(s || "").replace(/\*\*|\[\[|\]\]/g, "");
+  const CMS_PRESETS = [
+    ["#D4A017", "ডিফল্ট"], ["#E8833A", "কমলা"], ["#C0392B", "লাল"],
+    ["#1E88E5", "নীল"], ["#2E9E6B", "সবুজ"], ["#8E44AD", "বেগুনি"],
+  ];
+  const PRIMARY_PRESETS = [["#0B3D2E", "ডিফল্ট"], ["#1F3A5F", "নেভি"], ["#3B2F63", "বেগুনি"], ["#5A2A27", "মেরুন"], ["#22313F", "স্লেট"]];
+  const LIVE_NOTE = " — ১ মিনিটের মধ্যে লাইভ হবে";
+  const secOf = (id) => cms && cms.sections.find((s) => s.id === id);
+
+  async function loadCms() {
+    await modelReady;
+    if (!M) throw new Error("model");
+    const r = await api("/content/homepage");
+    cms = { sections: r.sections, settings: r.settings, source: r.source };
+    return cms;
+  }
+  async function ensureCms(host) {
+    if (cms) return true;
+    if (host) { host.textContent = ""; host.append(h("div", { class: "card empty" }, h("div", { class: "spinner" }))); }
+    try { await loadCms(); return true; }
+    catch (e) {
+      if (e.message === "session") return false;
+      if (host) { host.textContent = ""; host.append(h("div", { class: "card empty", text: M ? "কনটেন্ট লোড হয়নি — পেজ রিফ্রেশ করে দেখুন" : "এডিটর ফাইল (/cms/model.js) লোড হয়নি — পেজ রিফ্রেশ করুন" })); }
+      return false;
     }
   }
-  function flashTarget(doc, field) {
-    const T = CMS_TARGETS[field]; if (!T) return;
-    let el = null;
-    if (field === "accentColor") el = doc.querySelector(T.flash);
-    else if (T.part === "em") el = doc.querySelector(T.selector + " em") || doc.querySelector(T.selector);
-    else el = doc.querySelector(T.selector) || (T.fallback && doc.querySelector(T.fallback));
+  async function loadMedia() { media = await api("/admin/media"); return media; }
+  function updatedLine(x) {
+    if (!x || !x.updatedAt) return "এখনো কোনো পরিবর্তন সেভ হয়নি — সাইটের মূল লেখা দেখানো হচ্ছে";
+    const by = x.updatedBy === "seed" ? "প্রাথমিক কনটেন্ট" : x.updatedBy;
+    return "সর্বশেষ আপডেট: " + fmtDateTime(x.updatedAt) + (by ? " · " + by : "");
+  }
+
+  /* ---------- sidebar + hash router ---------- */
+  const NAV = [
+    { id: "dashboard", icon: "⌂", label: "ড্যাশবোর্ড" },
+    { id: "homepage", icon: "🏠", label: "হোমপেজ", group: true },
+    { id: "pages", icon: "▤", label: "পেজ", badge: "শীঘ্রই" },
+    { id: "posts", icon: "✎", label: "পোস্ট", badge: "শীঘ্রই" },
+    { id: "media", icon: "🖼", label: "মিডিয়া" },
+    { id: "users", icon: "👥", label: "ইউজার", badgeId: "navPending" },
+    { id: "settings", icon: "⚙", label: "সেটিংস" },
+  ];
+  const PAGES = NAV.map((n) => n.id);
+  function buildNav() {
+    const nav = $("sideNav"); nav.textContent = "";
+    const items = me && me.isAdmin ? NAV : NAV.slice(0, 1);
+    nav.append(h("div", { class: "nav-t", text: "মেনু" }));
+    for (const n of items) {
+      const a = h("a", { class: "nav-i", href: "#/" + n.id, "data-nav": n.id }, h("span", { class: "ni", "aria-hidden": "true", text: n.icon }), h("span", { text: n.label }));
+      if (n.badge) a.append(h("span", { class: "nb", text: n.badge }));
+      if (n.badgeId) a.append(h("span", { class: "nb alert hidden", id: n.badgeId }));
+      if (!n.group) { nav.append(a); continue; }
+      const sub = h("div", { class: "nav-sub", id: "navHomeSub" });
+      for (const s of M ? M.SECTIONS : []) {
+        const cur = secOf(s.id);
+        sub.append(h("a", { class: "nav-s", href: "#/homepage/" + s.id, "data-nav": "homepage/" + s.id },
+          h("i", { "aria-hidden": "true", text: s.icon }), h("span", { text: s.label }), cur && cur.hidden ? h("span", { class: "off", text: "লুকানো" }) : null));
+      }
+      nav.append(h("div", { class: "nav-g", id: "navHome" }, a, sub));
+    }
+    updatePendingBadge();
+    markNav();
+  }
+  function updatePendingBadge() {
+    const b = $("navPending"); if (!b) return;
+    const n = users.filter((u) => u.status === "pending").length;
+    b.textContent = bnNum(n); b.classList.toggle("hidden", !n);
+    b.title = bnNum(n) + " জন অনুমোদনের অপেক্ষায়";
+  }
+  function parseHash() {
+    const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+    let page = parts[0] || "dashboard";
+    if (!PAGES.includes(page) || (!me.isAdmin && page !== "dashboard")) page = "dashboard";
+    return { page, sub: page === "homepage" ? parts[1] || "" : "" };
+  }
+  function markNav() {
+    if (!me) return;
+    const { page, sub } = parseHash(), key = sub ? page + "/" + sub : page;
+    document.querySelectorAll("#sideNav [data-nav]").forEach((a) => {
+      const on = a.dataset.nav === key;
+      a.classList.toggle("on", on);
+      a.classList.toggle("in", !on && a.dataset.nav === page);
+      if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    });
+    const g = $("navHome"); if (g) g.classList.toggle("open", page === "homepage");
+  }
+  let lastRoute = "";
+  async function route() {
+    if (!me) return;
+    const { page, sub } = parseHash(), key = page + "/" + sub;
+    document.querySelectorAll("[data-page]").forEach((s) => s.classList.toggle("hidden", s.dataset.page !== page));
+    markNav();
+    closeDrawer();
+    if (key !== lastRoute) window.scrollTo(0, 0);
+    lastRoute = key;
+    document.title = (NAV.find((n) => n.id === page) || NAV[0]).label + " — অ্যাডমিন প্যানেল — WebDesigner71";
+    if (page === "dashboard") return renderDash();
+    if (page === "users") return render();
+    if (page === "homepage") return sub ? renderSection(sub) : renderHomeOverview();
+    if (page === "media") return renderMedia();
+    if (page === "settings") return renderSettings();
+  }
+  window.addEventListener("hashchange", route);
+
+  /* mobile drawer */
+  function openDrawer() {
+    document.body.classList.add("drawer-open");
+    $("menuBtn").setAttribute("aria-expanded", "true");
+    const first = document.querySelector("#sideNav .nav-i.on") || document.querySelector("#sideNav a");
+    setTimeout(() => first && first.focus(), 60);
+  }
+  function closeDrawer(focusBtn) {
+    if (!document.body.classList.contains("drawer-open")) return;
+    document.body.classList.remove("drawer-open");
+    $("menuBtn").setAttribute("aria-expanded", "false");
+    if (focusBtn) $("menuBtn").focus();
+  }
+  $("menuBtn").onclick = () => (document.body.classList.contains("drawer-open") ? closeDrawer(true) : openDrawer());
+  $("sideClose").onclick = () => closeDrawer(true);
+  $("sideOv").onclick = () => closeDrawer(true);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && document.body.classList.contains("drawer-open") && !document.querySelector("dialog.mdl[open]")) closeDrawer(true);
+  });
+  $("sideNav").addEventListener("click", (e) => { if (e.target.closest("a")) closeDrawer(); });
+
+  /* ---------- Dashboard ---------- */
+  const labelOf = (id) => (id === "settings" ? "সেটিংস" : (M && M.sectionDef(id) ? M.sectionDef(id).label : id));
+  const byName = (x) => (x.updatedBy === "seed" ? "প্রাথমিক কনটেন্ট" : x.updatedBy || "");
+  async function renderDash() {
+    $("dashAdmin").classList.toggle("hidden", !me.isAdmin);
+    $("memberArea").classList.toggle("hidden", !!me.isAdmin);
+    if (!me.isAdmin) return;
+    const host = $("dashAdmin");
+    const draw = () => {
+      host.textContent = "";
+      const all = cms ? cms.sections.concat([Object.assign({}, cms.settings, { id: "settings" })]) : [];
+      const latest = all.filter((x) => x.updatedAt).sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+      const pending = users.filter((u) => u.status === "pending").length;
+      const L = latest[0];
+      host.append(h("div", { class: "stats" },
+        h("div", { class: "card stat", id: "statUpdated" }, h("div", { class: "ic", style: "background:#e6f3ee;color:var(--green)", text: "🕒" }),
+          h("div", { style: "min-width:0" }, h("div", { class: "l", text: "সর্বশেষ আপডেট" }),
+            h("div", { style: "font-weight:700;font-size:16px;color:var(--green)", text: L ? fmtDateTime(L.updatedAt) : cms ? "—" : "লোড হচ্ছে…" }),
+            h("div", { class: "l", text: L ? labelOf(L.id) + " · " + byName(L) : "" }))),
+        h("a", { class: "card stat", href: "#/users", style: "text-decoration:none", id: "statPending" }, h("div", { class: "ic", style: "background:#fff4d6;color:#8a6400", text: "⏳" }),
+          h("div", {}, h("div", { class: "n", text: bnNum(pending) }), h("div", { class: "l", text: "অনুমোদনের অপেক্ষায়" }))),
+        h("a", { class: "card stat", href: "#/media", style: "text-decoration:none", id: "statMedia" }, h("div", { class: "ic", style: "background:#fdf3d8;color:#8a6400", text: "🖼" }),
+          h("div", {}, h("div", { class: "n", text: media ? bnNum(media.items.length + media.builtin.length) : "…" }), h("div", { class: "l", text: "মিডিয়া ফাইল" })))));
+      const q = (href, ic, t, s, ext) => h("a", { class: "card qlink", href, target: ext ? "_blank" : null, rel: ext ? "noopener" : null }, h("span", { class: "ic", text: ic }), h("span", {}, h("b", { text: t }), h("small", { text: s })));
+      host.append(h("h3", { class: "sec-h", text: "দ্রুত লিংক" }), h("div", { class: "ql" },
+        q("#/homepage/hero", "★", "হিরো সেকশন", "শিরোনাম, বাটন, ছবি"),
+        q("#/homepage/packages", "৳", "প্যাকেজ ও দাম", "দাম ও ফিচার বদলান"),
+        q("#/homepage", "🏠", "পুরো হোমপেজ", "সব সেকশন এক জায়গায়"),
+        q("#/media", "🖼", "মিডিয়া লাইব্রেরি", "ছবি আপলোড করুন"),
+        q("#/settings", "⚙", "সেটিংস", "শিরোনাম, রং, যোগাযোগ"),
+        q("/", "↗", "সাইট দেখুন", "webdesigner71.com", true)));
+      if (latest.length) {
+        const box = h("div", { class: "card rows" });
+        for (const x of latest.slice(0, 5)) box.append(h("div", { class: "row" },
+          h("a", { class: "rl", href: x.id === "settings" ? "#/settings" : "#/homepage/" + x.id, text: labelOf(x.id) }),
+          h("span", { class: "rv", text: fmtDateTime(x.updatedAt) + " · " + byName(x) })));
+        host.append(h("h3", { class: "sec-h", text: "সাম্প্রতিক পরিবর্তন" }), box);
+      }
+    };
+    draw();
+    const jobs = [];
+    if (!cms) jobs.push(loadCms().catch(() => null));
+    if (!media) jobs.push(loadMedia().catch(() => null));
+    if (jobs.length) { await Promise.all(jobs); buildNav(); if (parseHash().page === "dashboard") draw(); }
+  }
+
+  /* ---------- Homepage overview + section pages ---------- */
+  function sectionHead(icon, title, crumb, ...actions) {
+    return h("div", { class: "phead" }, h("div", { class: "pico", "aria-hidden": "true", text: icon }),
+      h("div", { style: "min-width:0;flex:1" }, h("h2", { text: title }), h("div", { class: "crumb", text: crumb })),
+      actions.length ? h("div", { class: "acts2" }, ...actions) : null);
+  }
+  async function renderHomeOverview() {
+    const host = $("pHome");
+    if (!(await ensureCms(host))) return;
+    host.textContent = "";
+    host.append(sectionHead("🏠", "হোমপেজ", "প্রতিটি সেকশন আলাদাভাবে এডিট, লুকানো ও আগের ভার্সনে ফেরানো যায়",
+      h("a", { class: "btn btn-line btn-sm", href: "/", target: "_blank", rel: "noopener", text: "↗ সাইট দেখুন" })));
+    const box = h("div", { class: "card rows", id: "homeRows" });
+    for (const def of M.SECTIONS) {
+      const s = secOf(def.id);
+      box.append(h("div", { class: "row", "data-sec": def.id },
+        h("a", { class: "rl", href: "#/homepage/" + def.id, text: def.icon + "  " + def.label }),
+        h("span", { class: "rv", text: updatedLine(s) }),
+        h("span", { class: "pill " + (s.hidden ? "hid" : "approved"), text: s.hidden ? "লুকানো" : "দৃশ্যমান" }),
+        h("button", { type: "button", class: "btn btn-sm btn-gold", text: "✎ এডিট", "aria-label": def.label + " এডিট", onclick: () => openSectionEditor(def.id) })));
+    }
+    host.append(box);
+  }
+  function summarize(def, v) {
+    if (!v) return "—";
+    const count = (arr) => { const n = arr.length, hid = arr.filter((x) => x.hidden).length; return bnNum(n - hid) + "টি দৃশ্যমান" + (hid ? " · " + bnNum(hid) + "টি লুকানো" : ""); };
+    switch (def.type) {
+      case "text": return plain(v.text) || "—";
+      case "heroTitle": return v.text + (v.highlight ? " " + v.highlight : "");
+      case "image": return v.src ? v.src + (v.alt ? " · " + v.alt : "") : "মূল ইলাস্ট্রেশন";
+      case "link": return v.label + " → " + v.href;
+      case "buttons": return v.items.map((b) => b.label + (b.hidden ? " (লুকানো)" : "")).join(" · ") || "কোনো বাটন নেই";
+      default: return count(v.items);
+    }
+  }
+  async function renderSection(sid) {
+    const host = $("pHome");
+    if (!(await ensureCms(host))) return;
+    const def = M.sectionDef(sid);
+    if (!def) { location.hash = "#/homepage"; return; }
+    const s = secOf(sid);
+    host.textContent = "";
+    const undoBtn = h("button", { type: "button", class: "btn btn-sm btn-line", id: "secUndo", text: "↶ আগের ভার্সনে ফিরুন", onclick: () => undoSection(sid, undoBtn) });
+    host.append(sectionHead(def.icon, def.label, "হোমপেজ › " + def.label, undoBtn,
+      h("button", { type: "button", class: "btn btn-sm btn-gold", id: "secEdit", text: "✎ এডিট করুন", onclick: () => openSectionEditor(sid) })));
+    const box = h("div", { class: "card rows" });
+    box.append(h("div", { class: "row" }, h("span", { class: "rl", text: "অবস্থা" }),
+      h("span", { class: "rv" }, h("span", { class: "pill " + (s.hidden ? "hid" : "approved"), text: s.hidden ? "সাইটে লুকানো" : "সাইটে দেখা যাচ্ছে" }))));
+    for (const f of def.fields) {
+      const v = s.fields[f.key];
+      box.append(h("div", { class: "row", "data-field": f.key }, h("span", { class: "rl", text: f.label }),
+        h("span", { class: "rv" + (v && v.hidden ? " off" : ""), text: summarize(f, v) }),
+        h("button", { type: "button", class: "btn btn-sm btn-line", text: "এডিট", "aria-label": f.label + " এডিট", onclick: () => openSectionEditor(sid, f.key) })));
+    }
+    if (def.slot) box.append(h("div", { class: "row", "data-field": "extra" }, h("span", { class: "rl", text: "নতুন এলিমেন্ট" }),
+      h("span", { class: "rv", text: s.extra.length ? s.extra.map((e) => M.EXTRA_LABELS[e.type] + (e.hidden ? " (লুকানো)" : "")).join(" · ") : "নেই — শিরোনাম, প্যারাগ্রাফ, ছবি বা বাটন যোগ করা যায়" }),
+      h("button", { type: "button", class: "btn btn-sm btn-line", text: "যোগ করুন", onclick: () => openSectionEditor(sid, "extra") })));
+    host.append(box, h("div", { class: "cms-foot card", style: "margin-top:12px;border-radius:12px", id: "secFoot", text: updatedLine(s) + (s.version ? " · ভার্সন " + bnNum(s.version) : "") }));
+  }
+  async function undoSection(sid, btn) {
+    const def = M.sectionDef(sid);
+    const ok = await confirmModal({ title: "আগের ভার্সনে ফিরবেন?", message: "“" + def.label + "” সেকশন শেষ সেভের আগের অবস্থায় ফিরে যাবে। আবার চাপলে বর্তমান ভার্সনে ফেরা যাবে।", okText: "হ্যাঁ, ফিরুন" });
+    if (!ok) return;
+    btn.disabled = true;
+    try {
+      const s = secOf(sid);
+      const r = await api("/admin/content/homepage/sections/" + sid + "/undo", { method: "POST", body: s && s.version ? { version: s.version } : {} });
+      replaceSection(r.section);
+      toast("আগের ভার্সনে ফেরানো হয়েছে" + LIVE_NOTE, 3600);
+    } catch (e) {
+      if (e.message === "session") return;
+      if (e.status === 404) toast("ফেরার মতো আগের কোনো ভার্সন নেই");
+      else if (e.status === 409) { toast("অন্য কোথাও এডিট হয়েছে — নতুন ডেটা লোড করা হলো"); cms = null; route(); }
+      else toast("ব্যর্থ হয়েছে: " + e.message);
+    } finally { btn.disabled = false; }
+  }
+  function replaceSection(sec) {
+    const i = cms.sections.findIndex((s) => s.id === sec.id);
+    if (i >= 0) cms.sections[i] = sec;
+    media = null; // usage ("used on homepage") may have changed
+    buildNav();
+    route();
+  }
+
+  /* ---------- Live preview pane: same-origin iframe of /?cms_preview=1 + the shared renderer ---------- */
+  const CMS_COLOR_RE = /^#[0-9A-Fa-f]{6}$/;
+  const CMS_DEFAULT_ACCENT_LIGHT = "#E9B930";
+  function flashEl(el, doc) {
     if (!el) return;
     const win = doc.defaultView, r = el.getBoundingClientRect();
     if (win && (r.top < 0 || r.bottom > win.innerHeight)) win.scrollTo({ top: Math.max(0, r.top + win.scrollY - 120), behavior: reducedMotion() ? "auto" : "smooth" });
@@ -801,40 +1204,42 @@ function cmsLightShade(hex) {
     clearTimeout(el._cmsFlash);
     el._cmsFlash = setTimeout(() => { el.style.outline = ""; el.style.outlineOffset = ""; }, 900);
   }
-  function contentPreview(pane, ctx) {
-    let mode = isMobile() ? "mobile" : "desktop", doc = null, mock = null, last = ctx.getValues(), timer = 0;
+  function pagePreview(pane, opts) {
+    let mode = isMobile() ? "mobile" : "desktop", ctrl = null, doc = null, timer = 0, pending = null, first = true;
     const bDesk = h("button", { type: "button", class: mode === "desktop" ? "on" : null, text: "ডেস্কটপ", onclick: () => setMode("desktop") });
     const bMob = h("button", { type: "button", class: mode === "mobile" ? "on" : null, text: "মোবাইল", onclick: () => setMode("mobile") });
-    const reset = h("button", { type: "button", class: "btn btn-sm btn-line", text: "↺ রিসেট", title: "সব পরিবর্তন বাদ দিয়ে শুরুর মানে ফিরুন", onclick: () => ctx.reset() });
+    const reset = h("button", { type: "button", class: "btn btn-sm btn-line", text: "↺ রিসেট", title: "সব পরিবর্তন বাদ দিয়ে শুরুর মানে ফিরুন", onclick: () => opts.reset() });
     const badge = h("span", { class: "pvbadge", text: "প্রিভিউ — এখনো সেভ হয়নি" });
     const iframe = h("iframe", { src: "/?cms_preview=1", title: "হোমপেজ প্রিভিউ", sandbox: "allow-same-origin allow-scripts", loading: "eager" });
     const wrap = h("div", { class: "pvwrap" }, iframe);
     const stage = h("div", { class: "pvstage" }, wrap);
     pane.append(h("div", { class: "pvbar" }, h("div", { class: "seg", role: "group", "aria-label": "প্রিভিউ সাইজ" }, bDesk, bMob), reset, badge), stage);
-
-    function useMock() {
+    function fail() {
       wrap.style.display = "none";
-      if (mock) return;
-      mock = h("div", { class: "pvmock" }, h("h1"), h("p"), h("span", { class: "b", text: "এখনই অর্ডার করুন" }), h("small", { text: "লাইভ পেজ লোড করা যায়নি — সরল প্রিভিউ দেখানো হচ্ছে" }));
-      stage.append(mock);
-    }
-    function apply(changed) {
-      if (doc) { try { applyCms(doc, last); if (changed) flashTarget(doc, changed); } catch {} }
-      else if (mock) {
-        const t = mock.querySelector("h1"); t.textContent = last.heroTitle + (last.heroHighlight ? " " : "");
-        if (last.heroHighlight) t.append(h("em", { text: last.heroHighlight }));
-        mock.querySelector("p").textContent = last.heroSub;
-        if (CMS_COLOR_RE.test(last.accentColor)) { mock.style.setProperty("--gold", last.accentColor); mock.style.setProperty("--gold-2", cmsLightShade(last.accentColor)); }
-      }
+      if (!stage.querySelector(".pvmock")) stage.append(h("div", { class: "pvmock" }, h("h1", { text: "প্রিভিউ লোড করা যায়নি" }), h("p", { text: "লাইভ পেজটি এই মুহূর্তে লোড হচ্ছে না। আপনি তবুও সেভ করতে পারবেন — সেভের পর সাইটে দেখে নিন।" })));
     }
     iframe.addEventListener("load", () => {
       try {
         const dd = iframe.contentDocument;
-        if (!dd || !dd.querySelector(CMS_TARGETS.heroTitle.selector)) throw new Error("no hero");
-        doc = dd;
-      } catch { doc = null; useMock(); }
-      apply(null);
+        if (!dd || !dd.querySelector("[data-cms-section]")) throw new Error("no cms page");
+        doc = dd; ctrl = M.previewController(dd);
+      } catch { ctrl = null; return fail(); }
+      flush();
     });
+    function flush() {
+      if (!ctrl || !pending) return;
+      const { ops, focus } = pending;
+      pending = null;
+      try {
+        ctrl.apply(ops);
+        if (focus) {
+          let el = focus.sel ? doc.querySelector(focus.sel) : ctrl.find(focus.sid, focus.key);
+          if (el && focus.part) el = el.querySelector(focus.part) || el;
+          if (el && el.getClientRects().length) flashEl(el, doc);
+        }
+      } catch (e) { console.warn("preview", e); }
+      first = false;
+    }
     function relayout() {
       const W = stage.clientWidth - 28, H = stage.clientHeight - 28;
       if (W <= 0 || H <= 0) return;
@@ -849,70 +1254,594 @@ function cmsLightShade(hex) {
     const ro = new ResizeObserver(relayout); ro.observe(stage);
     requestAnimationFrame(relayout);
     return {
-      update(v, changed) { last = v; clearTimeout(timer); timer = setTimeout(() => apply(changed), 40); },
+      update(ops, focus) { pending = { ops, focus: focus || (first ? opts.initialFocus : null) }; clearTimeout(timer); timer = setTimeout(flush, 40); },
       relayout,
       destroy() { ro.disconnect(); clearTimeout(timer); },
+      get ready() { return !!ctrl; },
     };
   }
 
-  /* Dashboard content card */
-  const pickContent = (c) => ({ heroTitle: c.heroTitle, heroHighlight: c.heroHighlight, heroSub: c.heroSub, accentColor: c.accentColor });
-  async function loadContent() {
-    const r = await api("/content");
-    content = r && r.content ? r.content : { ...CMS_DEFAULTS };
-    renderContentCard();
-    return content;
+  /* ---------- Section editor: defaults for new items ---------- */
+  const NEW_BUTTON = () => ({ label: "নতুন বাটন", href: "#contact", style: "gold", newTab: false });
+  const NEW_CARD = {
+    pain: () => ({ icon: "✨", title: "নতুন কার্ড", text: "" }),
+    package: () => ({ popular: false, tag: "", name: "নতুন প্যাকেজ", for: "", price: "৳০", priceNote: "/ এককালীন", features: { items: [{ id: M.newId(), text: "নতুন ফিচার", hidden: false }] }, buttonLabel: "অর্ডার করুন", buttonHref: "#contact", buttonStyle: "gold" }),
+    work: () => ({ theme: 1, initial: "N", image: "", imageAlt: "", title: "নতুন প্রজেক্ট", text: "", buttonLabel: "দেখুন", buttonHref: "#" }),
+    step: () => ({ title: "নতুন ধাপ", text: "" }),
+    faq: () => ({ q: "নতুন প্রশ্ন?", a: "উত্তর লিখুন" }),
+  };
+  const NEW_EXTRA = {
+    heading: () => ({ type: "heading", text: "নতুন শিরোনাম" }),
+    text: () => ({ type: "text", text: "নতুন প্যারাগ্রাফ লিখুন" }),
+    image: () => ({ type: "image", src: "", alt: "" }),
+    button: () => ({ type: "button", label: "নতুন বাটন", href: "#contact", style: "gold", newTab: false }),
+  };
+  function errMsg(path, input) {
+    const last = path.split(".").pop();
+    if (last === "href" || last === "buttonHref") return "সঠিক লিংক দিন — https://…, mailto:, tel:, #সেকশন বা /পাথ";
+    if (last === "src" || last === "image") return "মিডিয়া লাইব্রেরি থেকে একটি ছবি বাছুন";
+    if (last === "items" || last === "extra") return "সর্বোচ্চ সংখ্যা ছাড়িয়ে গেছে";
+    if (last === "style" || last === "buttonStyle") return "একটি স্টাইল বাছুন";
+    if (input && input.dataset.max) {
+      const n = charLen(input.value.replace(/\s+/g, " ").trim()), min = +(input.dataset.min || 0), max = +input.dataset.max;
+      if (n < min) return "এই ঘর খালি রাখা যাবে না";
+      if (n > max) return "সর্বোচ্চ " + bnNum(max) + " অক্ষর দেওয়া যাবে";
+      return "বিশেষ/নিয়ন্ত্রণ অক্ষর দেওয়া যাবে না";
+    }
+    return "এই মানটি গ্রহণযোগ্য নয়";
   }
-  function renderContentCard() {
-    if (!content) return;
-    const t = $("cmsTitle"); t.textContent = content.heroTitle + (content.heroHighlight ? " " : "");
-    if (content.heroHighlight) t.append(h("em", { text: content.heroHighlight }));
-    $("cmsSub").textContent = content.heroSub || "";
-    $("cmsSwatch").style.background = content.accentColor;
-    $("cmsCard").style.setProperty("--cms-gold2", cmsLightShade(content.accentColor));
-    $("cmsHex").textContent = content.accentColor;
-    const parts = [];
-    if (content.updatedAt) parts.push("সর্বশেষ আপডেট: " + fmtDateTime(content.updatedAt));
-    if (content.updatedBy) parts.push(content.updatedBy === "seed" ? "প্রাথমিক কনটেন্ট" : content.updatedBy);
-    $("cmsFoot").textContent = parts.length ? parts.join(" · ") : "এখনো কোনো পরিবর্তন সেভ হয়নি — সাইটের মূল লেখা দেখানো হচ্ছে";
+  const pickSec = (x) => ({ hidden: !!x.hidden, fields: x.fields, extra: x.extra || [] });
+
+  /* ---------- Section editor (modal with live preview) ---------- */
+  function openSectionEditor(sid, focusKey) {
+    if (!M || !cms) { toast("এডিটর লোড হয়নি — পেজ রিফ্রেশ করুন"); return null; }
+    const def = M.sectionDef(sid);
+    let base = secOf(sid), initial = clone(pickSec(base)), draft = clone(initial);
+    let saving = false, closed = false, serverErr = null, pv = null, valid = null;
+    const openKeys = new Set();
+    const d = makeDialog("wide");
+    d.dataset.tab = "form"; d.dataset.section = sid;
+
+    const head = h("div", { class: "mhead" }, h("h3", { text: def.icon + " " + def.label + " — এডিট" }), h("button", { type: "button", class: "mx", "aria-label": "বন্ধ করুন", text: "✕", onclick: () => attemptClose() }));
+    const tabForm = h("button", { type: "button", class: "on", text: "ফর্ম", onclick: () => setTab("form") });
+    const tabPv = h("button", { type: "button", text: "প্রিভিউ", onclick: () => setTab("preview") });
+    const tabs = h("div", { class: "mtabs", role: "tablist" }, tabForm, tabPv);
+    function setTab(t) { d.dataset.tab = t; tabForm.classList.toggle("on", t === "form"); tabPv.classList.toggle("on", t === "preview"); if (pv) requestAnimationFrame(pv.relayout); }
+    const banner = h("div", { class: "mbanner hidden", role: "alert" });
+    const form = h("div", { class: "sform" });
+    const body = h("div", { class: "mbody" }, banner, form);
+    const pvPane = h("div", { class: "mpv" });
+    const fstat = h("span", { class: "fstat", "aria-live": "polite" });
+    const saveBtn = h("button", { type: "button", class: "btn btn-gold", "data-act": "save", text: "সেভ করুন", onclick: () => save() });
+    const cancelBtn = h("button", { type: "button", class: "btn btn-line", text: "বাতিল", onclick: () => attemptClose() });
+    d.append(h("div", { class: "mbox", role: "dialog", "aria-modal": "true", "aria-label": def.label + " এডিট" }, head, tabs, h("div", { class: "mmain" }, body, pvPane), h("div", { class: "mfoot" }, fstat, cancelBtn, saveBtn)));
+
+    /* draft access by validation path ("title.text", "buttons.items.2.href", "extra.1.src") */
+    const dpath = (p) => (p === "extra" || p.startsWith("extra.") ? p : "fields." + p).split(".");
+    const get = (p) => dpath(p).reduce((o, k) => (o == null ? undefined : o[k]), draft);
+    function set(p, v) { const ks = dpath(p); let o = draft; for (const k of ks.slice(0, -1)) o = o[k]; o[ks[ks.length - 1]] = v; }
+
+    function validate() {
+      try { return { ok: true, clean: M.cleanSection(sid, draft) }; }
+      catch (e) { return { ok: false, field: e instanceof M.CmsError ? e.field : "section" }; }
+    }
+    let initialClean = null;
+    try { initialClean = JSON.stringify(pickSec(M.cleanSection(sid, initial))); } catch {}
+    function isDirty() {
+      if (valid && valid.ok && initialClean) return JSON.stringify(pickSec(valid.clean)) !== initialClean;
+      return JSON.stringify(draft) !== JSON.stringify(initial);
+    }
+    function refresh() {
+      valid = validate();
+      form.querySelectorAll(".bad").forEach((n) => n.classList.remove("bad"));
+      form.querySelectorAll(".ferr").forEach((n) => (n.textContent = ""));
+      form.querySelectorAll("[aria-invalid=true]").forEach((n) => n.setAttribute("aria-invalid", "false"));
+      const errPath = serverErr || (valid.ok ? null : valid.field);
+      if (errPath) {
+        let p = errPath, target = null;
+        while (p && !(target = form.querySelector('[data-path="' + CSS.escape(p) + '"]'))) p = p.includes(".") ? p.slice(0, p.lastIndexOf(".")) : "";
+        if (target) {
+          target.classList.add("bad");
+          const input = target.matches(".fld") ? target.querySelector("input[type=text], textarea") : null;
+          if (input) input.setAttribute("aria-invalid", "true");
+          const fe = [...target.querySelectorAll(".ferr")].find((x) => x.closest("[data-path]") === target);
+          if (fe) fe.textContent = serverErr ? "সার্ভার এই মানটি গ্রহণ করেনি — ঠিক করে আবার দিন" : errMsg(errPath, input);
+          for (let it = target.closest(".rep-item"); it; it = it.parentElement.closest(".rep-item")) {
+            it.classList.add("bad");
+            if (!it.classList.contains("open")) { it.classList.add("open"); openKeys.add(it.dataset.key); const t = it.querySelector(":scope > .rep-h > .rep-t"); if (t) t.setAttribute("aria-expanded", "true"); }
+          }
+        }
+      }
+      const dirty = isDirty();
+      fstat.className = "fstat" + (errPath ? " err" : "");
+      fstat.textContent = errPath ? "একটি ঘর ঠিক করতে হবে" : dirty ? "সেভ না করা পরিবর্তন আছে" : "";
+      saveBtn.disabled = saving || !valid.ok || !dirty;
+      cancelBtn.disabled = saving;
+    }
+    function preview(path) {
+      if (!pv || !valid || !valid.ok) return;
+      const v = valid.clean;
+      const doc = { schema: M.SCHEMA, sections: cms.sections.map((s) => (s.id === sid ? Object.assign({}, s, v) : s)) };
+      let focus = null;
+      if (path) focus = path === "hidden" ? { sel: '[data-cms-section="' + sid + '"]' } : { sid, key: path.split(".")[0], part: path === "title.highlight" ? "em" : null };
+      pv.update(M.plan(doc, cms.settings), focus);
+    }
+    function changed(path) { serverErr = null; refresh(); preview(path); }
+
+    /* ---- controls ---- */
+    let uidN = 0;
+    const uid = () => "sf_" + sid + "_" + ++uidN;
+    function textInput(path, label, o = {}) {
+      const id = uid();
+      const input = o.long ? h("textarea", { id, placeholder: " ", rows: 3 }) : h("input", { id, type: "text", placeholder: " ", list: o.list || null, spellcheck: o.list ? "false" : null });
+      if (o.long) input.addEventListener("keydown", (e) => { if (e.key === "Enter") e.preventDefault(); });
+      const cur = get(path);
+      input.value = cur == null ? "" : String(cur);
+      input.dataset.max = o.max || 500; input.dataset.min = o.min || 0;
+      input.setAttribute("aria-describedby", id + "_e");
+      const cnt = o.max ? h("span", { class: "fcnt", "aria-hidden": "true" }) : null;
+      const upd = () => { if (cnt) { const n = charLen(input.value.trim()); cnt.textContent = bnNum(n) + "/" + bnNum(o.max); cnt.classList.toggle("over", n > o.max); } };
+      input.addEventListener("input", () => { set(path, input.value); upd(); changed(path); });
+      upd();
+      const meta = h("div", { class: "fmeta" }, h("span", { class: "ferr", id: id + "_e", "aria-live": "polite" }), o.hint ? h("span", { class: "fhint", text: o.hint }) : null, cnt, o.side || null);
+      return h("div", { class: "fld", "data-path": path }, h("div", { class: "fl" }, input, h("label", { for: id, text: label })), meta);
+    }
+    const hrefInput = (path, label, o = {}) => textInput(path, label || "লিংক", Object.assign({ max: 500, list: "anchors", hint: "যেমন https://…, #packages, tel:+880…, mailto:…" }, o));
+    function checkbox(path, label) {
+      const c = h("input", { type: "checkbox" });
+      c.checked = !!get(path);
+      c.addEventListener("change", () => { set(path, c.checked); changed(path); });
+      return h("label", { class: "chk", "data-path": path }, c, h("span", { text: label }));
+    }
+    function select(path, label, options, num) {
+      const id = uid(), s = h("select", { id, class: "sel" });
+      for (const [v, t] of options) { const o = h("option", { value: String(v), text: t }); if (String(get(path)) === String(v)) o.selected = true; s.append(o); }
+      s.addEventListener("change", () => { set(path, num ? Number(s.value) : s.value); changed(path); });
+      return h("div", { class: "flsel", "data-path": path }, s, h("label", { for: id, text: label }));
+    }
+    const styleSelect = (path, label) => select(path, label || "বাটনের স্টাইল", M.BUTTON_STYLES.map((s) => [s, M.BUTTON_STYLE_LABELS[s]]));
+    function imageInput(path, o = {}) {
+      const src = get(path) || "";
+      const fallback = o.fallback || "";
+      const shown = src || fallback;
+      const thumb = h("div", { class: "thumb" }, shown ? h("img", { src: shown, alt: "" }) : h("span", { text: "ছবি নেই" }));
+      const pick = h("button", { type: "button", class: "btn btn-sm btn-gold", "data-act": "pick", text: src ? "ছবি বদলান" : "ছবি বাছুন", onclick: async () => {
+        const r = await openImagePicker(src);
+        if (!r || closed) return;
+        set(path, r.url);
+        if (o.altPath && r.alt && !get(o.altPath)) set(o.altPath, r.alt);
+        renderForm(); changed(path);
+      } });
+      const clear = src ? h("button", { type: "button", class: "btn btn-sm btn-line", "data-act": "clear", text: o.clearText || "ছবি সরান", onclick: () => { set(path, ""); renderForm(); changed(path); } }) : null;
+      return h("div", { class: "imgf", "data-path": path }, thumb, h("div", { style: "min-width:0;flex:1" },
+        h("div", { style: "display:flex;gap:8px;flex-wrap:wrap" }, pick, clear),
+        h("div", { class: "src", text: src || (fallback ? "মূল ছবি দেখানো হচ্ছে" : "") }), h("span", { class: "ferr" })));
+    }
+    function group(title, opts, ...kids) {
+      return h("div", { class: "fgroup" }, h("div", { class: "gh" }, h("span", { text: title }), opts && opts.right ? opts.right : null), ...kids);
+    }
+
+    /** Repeater for the array at `path` (its validation path, e.g. "buttons.items" or "extra"). */
+    function repeater(path, o) {
+      const arr = get(path) || [];
+      const wrap = h("div", { class: "rep", "data-path": path });
+      wrap.append(h("div", { class: "rep-top" }, h("span", { text: (o.label ? o.label + " · " : "") + bnNum(arr.length) + "/" + bnNum(o.max) }), h("span", { class: "ferr" })));
+      arr.forEach((it, i) => {
+        const ip = path + "." + i, k = path + "#" + it.id;
+        const open = !o.compact && openKeys.has(k);
+        const item = h("div", { class: "rep-item" + (open ? " open" : "") + (o.compact ? " compact" : "") + (it.hidden ? " is-hidden" : ""), "data-path": ip, "data-id": it.id, "data-key": k });
+        const mv = (delta) => { const j = i + delta; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; renderForm(); changed(path + "." + j); focusAct(arr[j].id, delta < 0 ? "up" : "down"); };
+        const acts = [
+          h("button", { type: "button", class: "ib", "data-act": "up", title: "উপরে সরান", "aria-label": "উপরে সরান", disabled: i === 0, text: "↑", onclick: () => mv(-1) }),
+          h("button", { type: "button", class: "ib", "data-act": "down", title: "নিচে সরান", "aria-label": "নিচে সরান", disabled: i === arr.length - 1, text: "↓", onclick: () => mv(1) }),
+          o.noHide ? null : h("button", { type: "button", class: "ib", "data-act": "hide", "aria-pressed": it.hidden ? "true" : "false", title: it.hidden ? "দেখান" : "লুকান", "aria-label": it.hidden ? "দেখান" : "লুকান", text: it.hidden ? "🚫" : "👁", onclick: () => { it.hidden = !it.hidden; renderForm(); changed(ip); } }),
+          h("button", { type: "button", class: "ib del", "data-act": "del", title: "মুছুন", "aria-label": "মুছুন", text: "🗑", onclick: () => { arr.splice(i, 1); openKeys.delete(k); renderForm(); changed(path); } }),
+        ];
+        const content = o.body(ip, it, i);
+        if (o.compact) {
+          item.append(h("div", { class: "rep-h" }, h("div", { class: "rep-b" }, ...content), ...acts));
+        } else {
+          const t = h("button", { type: "button", class: "rep-t", "aria-expanded": open ? "true" : "false", text: (o.title(it, i) || "—") + (it.hidden ? " (লুকানো)" : ""), onclick: () => {
+            const on = item.classList.toggle("open"); t.setAttribute("aria-expanded", on ? "true" : "false"); if (on) openKeys.add(k); else openKeys.delete(k);
+          } });
+          item.append(h("div", { class: "rep-h" }, t, ...acts), h("div", { class: "rep-b" }, ...content));
+        }
+        wrap.append(item);
+      });
+      const adders = o.adders || [[o.addLabel || "যোগ করুন", o.make]];
+      wrap.append(h("div", { class: "rep-add" }, ...adders.map(([label, make]) => h("button", { type: "button", class: "btn btn-sm btn-line", "data-act": "add", disabled: arr.length >= o.max, text: "+ " + label, onclick: async () => {
+        const it = Object.assign({ id: M.newId() }, make(), { hidden: false });
+        if (o.beforeAdd && !(await o.beforeAdd(it))) return;
+        if (closed) return;
+        arr.push(it); openKeys.add(path + "#" + it.id); renderForm(); changed(path + "." + (arr.length - 1));
+        const el = form.querySelector('[data-id="' + it.id + '"] input[type=text], [data-id="' + it.id + '"] textarea');
+        if (el) { el.scrollIntoView({ block: "nearest" }); if (!isMobile()) el.focus(); }
+      } }))));
+      return wrap;
+    }
+    function focusAct(id, act) {
+      const b = form.querySelector('[data-id="' + id + '"] [data-act="' + act + '"]');
+      if (b && !b.disabled) b.focus();
+    }
+    function buttonBody(ip) {
+      return [h("div", { class: "two" }, textInput(ip + ".label", "বাটনের লেখা", { max: 60, min: 1 }), styleSelect(ip + ".style")),
+        hrefInput(ip + ".href", "লিংক"), checkbox(ip + ".newTab", "নতুন ট্যাবে খুলবে")];
+    }
+    function cardBody(kind, ip) {
+      const out = [];
+      for (const f of M.CARD_KINDS[kind]) {
+        const p = ip + "." + f.k;
+        if (f.t === "s") out.push(textInput(p, f.label, { max: f.max, min: f.min || 0, long: f.long, hint: f.rich ? "**মোটা লেখা** এভাবে লিখুন" : null }));
+        else if (f.t === "b") out.push(checkbox(p, f.label));
+        else if (f.t === "href") out.push(hrefInput(p, f.label));
+        else if (f.t === "img") out.push(imageInput(p, { altPath: ip + ".imageAlt" }));
+        else if (f.t === "style") out.push(styleSelect(p, f.label));
+        else if (f.t === "n") out.push(select(p, f.label, f.options.map((n) => [n, "থিম " + bnNum(n)]), true));
+        else if (f.t === "list") out.push(repeater(p + ".items", { label: f.label, max: 15, compact: true, addLabel: "ফিচার যোগ করুন", make: () => ({ text: "নতুন ফিচার" }), body: (fp) => [textInput(fp + ".text", "ফিচার", { max: f.max, min: 1 })] }));
+      }
+      return out;
+    }
+    function fieldControls(f) {
+      const k = f.key;
+      switch (f.type) {
+        case "text":
+          return textInput(k + ".text", f.label, { max: f.max, min: f.min, long: f.long, hint: f.hint || (f.rich ? "**মোটা লেখা** এভাবে লিখুন" : null), side: f.hideable ? checkbox(k + ".hidden", "লুকান") : null });
+        case "heroTitle":
+          return group(f.label, null, textInput(k + ".text", "শিরোনাম", { max: 120, min: 1 }), textInput(k + ".highlight", "হাইলাইট অংশ", { max: 40, hint: "সোনালি রঙে দেখাবে · ঐচ্ছিক" }));
+        case "image":
+          return group(f.label, { right: checkbox(k + ".hidden", "লুকান") },
+            imageInput(k + ".src", { altPath: k + ".alt", fallback: sid === "hero" ? M.BUILTIN_MEDIA[0].url : "", clearText: "মূল ছবিতে ফিরুন" }),
+            textInput(k + ".alt", "ছবির বিবরণ (alt)", { max: 150, hint: f.hint || "দৃষ্টি-প্রতিবন্ধী ও গুগলের জন্য" }));
+        case "link":
+          return group(f.label, { right: checkbox(k + ".hidden", "লুকান") }, hrefInput(k + ".href", "লিংক"), textInput(k + ".label", "লেবেল (স্ক্রিন রিডারের জন্য)", { max: 60, min: 1 }));
+        case "buttons":
+          return group(f.label, null, repeater(k + ".items", { max: f.max, addLabel: "বাটন যোগ করুন", make: NEW_BUTTON, title: (b) => b.label, body: (ip) => buttonBody(ip) }));
+        case "links":
+          return group(f.label, null, repeater(k + ".items", { max: f.max, addLabel: "লিংক যোগ করুন", make: () => ({ label: "নতুন লিংক", href: "#" }), title: (b) => b.label + " → " + b.href,
+            body: (ip) => [h("div", { class: "two" }, textInput(ip + ".label", "লেখা", { max: 60, min: 1 }), hrefInput(ip + ".href", "লিংক", { hint: null }))] }));
+        case "list":
+          return group(f.label, null, repeater(k + ".items", { max: f.max, compact: true, addLabel: "পয়েন্ট যোগ করুন", make: () => ({ text: "নতুন পয়েন্ট" }), body: (ip) => [textInput(ip + ".text", "লেখা", { max: f.itemMax || 120, min: 1 })] }));
+        case "cards":
+          return group(f.label, null, repeater(k + ".items", { max: f.max, addLabel: (f.itemLabel || "আইটেম") + " যোগ করুন", make: NEW_CARD[f.card], title: (c) => plain(c.title || c.name || c.q), body: (ip) => cardBody(f.card, ip) }));
+      }
+      return null;
+    }
+    function extraControls() {
+      return group("নতুন এলিমেন্ট — সেকশনের শেষে দেখাবে", null, repeater("extra", {
+        max: 12,
+        adders: M.EXTRA_TYPES.map((t) => [M.EXTRA_LABELS[t], NEW_EXTRA[t]]),
+        beforeAdd: async (it) => {
+          if (it.type !== "image") return true;
+          const r = await openImagePicker("");
+          if (!r || !r.url) return false;
+          it.src = r.url; it.alt = r.alt || ""; return true;
+        },
+        title: (e) => M.EXTRA_LABELS[e.type] + ": " + (e.text || e.label || e.alt || e.src || ""),
+        body: (ip, e) => e.type === "heading" ? [textInput(ip + ".text", "শিরোনাম", { max: 160, min: 1 })]
+          : e.type === "text" ? [textInput(ip + ".text", "প্যারাগ্রাফ", { max: 800, min: 1, long: true })]
+          : e.type === "image" ? [imageInput(ip + ".src", { altPath: ip + ".alt", clearText: null }), textInput(ip + ".alt", "ছবির বিবরণ (alt)", { max: 150 })]
+          : buttonBody(ip),
+      }));
+    }
+    function renderForm() {
+      const st = body.scrollTop;
+      form.textContent = "";
+      const tgText = () => (draft.hidden ? "এই সেকশন সাইটে লুকানো থাকবে" + (sid === "footer" ? " (ভাসমান মেসেঞ্জার বাটনসহ)" : "") : "এই সেকশন সাইটে দেখা যাবে");
+      const label = h("span", { text: tgText() });
+      const c = h("input", { type: "checkbox", "aria-label": "সেকশন দেখান" }); c.checked = !draft.hidden;
+      const tg = h("label", { class: "sectoggle" + (draft.hidden ? " off" : ""), "data-path": "hidden", id: "secVisible" }, c, label);
+      c.addEventListener("change", () => { draft.hidden = !c.checked; tg.classList.toggle("off", draft.hidden); label.textContent = tgText(); changed("hidden"); });
+      form.append(tg);
+      for (const f of def.fields) { const el = fieldControls(f); if (el) { el.dataset.key = f.key; form.append(el); } }
+      if (def.slot) { const ex = extraControls(); ex.dataset.key = "extra"; form.append(ex); }
+      body.scrollTop = st;
+    }
+
+    function showBanner(kind, text, actionText, action) {
+      banner.className = "mbanner " + kind; banner.textContent = "";
+      banner.append(h("span", { text }));
+      if (actionText) banner.append(h("button", { type: "button", class: "btn btn-sm " + (kind === "err" ? "btn-danger" : "btn-gold"), text: actionText, onclick: action }));
+      if (isMobile()) setTab("form");
+      body.scrollTop = 0;
+    }
+    const hideBanner = () => { banner.className = "mbanner hidden"; banner.textContent = ""; };
+    function setSaving(on) {
+      saving = on; saveBtn.textContent = "";
+      if (on) saveBtn.append(h("span", { class: "bspin", "aria-hidden": "true" }), "সেভ হচ্ছে…"); else saveBtn.textContent = "সেভ করুন";
+      refresh();
+    }
+    async function save() {
+      if (saving || closed) return;
+      refresh();
+      if (saveBtn.disabled) return;
+      hideBanner(); setSaving(true);
+      try {
+        const r = await api("/admin/content/homepage/sections/" + sid, { method: "PUT", body: Object.assign(pickSec(valid.clean), { version: base.version || 0 }) });
+        setSaving(false); close();
+        replaceSection(r.section);
+        toast("সেভ হয়েছে" + LIVE_NOTE, 3600);
+      } catch (e) {
+        setSaving(false);
+        if (e.message === "session") return close();
+        if (e.status === 400 && e.field && e.field !== "version") {
+          serverErr = e.field; refresh(); if (isMobile()) setTab("form");
+          const t = form.querySelector(".bad input[type=text], .bad textarea"); if (t) t.focus();
+          if (!form.querySelector(".bad")) showBanner("err", "সার্ভার একটি মান গ্রহণ করেনি (" + e.field + ")।");
+        }
+        else if (e.status === 409) showBanner("warn", "অন্য কোথাও এডিট হয়েছে, নতুন ডেটা লোড করুন", "রিলোড", reloadData);
+        else if (!e.status) showBanner("err", "সংযোগ ব্যর্থ হয়েছে — আপনার পরিবর্তন রাখা আছে। ইন্টারনেট দেখে আবার চেষ্টা করুন।", "আবার চেষ্টা", () => save());
+        else if (e.status === 403) showBanner("err", "এই কাজের অনুমতি আপনার নেই।");
+        else if (e.status === 413) showBanner("err", "কনটেন্ট অনেক বড় হয়ে গেছে — কিছু আইটেম কমিয়ে আবার চেষ্টা করুন।");
+        else showBanner("err", "সেভ হয়নি (" + e.message + "), আবার চেষ্টা করুন।", "আবার চেষ্টা", () => save());
+      }
+    }
+    async function reloadData() {
+      try {
+        await loadCms(); base = secOf(sid); initial = clone(pickSec(base)); draft = clone(initial); serverErr = null;
+        try { initialClean = JSON.stringify(pickSec(M.cleanSection(sid, initial))); } catch { initialClean = null; }
+        renderForm(); refresh(); preview(null); hideBanner(); buildNav(); toast("নতুন ডেটা লোড হয়েছে");
+      } catch (e) { if (e.message === "session") return close(); showBanner("err", "লোড করা যায়নি, আবার চেষ্টা করুন।", "রিলোড", reloadData); }
+    }
+    function resetAll() { draft = clone(initial); serverErr = null; renderForm(); refresh(); preview(null); }
+    async function attemptClose() {
+      if (saving || closed) return;
+      if (isDirty()) {
+        const ok = await confirmModal({ title: "পরিবর্তন বাদ দেবেন?", message: "আপনার সেভ না করা পরিবর্তনগুলো হারিয়ে যাবে।", okText: "বাদ দিন", cancelText: "এডিটে ফিরুন", danger: true });
+        if (!ok) return;
+      }
+      close();
+    }
+    function close() { if (closed) return; closed = true; if (pv) pv.destroy(); d.close(); }
+    d.addEventListener("cancel", (e) => { e.preventDefault(); attemptClose(); });
+    d.addEventListener("backdrop", () => attemptClose());
+
+    d.showModal();
+    pv = pagePreview(pvPane, { reset: resetAll, initialFocus: { sid, key: focusKey || (def.fields[0] && def.fields[0].key) } });
+    renderForm(); refresh(); preview(null);
+    if (focusKey) setTimeout(() => {
+      const g = form.querySelector('[data-key="' + focusKey + '"]');
+      if (g) { g.scrollIntoView({ block: "start" }); const i = g.querySelector("input[type=text], textarea"); if (i && !isMobile()) i.focus(); }
+    }, 40);
+    return d;
   }
-  async function refreshContentCard() {
-    try { await loadContent(); }
-    catch (e) { if (e.message !== "session") $("cmsFoot").textContent = "কনটেন্ট লোড হয়নি — পেজ রিফ্রেশ করে দেখুন"; }
-  }
-  $("cmsEdit").onclick = async () => {
-    const b = $("cmsEdit"); b.disabled = true;
-    try { await loadContent(); }
-    catch (e) { if (e.message !== "session") toast("কনটেন্ট লোড হয়নি, আবার চেষ্টা করুন"); return; }
-    finally { b.disabled = false; }
-    openModal({
-      title: "হোমপেজ হিরো সেকশন এডিট",
-      fields: CONTENT_FIELDS,
-      values: pickContent(content),
-      preview: contentPreview,
-      successText: "সেভ হয়েছে — ১ মিনিটের মধ্যে লাইভ হবে",
-      onSave: async (vals) => {
-        const r = await api("/admin/content", { method: "PUT", body: Object.assign({}, vals, { version: content.version || 0 }) });
-        content = r.content; renderContentCard();
-      },
-      reload: async () => pickContent(await loadContent()),
+
+  /* ---------- Media: library, picker, upload ---------- */
+  const fmtSize = (n) => (n >= 1048576 ? bnNum((n / 1048576).toFixed(1)) + " MB" : bnNum(Math.max(1, Math.round(n / 1024))) + " KB");
+  const usedLabel = (p) => { const [s, ...rest] = String(p).split("."); return labelOf(s) + (rest[0] === "extra" ? " · নতুন এলিমেন্ট" : ""); };
+  function chooseFile() {
+    return new Promise((resolve) => {
+      const inp = h("input", { type: "file", accept: "image/jpeg,image/png,image/webp,image/gif", style: "display:none", id: "fileInput" });
+      inp.addEventListener("change", () => { resolve(inp.files[0] || null); inp.remove(); });
+      inp.addEventListener("cancel", () => { resolve(null); inp.remove(); });
+      document.body.append(inp); inp.click();
     });
-  };
-  $("cmsUndo").onclick = async () => {
-    const ok = await confirmModal({ title: "আগের ভার্সনে ফিরবেন?", message: "হোমপেজের হিরো সেকশন শেষ সেভের আগের অবস্থায় ফিরে যাবে। দরকার হলে আবার এই বোতামে চাপ দিয়ে বর্তমান ভার্সনে ফেরা যাবে।", okText: "হ্যাঁ, ফিরুন" });
+  }
+  function checkFile(file) {
+    const max = (media && media.maxBytes) || 5 * 1024 * 1024;
+    if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type)) return "শুধু JPG, PNG, WebP বা GIF ছবি আপলোড করা যাবে (SVG নয়)";
+    if (file.size > max) return "ফাইলটি " + fmtSize(file.size) + " — সর্বোচ্চ ৫ MB পর্যন্ত আপলোড করা যাবে";
+    return "";
+  }
+  /** Pick (or receive) a file, ask for alt text, upload. → Promise<item|null> */
+  async function uploadFlow(file) {
+    file = file || (await chooseFile());
+    if (!file) return null;
+    const bad = checkFile(file);
+    if (bad) { await confirmModal({ title: "এই ফাইল আপলোড করা যাবে না", message: bad, okText: "ঠিক আছে", cancelText: "বন্ধ করুন" }); return null; }
+    return new Promise((resolve) => {
+      const d = makeDialog("small");
+      const url = URL.createObjectURL(file);
+      let done = false, busy = false;
+      const finish = (v) => { if (done) return; done = true; URL.revokeObjectURL(url); d.close(); resolve(v); };
+      const altIn = h("input", { type: "text", id: "upAlt", placeholder: " ", maxlength: 150 });
+      const err = h("div", { class: "mbanner err hidden", role: "alert" });
+      const ok = h("button", { type: "button", class: "btn btn-gold", id: "upGo", text: "⬆ আপলোড করুন", onclick: go });
+      const cancel = h("button", { type: "button", class: "btn btn-line", text: "বাতিল", onclick: () => !busy && finish(null) });
+      altIn.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); go(); } });
+      d.append(h("div", { class: "mbox", role: "dialog", "aria-modal": "true", "aria-label": "ছবি আপলোড" },
+        h("div", { class: "mhead" }, h("h3", { text: "ছবি আপলোড" }), h("button", { type: "button", class: "mx", "aria-label": "বন্ধ করুন", text: "✕", onclick: () => !busy && finish(null) })),
+        h("div", { class: "mbody" }, err, h("img", { class: "upv", src: url, alt: "" }),
+          h("div", { class: "note2", style: "margin:0 0 12px;text-align:center", text: (file.name || "ছবি") + " · " + fmtSize(file.size) }),
+          h("div", { class: "fld" }, h("div", { class: "fl" }, altIn, h("label", { for: "upAlt", text: "ছবির বিবরণ (alt) — ঐচ্ছিক" })), h("div", { class: "fmeta" }, h("span", { class: "fhint", text: "ছবিতে কী আছে লিখুন, যেমন: “দোকানের সামনের ছবি”" })))),
+        h("div", { class: "mfoot" }, cancel, ok)));
+      async function go() {
+        if (busy) return;
+        busy = true; ok.disabled = cancel.disabled = true; ok.textContent = ""; ok.append(h("span", { class: "bspin" }), "আপলোড হচ্ছে…");
+        const fd = new FormData(); fd.append("file", file, file.name || "image"); fd.append("alt", cleanText(altIn.value).slice(0, 150));
+        try {
+          const r = await api("/admin/media", { method: "POST", body: fd });
+          toast("ছবি আপলোড হয়েছে");
+          media = null;
+          finish(r.item);
+        } catch (e) {
+          busy = false; ok.disabled = cancel.disabled = false; ok.textContent = "⬆ আবার চেষ্টা করুন";
+          if (e.message === "session") return finish(null);
+          err.classList.remove("hidden");
+          err.textContent = e.status === 413 ? "ফাইলটি ৫ MB-এর বেশি — ছোট ছবি দিন" : e.status === 415 ? "এই ধরনের ফাইল চলবে না — শুধু JPG, PNG, WebP বা GIF" : !e.status ? "সংযোগ ব্যর্থ হয়েছে, আবার চেষ্টা করুন" : "আপলোড হয়নি (" + e.message + ")";
+        }
+      }
+      d.addEventListener("cancel", (e) => { e.preventDefault(); if (!busy) finish(null); });
+      d.addEventListener("backdrop", () => !busy && finish(null));
+      d.showModal(); altIn.focus();
+    });
+  }
+  function promptModal({ title, label, value, max, hint }) {
+    return new Promise((resolve) => {
+      const d = makeDialog("small");
+      let done = false;
+      const finish = (v) => { if (done) return; done = true; d.close(); resolve(v); };
+      const inp = h("input", { type: "text", id: "pmIn", placeholder: " ", maxlength: max || 150 }); inp.value = value || "";
+      inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); finish(cleanText(inp.value)); } });
+      d.append(h("div", { class: "mbox", role: "dialog", "aria-modal": "true", "aria-label": title },
+        h("div", { class: "mhead" }, h("h3", { text: title }), h("button", { type: "button", class: "mx", "aria-label": "বন্ধ করুন", text: "✕", onclick: () => finish(null) })),
+        h("div", { class: "mbody" }, h("div", { class: "fld" }, h("div", { class: "fl" }, inp, h("label", { for: "pmIn", text: label })), h("div", { class: "fmeta" }, hint ? h("span", { class: "fhint", text: hint }) : null))),
+        h("div", { class: "mfoot" }, h("button", { type: "button", class: "btn btn-line", text: "বাতিল", onclick: () => finish(null) }), h("button", { type: "button", class: "btn btn-gold", id: "pmOk", text: "সেভ করুন", onclick: () => finish(cleanText(inp.value)) }))));
+      d.addEventListener("cancel", (e) => { e.preventDefault(); finish(null); });
+      d.addEventListener("backdrop", () => finish(null));
+      d.showModal(); inp.focus(); inp.select();
+    });
+  }
+  async function copyText(t) {
+    try { await navigator.clipboard.writeText(t); toast("লিংক কপি হয়েছে"); }
+    catch { await promptModal({ title: "লিংক কপি করুন", label: "ছবির লিংক", value: t, max: 600, hint: "সিলেক্ট করে কপি করুন" }); }
+  }
+  const usedList = (u) => (Array.isArray(u) ? u : u ? [u] : []);
+  async function renderMedia() {
+    const box = $("pMedia");
+    if (!media) { box.textContent = ""; box.append(h("div", { class: "card" }, h("div", { class: "spinner" }))); try { await loadMedia(); } catch (e) { box.textContent = ""; box.append(h("div", { class: "card" }, h("p", { text: "মিডিয়া লোড করা যায়নি।" }), h("button", { type: "button", class: "btn btn-sm btn-gold", text: "আবার চেষ্টা", onclick: () => renderMedia() }))); return; } }
+    if (parseHash().page !== "media") return;
+    box.textContent = "";
+    const up = h("button", { type: "button", class: "btn btn-gold", id: "mediaUpload", text: "⬆ ছবি আপলোড", onclick: async () => { const it = await uploadFlow(); if (it) renderMedia(); } });
+    const drop = h("div", { class: "drop", tabindex: "0", role: "button", "aria-label": "ছবি টেনে এনে ছাড়ুন বা ক্লিক করুন", text: "ছবি এখানে টেনে এনে ছাড়ুন — JPG, PNG, WebP, GIF · সর্বোচ্চ ৫ MB" });
+    drop.addEventListener("click", () => up.click());
+    drop.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); up.click(); } });
+    drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+    drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+    drop.addEventListener("drop", async (e) => { e.preventDefault(); drop.classList.remove("over"); const f = e.dataTransfer.files[0]; if (f) { const it = await uploadFlow(f); if (it) renderMedia(); } });
+    const grid = h("div", { class: "mgrid", id: "mediaGrid" });
+    for (const b of media.builtin) grid.append(mediaCard(b, true));
+    for (const it of media.items) grid.append(mediaCard(it, false));
+    const storage = media.storage === "r2" ? "ছবি Cloudflare R2-তে রাখা হচ্ছে।" : "ছবি এখন Cloudflare KV-তে রাখা হচ্ছে (R2 চালু হলে সেখানে সরানো যাবে)।";
+    box.append(h("div", { class: "card" },
+      h("div", { class: "card-h" }, h("div", {}, h("h2", { text: "মিডিয়া লাইব্রেরি" }), h("p", { class: "note2", style: "margin:4px 0 0", text: bnNum(media.items.length) + "টি আপলোড করা ছবি · " + bnNum(media.builtin.length) + "টি সাইটের নিজস্ব" })), up),
+      drop, grid,
+      media.items.length ? null : h("p", { class: "note2", text: "এখনো কোনো ছবি আপলোড করা হয়নি।" }),
+      h("p", { class: "note2", id: "mediaStorage", text: storage })));
+  }
+  function mediaCard(it, builtin) {
+    const used = usedList(it.usedIn);
+    const card = h("div", { class: "mcard", "data-key": it.key },
+      h("div", { class: "mimg" }, h("img", { src: it.url, alt: it.alt || "", loading: "lazy" })),
+      h("div", { class: "minfo" },
+        h("div", { class: "mname", title: it.name || it.key, text: builtin ? "সাইটের নিজস্ব ছবি" : it.name || it.key }),
+        h("div", { class: "msub", text: builtin ? "SVG · মূল ইলাস্ট্রেশন" : fmtSize(it.size) + " · " + (it.contentType || "").replace("image/", "").toUpperCase() }),
+        h("div", { class: "malt" + (it.alt ? "" : " none"), text: it.alt ? "alt: " + it.alt : "alt নেই" }),
+        used.length ? h("div", { class: "mused" }, ...used.map((u) => h("span", { class: "pill", text: "ব্যবহৃত: " + usedLabel(u) }))) : null),
+      h("div", { class: "macts" },
+        h("button", { type: "button", class: "btn btn-sm btn-line", "data-act": "copy", text: "লিংক কপি", onclick: () => copyText(SITE_ORIGIN + it.url) }),
+        builtin ? null : h("button", { type: "button", class: "btn btn-sm btn-line", "data-act": "alt", text: "alt লিখুন", onclick: () => editAlt(it) }),
+        builtin ? null : h("button", { type: "button", class: "btn btn-sm btn-danger", "data-act": "delete", text: "মুছুন", onclick: () => deleteMedia(it) })));
+    return card;
+  }
+  async function editAlt(it) {
+    const v = await promptModal({ title: "ছবির বিবরণ (alt)", label: "বিবরণ", value: it.alt, max: 150, hint: "ছবিতে কী আছে এক লাইনে লিখুন" });
+    if (v == null) return;
+    try { await api("/admin/media/" + encodeURIComponent(it.key), { method: "PUT", body: { alt: v.slice(0, 150) } }); toast("alt সেভ হয়েছে"); media = null; renderMedia(); }
+    catch (e) { if (e.message !== "session") toast("সেভ হয়নি, আবার চেষ্টা করুন"); }
+  }
+  async function deleteMedia(it) {
+    const used = usedList(it.usedIn);
+    if (used.length) {
+      const go = await confirmModal({ title: "ছবিটি ব্যবহার হচ্ছে", message: "এই ছবিটি হোমপেজে ব্যবহার হচ্ছে (" + used.map(usedLabel).join(", ") + ")। আগে সেখান থেকে ছবিটি বদলান, তারপর মুছুন।", okText: "সেকশনে যান", cancelText: "বন্ধ করুন" });
+      if (go) location.hash = "#/homepage/" + String(used[0]).split(".")[0];
+      return;
+    }
+    const ok = await confirmModal({ title: "ছবিটি মুছবেন?", message: (it.name || it.key) + " স্থায়ীভাবে মুছে যাবে। এই কাজ ফেরানো যাবে না।", okText: "মুছে ফেলুন", cancelText: "বাতিল", danger: true });
     if (!ok) return;
-    const b = $("cmsUndo"); b.disabled = true;
-    try {
-      const r = await api("/admin/content/undo", { method: "POST", body: content && content.version ? { version: content.version } : {} });
-      content = r.content; renderContentCard();
-      toast("আগের ভার্সনে ফেরানো হয়েছে — ১ মিনিটের মধ্যে লাইভ হবে", 3600);
-    } catch (e) {
+    try { await api("/admin/media/" + encodeURIComponent(it.key), { method: "DELETE" }); toast("ছবি মুছে ফেলা হয়েছে"); media = null; renderMedia(); }
+    catch (e) {
       if (e.message === "session") return;
-      if (e.status === 404) toast("ফেরার মতো আগের কোনো ভার্সন নেই");
-      else if (e.status === 409) { toast("অন্য কোথাও এডিট হয়েছে — নতুন ডেটা লোড করা হলো"); refreshContentCard(); }
-      else toast("ব্যর্থ হয়েছে: " + e.message);
-    } finally { b.disabled = false; }
-  };
+      if (e.status === 409) { toast("ছবিটি এখন হোমপেজে ব্যবহার হচ্ছে — মোছা হয়নি", 4000); media = null; renderMedia(); }
+      else toast("মোছা যায়নি, আবার চেষ্টা করুন");
+    }
+  }
+  const SITE_ORIGIN = location.origin;
+  /** Choose an image from the library (or upload a new one). → Promise<{url, alt}|null> */
+  async function openImagePicker(current) {
+    if (!media) { try { await loadMedia(); } catch { toast("মিডিয়া লোড করা যায়নি"); return null; } }
+    return new Promise((resolve) => {
+      const d = makeDialog("picker");
+      let done = false, sel = current ? { url: current, alt: "" } : null;
+      const finish = (v) => { if (done) return; done = true; d.close(); resolve(v); };
+      const grid = h("div", { class: "pgrid", id: "pickGrid", role: "listbox", "aria-label": "ছবি বাছুন" });
+      const ok = h("button", { type: "button", class: "btn btn-gold", id: "pickOk", text: "এই ছবি নিন", onclick: () => sel && finish(sel) });
+      function tiles() {
+        grid.textContent = "";
+        const all = [...media.builtin, ...media.items];
+        for (const it of all) {
+          const on = !!sel && sel.url === it.url;
+          const t = h("button", { type: "button", class: "ptile" + (on ? " on" : ""), role: "option", "aria-selected": on ? "true" : "false", "data-url": it.url, title: it.alt || it.name || it.key, onclick: () => { sel = { url: it.url, alt: it.alt || "" }; tiles(); ok.disabled = false; } },
+            h("img", { src: it.url, alt: it.alt || "", loading: "lazy" }), h("span", { text: it.builtin ? "মূল ইলাস্ট্রেশন" : it.name || it.key }));
+          t.addEventListener("dblclick", () => finish({ url: it.url, alt: it.alt || "" }));
+          grid.append(t);
+        }
+        if (!media.items.length) grid.append(h("p", { class: "note2", style: "grid-column:1/-1", text: "লাইব্রেরিতে এখনো কোনো আপলোড করা ছবি নেই — নতুন ছবি আপলোড করুন।" }));
+        ok.disabled = !sel;
+      }
+      const upl = h("button", { type: "button", class: "btn btn-line", id: "pickUpload", text: "⬆ নতুন ছবি আপলোড", onclick: async () => {
+        const it = await uploadFlow();
+        if (!it) return;
+        try { await loadMedia(); } catch { media = media || { items: [], builtin: M.BUILTIN_MEDIA }; media.items.unshift(it); }
+        sel = { url: it.url, alt: it.alt || "" }; tiles();
+      } });
+      d.append(h("div", { class: "mbox", role: "dialog", "aria-modal": "true", "aria-label": "ছবি বাছুন" },
+        h("div", { class: "mhead" }, h("h3", { text: "মিডিয়া থেকে ছবি বাছুন" }), h("button", { type: "button", class: "mx", "aria-label": "বন্ধ করুন", text: "✕", onclick: () => finish(null) })),
+        h("div", { class: "mbody" }, grid), h("div", { class: "mfoot" }, upl, h("span", { style: "flex:1" }), h("button", { type: "button", class: "btn btn-line", text: "বাতিল", onclick: () => finish(null) }), ok)));
+      d.addEventListener("cancel", (e) => { e.preventDefault(); finish(null); });
+      d.addEventListener("backdrop", () => finish(null));
+      tiles(); d.showModal();
+    });
+  }
+
+  /* ---------- Settings ---------- */
+  const PHONE_RE = /^\+?[0-9 ()\-.]{3,30}$/;
+  const EMAIL_RE = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
+  const SETTINGS_FIELDS = [
+    { name: "siteTitle", label: "সাইটের টাইটেল (ব্রাউজার ট্যাব ও গুগল)", type: "text", min: 1, max: 120, emptyMsg: "টাইটেল খালি রাখা যাবে না" },
+    { name: "metaDescription", label: "মেটা ডেসক্রিপশন (গুগলে দেখাবে)", type: "textarea", min: 0, max: 300 },
+    { name: "accentColor", label: "অ্যাকসেন্ট রং (বাটন ও হাইলাইট)", type: "color", presets: CMS_PRESETS },
+    { name: "primaryColor", label: "প্রধান রং (সবুজ অংশ)", type: "color", presets: PRIMARY_PRESETS },
+    { name: "contactPhone", label: "ফুটারে ফোন নম্বর", type: "text", min: 0, max: 40, hint: "ঐচ্ছিক · যেমন +880 1XXX-XXXXXX", validate: (v) => (v && !PHONE_RE.test(v) ? "সঠিক ফোন নম্বর দিন" : "") },
+    { name: "contactEmail", label: "ফুটারে ইমেইল", type: "text", min: 0, max: 120, hint: "ঐচ্ছিক", validate: (v) => (v && !EMAIL_RE.test(v) ? "সঠিক ইমেইল ঠিকানা দিন" : "") },
+    { name: "contactAddress", label: "ফুটারে ঠিকানা", type: "text", min: 0, max: 160, hint: "ঐচ্ছিক" },
+  ];
+  const pickSettings = (s) => Object.fromEntries(SETTINGS_FIELDS.map((f) => [f.name, s[f.name] == null ? "" : s[f.name]]));
+  const SETTINGS_FOCUS = { accentColor: ".hero .btn-gold", primaryColor: ".hero", contactPhone: "[data-cms-slot=footer]", contactEmail: "[data-cms-slot=footer]", contactAddress: "[data-cms-slot=footer]" };
+  async function renderSettings() {
+    const host = $("pSettings");
+    if (!(await ensureCms(host))) return;
+    if (parseHash().page !== "settings") return;
+    const s = cms.settings;
+    host.textContent = "";
+    const row = (label, val, sw) => h("div", { class: "srow" }, h("span", { class: "k", text: label }), h("span", { class: "v" + (val ? "" : " muted") }, sw ? h("i", { class: "sw", style: "--c:" + val }) : null, val || "—"));
+    host.append(h("div", { class: "card" },
+      h("div", { class: "card-h" }, h("div", {}, h("h2", { text: "সাইট সেটিংস" }), h("p", { class: "note2", style: "margin:4px 0 0", text: updatedLine(s) })),
+        h("div", { style: "display:flex;gap:8px;flex-wrap:wrap" },
+          s.version > 0 ? h("button", { type: "button", class: "btn btn-sm btn-line", id: "setUndo", text: "↶ আগের অবস্থায় ফিরুন", onclick: () => undoSettings() }) : null,
+          h("button", { type: "button", class: "btn btn-sm btn-gold", id: "setEdit", text: "✎ এডিট করুন", onclick: () => editSettings() }))),
+      ...SETTINGS_FIELDS.map((f) => row(f.label, s[f.name], f.type === "color"))));
+  }
+  function editSettings() {
+    openModal({
+      title: "সাইট সেটিংস এডিট", fields: SETTINGS_FIELDS, values: pickSettings(cms.settings), successText: "সেটিংস সেভ হয়েছে" + LIVE_NOTE,
+      preview: (pane, o) => {
+        const p = pagePreview(pane, { reset: o.reset, initialFocus: { sel: ".hero" } });
+        return {
+          update(v, name) {
+            let st; try { st = M.cleanSettings(v); } catch { return; }
+            p.update(M.plan({ sections: cms.sections }, st), name && SETTINGS_FOCUS[name] ? { sel: SETTINGS_FOCUS[name] } : null);
+          },
+          relayout: p.relayout, destroy: p.destroy,
+        };
+      },
+      onSave: async (v) => {
+        const r = await api("/admin/settings", { method: "PUT", body: Object.assign({}, v, { version: cms.settings.version || 0 }) });
+        cms.settings = r.settings; renderSettings();
+      },
+      reload: async () => { await loadCms(); renderSettings(); return pickSettings(cms.settings); },
+    });
+  }
+  async function undoSettings() {
+    const ok = await confirmModal({ title: "আগের সেটিংসে ফিরবেন?", message: "শেষবার সেভ করার আগের সেটিংস আবার চালু হবে।", okText: "↶ ফিরে যান", cancelText: "বাতিল" });
+    if (!ok) return;
+    try { const r = await api("/admin/settings/undo", { method: "POST", body: { version: cms.settings.version } }); cms.settings = r.settings; renderSettings(); toast("আগের সেটিংস ফিরিয়ে আনা হয়েছে" + LIVE_NOTE, 3600); }
+    catch (e) {
+      if (e.message === "session") return;
+      if (e.status === 404) toast("ফেরার মতো আগের কোনো সেটিংস নেই");
+      else if (e.status === 409) { toast("অন্য কোথাও এডিট হয়েছে — নতুন ডেটা লোড হলো"); await loadCms().catch(() => {}); renderSettings(); }
+      else toast("ব্যর্থ হয়েছে, আবার চেষ্টা করুন");
+    }
+  }
 
   $("tabs").addEventListener("click", (e) => {
     const t = e.target.closest(".tab"); if (!t) return;
@@ -922,7 +1851,8 @@ function cmsLightShade(hex) {
   });
 
   function logout(expired) {
-    sessionStorage.removeItem(TOKEN_KEY); me = null; users = []; content = null;
+    sessionStorage.removeItem(TOKEN_KEY); me = null; users = []; cms = null; media = null; lastRoute = "";
+    closeDrawer();
     document.querySelectorAll("dialog.mdl").forEach((d) => d.close());
     try { google.accounts.id.disableAutoSelect(); } catch {}
     show("v-login");

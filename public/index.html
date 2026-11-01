@@ -206,40 +206,40 @@ a{color:inherit}
 </head>
 <body>
 
-<header class="header">
+<header class="header" data-cms-section="header">
   <div class="container">
-    <a href="#top" class="logo" aria-label="WebDesigner71 হোম">WebDesigner<span>71</span></a>
-    <nav class="nav" aria-label="প্রধান মেনু">
+    <a href="#top" class="logo" aria-label="WebDesigner71 হোম" data-cms="header.logo">WebDesigner<span>71</span></a>
+    <nav class="nav" aria-label="প্রধান মেনু" data-cms="header.nav">
       <a href="#packages">প্যাকেজ</a>
       <a href="#work">কাজের নমুনা</a>
       <a href="#how">কীভাবে কাজ করি</a>
       <a href="#faq">প্রশ্নোত্তর</a>
     </nav>
-    <a href="#contact" class="btn btn-gold">মেসেজ করুন</a>
+    <a href="#contact" class="btn btn-gold" data-cms="header.cta">মেসেজ করুন</a>
   </div>
 </header>
 
 <main id="top">
 
 <!-- 1) HERO -->
-<section class="hero" aria-labelledby="hero-title">
+<section class="hero" aria-labelledby="hero-title" data-cms-section="hero">
   <div class="motif" style="position:absolute;inset:0;opacity:.5" aria-hidden="true"></div>
   <div class="container">
-    <div class="reveal">
-      <span class="badge">ফ্রি ডোমেইন ও হোস্টিং</span>
-      <h1 id="hero-title">আপনার ব্যবসার ওয়েবসাইট, মাত্র <em>৩৯০০ টাকায়</em></h1>
-      <p class="sub" id="hero-sub">ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে</p>
-      <div class="hero-actions">
+    <div class="reveal" data-cms-slot="hero">
+      <span class="badge" data-cms="hero.badge">ফ্রি ডোমেইন ও হোস্টিং</span>
+      <h1 id="hero-title" data-cms="hero.title">আপনার ব্যবসার ওয়েবসাইট, মাত্র <em>৩৯০০ টাকায়</em></h1>
+      <p class="sub" id="hero-sub" data-cms="hero.sub">ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে</p>
+      <div class="hero-actions" data-cms="hero.buttons">
         <a href="#packages" class="btn btn-gold">অফার নিন →</a>
         <a href="#work" class="btn btn-ghost">কাজের নমুনা দেখুন</a>
       </div>
-      <div class="hero-trust">
+      <div class="hero-trust" data-cms="hero.trust">
         <span>ই-কমার্স ও বিজনেস ওয়েবসাইট</span>
         <span>মোবাইল-ফ্রেন্ডলি ডিজাইন</span>
         <span>ডোমেইন আপনার নামে</span>
       </div>
     </div>
-    <figure class="mockup reveal d2">
+    <figure class="mockup reveal d2" data-cms="hero.image">
       <svg viewBox="0 0 520 480" role="img" aria-labelledby="mk-title mk-desc" xmlns="http://www.w3.org/2000/svg">
         <title id="mk-title">একটি আধুনিক ওয়েবসাইট হোমপেজের অ্যানোটেটেড ডিজাইন</title>
         <desc id="mk-desc">ব্রাউজার ফ্রেমে একটি ওয়েবসাইটের হোমপেজ, যেখানে লোগো, মেনু, হিরো সেকশন, কল-টু-অ্যাকশন বাটন, ছবি/ব্যানার ও সার্ভিস সেকশন চিহ্নিত করা আছে।</desc>
@@ -345,14 +345,14 @@ a{color:inherit}
 </section>
 
 <!-- 2) PROBLEM & SOLUTION -->
-<section class="section" aria-labelledby="problem-title">
-  <div class="container">
+<section class="section" aria-labelledby="problem-title" data-cms-section="problem">
+  <div class="container" data-cms-slot="problem">
     <div class="center reveal">
-      <span class="eyebrow">সমস্যাটা চেনা চেনা লাগছে?</span>
-      <h2 class="section-title" id="problem-title">ব্যবসা আছে, কিন্তু অনলাইনে আপনি কোথায়?</h2>
+      <span class="eyebrow" data-cms="problem.eyebrow">সমস্যাটা চেনা চেনা লাগছে?</span>
+      <h2 class="section-title" id="problem-title" data-cms="problem.title">ব্যবসা আছে, কিন্তু অনলাইনে আপনি কোথায়?</h2>
       <div class="stitch" aria-hidden="true"></div>
     </div>
-    <div class="pains">
+    <div class="pains" data-cms="problem.pains">
       <article class="pain reveal">
         <div class="ic" aria-hidden="true">🏪</div>
         <h3>দোকান আছে, অনলাইনে কেউ খুঁজে পাচ্ছে না</h3>
@@ -372,24 +372,24 @@ a{color:inherit}
     <div class="solution reveal">
       <div class="motif" style="position:absolute;inset:0;opacity:.35" aria-hidden="true"></div>
       <div>
-        <h3>সমাধান: <span>এক প্যাকেজেই</span> আপনার পুরো অনলাইন উপস্থিতি</h3>
-        <p>ডিজাইন, ডোমেইন, হোস্টিং — সব আমরা সেটআপ করে দিই। আপনি শুধু ব্যবসায় মন দিন।</p>
+        <h3 data-cms="problem.solutionTitle">সমাধান: <span>এক প্যাকেজেই</span> আপনার পুরো অনলাইন উপস্থিতি</h3>
+        <p data-cms="problem.solutionText">ডিজাইন, ডোমেইন, হোস্টিং — সব আমরা সেটআপ করে দিই। আপনি শুধু ব্যবসায় মন দিন।</p>
       </div>
-      <a href="#packages" class="btn btn-gold">প্যাকেজ দেখুন</a>
+      <a href="#packages" class="btn btn-gold" data-cms="problem.solutionButtons">প্যাকেজ দেখুন</a>
     </div>
   </div>
 </section>
 
 <!-- 3) PACKAGES -->
-<section class="section packages" id="packages" aria-labelledby="packages-title">
-  <div class="container">
+<section class="section packages" id="packages" aria-labelledby="packages-title" data-cms-section="packages">
+  <div class="container" data-cms-slot="packages">
     <div class="center reveal">
-      <span class="eyebrow">সহজ ও স্বচ্ছ দাম</span>
-      <h2 class="section-title" id="packages-title">আপনার জন্য সঠিক প্যাকেজ বেছে নিন</h2>
-      <p class="section-sub">কোনো লুকানো খরচ নেই। ই-কমার্স বা বিজনেস — দুই ধরনের ওয়েবসাইটই পাবেন।</p>
+      <span class="eyebrow" data-cms="packages.eyebrow">সহজ ও স্বচ্ছ দাম</span>
+      <h2 class="section-title" id="packages-title" data-cms="packages.title">আপনার জন্য সঠিক প্যাকেজ বেছে নিন</h2>
+      <p class="section-sub" data-cms="packages.sub">কোনো লুকানো খরচ নেই। ই-কমার্স বা বিজনেস — দুই ধরনের ওয়েবসাইটই পাবেন।</p>
       <div class="stitch" aria-hidden="true"></div>
     </div>
-    <div class="cards">
+    <div class="cards" data-cms="packages.cards">
       <article class="card popular reveal">
         <span class="pop-tag">সবচেয়ে জনপ্রিয়</span>
         <h3>স্ট্যান্ডার্ড</h3>
@@ -415,20 +415,20 @@ a{color:inherit}
         <a href="#contact" class="btn btn-green">প্রিমিয়াম নিন</a>
       </article>
     </div>
-    <p class="note">* সাপোর্ট ১ মাসের জন্য, আজীবন নয়। ফ্রি ডোমেইন ও হোস্টিং প্রথম বছরের জন্য।</p>
+    <p class="note" data-cms="packages.note">* সাপোর্ট ১ মাসের জন্য, আজীবন নয়। ফ্রি ডোমেইন ও হোস্টিং প্রথম বছরের জন্য।</p>
   </div>
 </section>
 
 <!-- 4) SAMPLE WORK -->
-<section class="section" id="work" aria-labelledby="work-title">
-  <div class="container">
+<section class="section" id="work" aria-labelledby="work-title" data-cms-section="work">
+  <div class="container" data-cms-slot="work">
     <div class="center reveal">
-      <span class="eyebrow">আমাদের কাজ</span>
-      <h2 class="section-title" id="work-title">কাজের নমুনা</h2>
-      <p class="section-sub">বিভিন্ন ধরনের বাংলাদেশি ব্যবসার জন্য তৈরি ওয়েবসাইট।</p>
+      <span class="eyebrow" data-cms="work.eyebrow">আমাদের কাজ</span>
+      <h2 class="section-title" id="work-title" data-cms="work.title">কাজের নমুনা</h2>
+      <p class="section-sub" data-cms="work.sub">বিভিন্ন ধরনের বাংলাদেশি ব্যবসার জন্য তৈরি ওয়েবসাইট।</p>
       <div class="stitch" aria-hidden="true"></div>
     </div>
-    <div class="works">
+    <div class="works" data-cms="work.items">
       <article class="work reveal">
         <div class="work-thumb w1" aria-hidden="true"><div class="motif" style="position:absolute;inset:0;opacity:.5"></div><div class="bar"><i></i><i></i><i></i></div><span class="initial">D</span></div>
         <div class="work-body">
@@ -458,14 +458,14 @@ a{color:inherit}
 </section>
 
 <!-- 5) HOW IT WORKS -->
-<section class="section" id="how" aria-labelledby="how-title" style="padding-top:0">
-  <div class="container">
+<section class="section" id="how" aria-labelledby="how-title" style="padding-top:0" data-cms-section="how">
+  <div class="container" data-cms-slot="how">
     <div class="center reveal">
-      <span class="eyebrow">সহজ ৪ ধাপ</span>
-      <h2 class="section-title" id="how-title">কীভাবে কাজ করি</h2>
+      <span class="eyebrow" data-cms="how.eyebrow">সহজ ৪ ধাপ</span>
+      <h2 class="section-title" id="how-title" data-cms="how.title">কীভাবে কাজ করি</h2>
       <div class="stitch" aria-hidden="true"></div>
     </div>
-    <ol class="steps" style="list-style:none">
+    <ol class="steps" style="list-style:none" data-cms="how.steps">
       <li class="step reveal"><div class="num">১</div><h3>অফার নিন</h3><p>পছন্দের প্যাকেজ বেছে নিয়ে আমাদের মেসেজ করুন।</p></li>
       <li class="step reveal d1"><div class="num">২</div><h3>ব্যবসার কথা বলো</h3><p>আপনার ব্যবসা, পণ্য আর পছন্দের কথা জানান।</p></li>
       <li class="step reveal d2"><div class="num">৩</div><h3>ডিজাইন করে দিচ্ছি</h3><p>আমরা ওয়েবসাইট বানাই, আপনি দেখে মতামত দেন।</p></li>
@@ -475,14 +475,14 @@ a{color:inherit}
 </section>
 
 <!-- 6) FAQ -->
-<section class="section faq" id="faq" aria-labelledby="faq-title">
-  <div class="container">
+<section class="section faq" id="faq" aria-labelledby="faq-title" data-cms-section="faq">
+  <div class="container" data-cms-slot="faq">
     <div class="center reveal">
-      <span class="eyebrow">প্রশ্নোত্তর</span>
-      <h2 class="section-title" id="faq-title">সাধারণ কিছু প্রশ্ন</h2>
+      <span class="eyebrow" data-cms="faq.eyebrow">প্রশ্নোত্তর</span>
+      <h2 class="section-title" id="faq-title" data-cms="faq.title">সাধারণ কিছু প্রশ্ন</h2>
       <div class="stitch" aria-hidden="true"></div>
     </div>
-    <div class="faq-list">
+    <div class="faq-list" data-cms="faq.items">
       <div class="faq-item reveal">
         <button class="faq-q" aria-expanded="false" aria-controls="fa1" id="fq1">দাম কত?<span class="pm" aria-hidden="true">+</span></button>
         <div class="faq-a" id="fa1" role="region" aria-labelledby="fq1"><div><p>স্ট্যান্ডার্ড প্যাকেজ <strong>৳৩৯০০</strong> — ওয়েবসাইট, ফ্রি ডোমেইন ও ফ্রি হোস্টিং সহ। প্রিমিয়াম প্যাকেজ <strong>৳৪৯০০</strong> — এর সাথে সোশ্যাল মিডিয়া সেটআপ আর ১ মাসের সাপোর্ট। এটা এককালীন খরচ।</p></div></div>
@@ -515,35 +515,35 @@ a{color:inherit}
 </section>
 
 <!-- 7) FINAL CTA -->
-<section class="section final" id="contact" aria-labelledby="contact-title">
+<section class="section final" id="contact" aria-labelledby="contact-title" data-cms-section="contact">
   <div class="motif" style="position:absolute;inset:0;opacity:.45" aria-hidden="true"></div>
-  <div class="container reveal">
-    <span class="eyebrow">আর দেরি নয়</span>
-    <h2 id="contact-title">আজই আপনার ব্যবসাকে <span>অনলাইনে</span> আনুন</h2>
-    <p class="lead">একটা মেসেজই যথেষ্ট। আপনার ব্যবসার কথা জানান, বাকিটা আমরা দেখছি।</p>
+  <div class="container reveal" data-cms-slot="contact">
+    <span class="eyebrow" data-cms="contact.eyebrow">আর দেরি নয়</span>
+    <h2 id="contact-title" data-cms="contact.title">আজই আপনার ব্যবসাকে <span>অনলাইনে</span> আনুন</h2>
+    <p class="lead" data-cms="contact.lead">একটা মেসেজই যথেষ্ট। আপনার ব্যবসার কথা জানান, বাকিটা আমরা দেখছি।</p>
     <!-- REPLACE: Facebook Messenger link (https://m.me/YOUR_PAGE) -->
-    <a href="https://m.me/YOUR_PAGE" class="btn btn-gold btn-xl" target="_blank" rel="noopener">💬 এখনই মেসেজ করুন</a>
-    <div class="contact-row">
+    <a href="https://m.me/YOUR_PAGE" class="btn btn-gold btn-xl" target="_blank" rel="noopener" data-cms="contact.primary">💬 এখনই মেসেজ করুন</a>
+    <div class="contact-row" data-cms="contact.buttons">
       <!-- REPLACE: Facebook page link (https://facebook.com/YOUR_PAGE) -->
       <a href="https://facebook.com/YOUR_PAGE" class="btn btn-ghost" target="_blank" rel="noopener">ফেসবুক পেজ</a>
       <!-- REPLACE: WhatsApp number (display text and wa.me link) -->
       <a href="https://wa.me/8801XXXXXXXXX" class="btn btn-ghost" target="_blank" rel="noopener">হোয়াটসঅ্যাপ: +880 1XXX-XXXXXX</a>
     </div>
-    <p class="small-print">সাধারণত কয়েক ঘণ্টার মধ্যে উত্তর দিই।</p>
+    <p class="small-print" data-cms="contact.smallPrint">সাধারণত কয়েক ঘণ্টার মধ্যে উত্তর দিই।</p>
   </div>
 </section>
 
 </main>
 
-<footer class="footer">
-  <div class="container">
-    <a href="#top" class="logo">WebDesigner<span>71</span></a>
-    <p>© ২০২৬ WebDesigner71 · বাংলাদেশি উদ্যোক্তাদের জন্য ওয়েবসাইট</p>
+<footer class="footer" data-cms-section="footer">
+  <div class="container" data-cms-slot="footer">
+    <a href="#top" class="logo" data-cms="footer.logo">WebDesigner<span>71</span></a>
+    <p data-cms="footer.copyright">© ২০২৬ WebDesigner71 · বাংলাদেশি উদ্যোক্তাদের জন্য ওয়েবসাইট</p>
   </div>
 </footer>
 
 <!-- REPLACE: Facebook Messenger link for floating button (https://m.me/YOUR_PAGE) -->
-<a href="https://m.me/YOUR_PAGE" class="fab" target="_blank" rel="noopener" aria-label="মেসেঞ্জারে মেসেজ করুন">
+<a href="https://m.me/YOUR_PAGE" class="fab" target="_blank" rel="noopener" aria-label="মেসেঞ্জারে মেসেজ করুন" data-cms-section="footer" data-cms="footer.fab">
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.19 5.44 3.14 7.17.16.14.26.35.27.57l.05 1.78a.8.8 0 0 0 1.12.71l1.98-.87a.8.8 0 0 1 .53-.04c.91.25 1.87.38 2.91.38 5.64 0 10-4.13 10-9.7S17.64 2 12 2zm6 7.46-2.94 4.66a1.5 1.5 0 0 1-2.17.4l-2.34-1.75a.6.6 0 0 0-.72 0l-3.16 2.4c-.42.32-.97-.18-.69-.63l2.94-4.66a1.5 1.5 0 0 1 2.17-.4l2.34 1.75a.6.6 0 0 0 .72 0l3.16-2.4c.42-.32.97.18.69.63z"/></svg>
 </a>
 

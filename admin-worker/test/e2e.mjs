@@ -1,4 +1,4 @@
-// End-to-end test: runs `wrangler dev --local` with a test-only JWKS (TEST_MODE, localhost only),
+// End-to-end test (CMS Phase 2 included): runs `wrangler dev --local` with a test-only JWKS (TEST_MODE, localhost only),
 // signs fake Google ID tokens with a locally generated RSA key, and exercises the full flow.
 import { spawn } from "node:child_process";
 import { generateKeyPairSync, createSign, randomBytes, createHmac } from "node:crypto";
@@ -6,6 +6,8 @@ import { writeFileSync, rmSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import http from "node:http";
+import { execFileSync } from "node:child_process";
+import * as M from "../src/cms-model.js";
 
 const PORT = 8799;
 const BASE = `http://localhost:${PORT}`;
@@ -55,6 +57,12 @@ const api = (path, { method = "GET", body, token, origin = ORIGIN, form } = {}) 
     headers: { ...(origin ? { origin } : {}), ...(body ? { "content-type": "application/json" } : {}), ...(token ? { authorization: `Bearer ${token}` } : {}) },
     body: body ? JSON.stringify(body) : form ? new URLSearchParams(form) : undefined,
   });
+// Write a key straight into the local (throwaway) KV store, e.g. to simulate the Phase 1 key in production.
+const putLocalKV = (binding, key, obj) => {
+  const f = join(tmpdir(), "wd71-e2e-kv-value.json");
+  writeFileSync(f, JSON.stringify(obj));
+  execFileSync("npx", ["wrangler", "kv", "key", "put", key, "--path", f, "--binding", binding, "--local", "--persist-to", persist, "--config", TEST_CONFIG], { stdio: "pipe" });
+};
 const login = (claims, opt) => api("/auth/google", { method: "POST", body: { credential: googleToken(claims, opt) } });
 
 try {
@@ -154,65 +162,193 @@ try {
   r = await api("/admin/users", { token: userToken });
   check("approved user can list users", r.status === 200 && (await r.json()).users.length === 2);
 
-  // --- CMS Phase 1: homepage content
-  const C0 = { heroTitle: "আপনার ব্যবসার ওয়েবসাইট, মাত্র", heroHighlight: "৩৯০০ টাকায়", heroSub: "ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে", accentColor: "#D4A017" };
+  // --- CMS Phase 2: homepage sections, settings, media
   r = await api("/content", { origin: null });
   j = await r.json();
   check("public GET /content (empty) -> {content:null}", r.status === 200 && j.content === null, JSON.stringify(j));
-  r = await api("/admin/content", { method: "OPTIONS" });
-  check("CORS preflight allows PUT", r.status === 204 && /\bPUT\b/.test(r.headers.get("access-control-allow-methods") || ""));
-  r = await api("/admin/content", { method: "PUT", body: { ...C0, version: 0 } });
-  check("PUT /admin/content without token -> 401", r.status === 401);
-  r = await api("/admin/content", { method: "PUT", token: userToken, body: { ...C0, version: 0 } });
-  check("non-admin PUT /admin/content -> 403", r.status === 403 && (await r.json()).error === "admin_only");
-  r = await api("/admin/content/undo", { method: "POST", token: userToken, body: {} });
-  check("non-admin undo -> 403", r.status === 403);
-  r = await api("/admin/content/undo", { method: "POST", token: adminToken, body: {} });
-  check("undo with no previous -> 404", r.status === 404);
-  r = await api("/admin/content", { method: "PUT", token: adminToken, body: { ...C0, version: 0 } });
+  r = await api("/content/homepage", { origin: null });
   j = await r.json();
-  check("admin save -> 200 version 1", r.status === 200 && j.ok && j.content.version === 1 && j.content.heroTitle === C0.heroTitle && j.content.updatedBy === ADMIN, JSON.stringify(j));
+  check("public GET /content/homepage (empty) -> defaults, version 0", r.status === 200 && j.source === "defaults" && j.sections.length === M.SECTION_IDS.length && j.sections.every((s) => s.version === 0) && j.settings.accentColor === "#D4A017", JSON.stringify(j).slice(0, 200));
+  // Phase 1 key present (what production has) -> migrated read
+  const V1 = { heroTitle: "আপনার ব্যবসার ওয়েবসাইট, মাত্র", heroHighlight: "৩৯০০ টাকায়", heroSub: "ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে", accentColor: "#D4A017", version: 3, updatedBy: ADMIN, updatedAt: "2026-11-01T00:00:00.000Z" };
+  putLocalKV("CONTENT", "content:homepage", V1);
+  r = await api("/content/homepage", { origin: null });
+  j = await r.json();
+  const heroOf = (x) => x.sections.find((s) => s.id === "hero");
+  check("Phase 1 key -> source v1, hero equals defaults", j.source === "v1" && JSON.stringify(heroOf(j).fields) === JSON.stringify(M.DEFAULTS.hero.fields), JSON.stringify(heroOf(j)).slice(0, 200));
   r = await api("/content", { origin: null });
   j = await r.json();
-  check("public GET /content returns saved content (no updatedBy)", j.content && j.content.version === 1 && j.content.heroSub === C0.heroSub && !("updatedBy" in j.content), JSON.stringify(j));
-  r = await api("/content", { token: adminToken });
-  check("GET /content with session includes updatedBy", (await r.json()).content.updatedBy === ADMIN);
-  r = await api("/content", { token: "garbage" });
-  check("GET /content with bad token still 200 (public)", r.status === 200);
-  for (const [name, body, field] of [
-    ["bad color -> 400 accentColor", { ...C0, accentColor: "red", version: 1 }, "accentColor"],
-    ["short hex -> 400", { ...C0, accentColor: "#FFF", version: 1 }, "accentColor"],
-    ["empty title -> 400 heroTitle", { ...C0, heroTitle: "   ", version: 1 }, "heroTitle"],
-    ["title > 120 chars -> 400", { ...C0, heroTitle: "ক".repeat(121), version: 1 }, "heroTitle"],
-    ["highlight > 40 chars -> 400", { ...C0, heroHighlight: "x".repeat(41), version: 1 }, "heroHighlight"],
-    ["sub > 300 chars -> 400", { ...C0, heroSub: "x".repeat(301), version: 1 }, "heroSub"],
-    ["non-string field -> 400", { ...C0, heroSub: 5, version: 1 }, "heroSub"],
-    ["control chars -> 400", { ...C0, heroTitle: "a\nb", version: 1 }, "heroTitle"],
-    ["missing version -> 400", { ...C0 }, "version"],
-  ]) {
-    r = await api("/admin/content", { method: "PUT", token: adminToken, body });
-    j = await r.json();
-    check(name, r.status === 400 && j.error === "invalid_field" && j.field === field, r.status + " " + JSON.stringify(j));
-  }
-  r = await api("/admin/content", { method: "PUT", token: adminToken, body: { ...C0, heroTitle: "x".repeat(120), heroHighlight: "", heroSub: "", accentColor: "#0b7a55", version: 1 } });
+  check("Phase 1 GET /content still works (derived)", j.content && j.content.heroTitle === V1.heroTitle && j.content.accentColor === "#D4A017" && !("updatedBy" in j.content), JSON.stringify(j));
+  r = await api("/admin/content", { method: "PUT", token: adminToken, body: { ...V1, version: 3 } });
   j = await r.json();
-  check("boundary values accepted (120 chars, empty optional), color upper-cased", r.status === 200 && j.content.version === 2 && j.content.accentColor === "#0B7A55" && j.content.heroHighlight === "", JSON.stringify(j));
-  r = await api("/admin/content", { method: "PUT", token: adminToken, body: { ...C0, version: 1 } });
-  j = await r.json();
-  check("stale version -> 409 version_conflict", r.status === 409 && j.error === "version_conflict" && j.content.version === 2, JSON.stringify(j));
-  r = await api("/admin/content", { method: "PUT", token: adminToken, body: { ...C0, heroTitle: "নতুন <b>শিরোনাম</b>", version: 2 } });
-  j = await r.json();
-  check("HTML-looking text stored as plain text", r.status === 200 && j.content.heroTitle === "নতুন <b>শিরোনাম</b>" && j.content.version === 3);
-  r = await api("/admin/content/undo", { method: "POST", token: adminToken, body: { version: 2 } });
-  check("undo with stale version -> 409", r.status === 409);
-  r = await api("/admin/content/undo", { method: "POST", token: adminToken, body: { version: 3 } });
-  j = await r.json();
-  check("undo restores previous content (new version 4)", r.status === 200 && j.content.version === 4 && j.content.heroTitle === "x".repeat(120) && j.content.accentColor === "#0B7A55", JSON.stringify(j));
+  check("Phase 1 PUT /admin/content -> 410 superseded", r.status === 410 && j.error === "superseded" && /sections\/hero/.test(j.use), JSON.stringify(j));
   r = await api("/admin/content/undo", { method: "POST", token: adminToken, body: {} });
+  check("Phase 1 POST /admin/content/undo -> 410", r.status === 410);
+
+  r = await api("/admin/content/homepage/sections/hero", { method: "OPTIONS" });
+  const methods = r.headers.get("access-control-allow-methods") || "";
+  check("CORS preflight allows PUT + DELETE", r.status === 204 && /\bPUT\b/.test(methods) && /\bDELETE\b/.test(methods), methods);
+  const H = JSON.parse(JSON.stringify(M.DEFAULTS.hero));
+  const sec = (id, body, token = adminToken) => api(`/admin/content/homepage/sections/${id}`, { method: "PUT", token, body });
+  r = await sec("hero", { ...H, version: 1 }, null);
+  check("section PUT without token -> 401", r.status === 401);
+  r = await sec("hero", { ...H, version: 1 }, userToken);
+  check("non-admin section PUT -> 403", r.status === 403 && (await r.json()).error === "admin_only");
+  r = await sec("nope", { ...H, version: 1 });
+  check("unknown section -> 404", r.status === 404);
+  r = await api("/admin/content/homepage/sections/hero/undo", { method: "POST", token: adminToken, body: {} });
+  check("undo with no previous -> 404", r.status === 404);
+  r = await api("/admin/content/homepage/sections/hero/undo", { method: "POST", token: userToken, body: {} });
+  check("non-admin undo -> 403", r.status === 403);
+  const H1 = JSON.parse(JSON.stringify(H));
+  H1.fields.title = { text: "নতুন <b>শিরোনাম</b>", highlight: "৪৯০০ টাকায়" };
+  H1.fields.buttons.items.reverse();
+  H1.fields.buttons.items.push({ id: "b3", label: "কল করুন", href: "tel:+8801700000000", style: "green", newTab: false, hidden: false });
+  H1.fields.trust.items[1].hidden = true;
+  H1.extra = [{ id: "e1", type: "heading", text: "নতুন শিরোনাম" }, { id: "e2", type: "button", label: "দেখুন", href: "#work", style: "ghost" }];
+  r = await sec("hero", { ...H1, version: 1 });
   j = await r.json();
-  check("undo again swaps back (redo)", r.status === 200 && j.content.version === 5 && j.content.heroTitle === "নতুন <b>শিরোনাম</b>");
-  r = await api("/admin/content", { method: "PUT", token: adminToken, body: { ...C0, version: 5 } });
-  check("save original values again", r.status === 200 && (await r.json()).content.version === 6);
+  check("admin saves hero -> version 2 (migrated v1 = 1), HTML kept as plain text", r.status === 200 && j.section.version === 2 && j.section.fields.title.text === "নতুন <b>শিরোনাম</b>" && j.section.fields.buttons.items[2].id === "b3" && j.section.extra.length === 2 && j.section.updatedBy === ADMIN, JSON.stringify(j).slice(0, 300));
+  r = await api("/content/homepage", { origin: null });
+  j = await r.json();
+  check("public read: saved, no updatedBy, source v2", j.source === "v2" && heroOf(j).version === 2 && !("updatedBy" in heroOf(j)) && heroOf(j).fields.trust.items[1].hidden === true);
+  r = await api("/content/homepage", { token: adminToken });
+  check("read with session includes updatedBy", heroOf(await r.json()).updatedBy === ADMIN);
+  r = await api("/content", { origin: null });
+  check("Phase 1 GET /content follows v2 hero", (await r.json()).content.heroTitle === "নতুন <b>শিরোনাম</b>");
+  r = await sec("hero", { ...H, version: 1 });
+  j = await r.json();
+  check("stale version -> 409 with current section", r.status === 409 && j.error === "version_conflict" && j.section.version === 2, JSON.stringify(j).slice(0, 200));
+  const bad = (mut) => { const x = JSON.parse(JSON.stringify(H1)); mut(x); return { ...x, version: 2 }; };
+  for (const [name, body, field] of [
+    ["empty title -> title.text", bad((x) => (x.fields.title.text = "  ")), "title.text"],
+    ["title > 120 chars", bad((x) => (x.fields.title.text = "ক".repeat(121))), "title.text"],
+    ["control chars", bad((x) => (x.fields.sub.text = "a\u0007b")), "sub.text"],
+    ["javascript: href", bad((x) => (x.fields.buttons.items[0].href = "javascript:alert(1)")), "buttons.items.0.href"],
+    ["protocol-relative href", bad((x) => (x.fields.buttons.items[0].href = "//evil.example")), "buttons.items.0.href"],
+    ["data: href", bad((x) => (x.fields.buttons.items[0].href = "data:text/html,x")), "buttons.items.0.href"],
+    ["unknown button style", bad((x) => (x.fields.buttons.items[0].style = "red")), "buttons.items.0.style"],
+    ["duplicate item id", bad((x) => (x.fields.buttons.items[1].id = x.fields.buttons.items[0].id)), "buttons.items.1.id"],
+    ["too many buttons", bad((x) => { for (let i = 0; i < 7; i++) x.fields.buttons.items.push({ id: "z" + i, label: "x", href: "#", style: "gold" }); }), "buttons.items"],
+    ["external image", bad((x) => (x.fields.image = { src: "https://evil.example/a.png", alt: "" })), "image.src"],
+    ["image path traversal", bad((x) => (x.fields.image = { src: "/assets/../wrangler.jsonc", alt: "" })), "image.src"],
+    ["extra image must have src", bad((x) => x.extra.push({ id: "e9", type: "image", src: "" })), "extra.2.src"],
+    ["unknown extra type", bad((x) => x.extra.push({ id: "e9", type: "script", text: "x" })), "extra.2.type"],
+    ["missing version", (() => { const x = bad(() => {}); delete x.version; return x; })(), "version"],
+  ]) {
+    r = await sec("hero", body);
+    j = await r.json();
+    check("invalid: " + name, r.status === 400 && j.error === "invalid_field" && j.field === field, r.status + " " + JSON.stringify(j));
+  }
+  r = await sec("header", { ...JSON.parse(JSON.stringify(M.DEFAULTS.header)), extra: [{ id: "e1", type: "text", text: "x" }], version: 1 });
+  check("extras not allowed in header", r.status === 400 && (await r.json()).field === "extra");
+  r = await api("/admin/content/homepage/sections/hero", { method: "PUT", token: adminToken, body: { ...H1, version: 2, pad: "x".repeat(70000) } });
+  check("body > 64KB -> 413", r.status === 413);
+  // cards: reorder + hide + add on packages; another section keeps its own version
+  const P = JSON.parse(JSON.stringify(M.DEFAULTS.packages));
+  P.fields.cards.items.reverse(); P.fields.cards.items[0].hidden = true;
+  P.fields.cards.items.push({ id: "c3", popular: false, name: "বেসিক", price: "৳২৯০০", features: { items: [{ id: "f1", text: "এক পাতা" }] }, buttonLabel: "নিন", buttonHref: "#contact", buttonStyle: "outline" });
+  r = await sec("packages", { ...P, version: 1 });
+  j = await r.json();
+  check("packages cards reorder/hide/add saved independently (v2)", r.status === 200 && j.section.version === 2 && j.section.fields.cards.items.map((c) => c.id).join() === "c2,c1,c3" && j.section.fields.cards.items[2].priceNote === "", JSON.stringify(j).slice(0, 300));
+  r = await api("/admin/content/homepage/sections/hero/undo", { method: "POST", token: adminToken, body: { version: 1 } });
+  check("undo with stale version -> 409", r.status === 409);
+  r = await api("/admin/content/homepage/sections/hero/undo", { method: "POST", token: adminToken, body: { version: 2 } });
+  j = await r.json();
+  check("undo restores previous hero (version 3) and leaves packages alone", r.status === 200 && j.section.version === 3 && JSON.stringify(j.section.fields) === JSON.stringify(M.DEFAULTS.hero.fields), JSON.stringify(j).slice(0, 200));
+  r = await api("/admin/content/homepage/sections/hero/undo", { method: "POST", token: adminToken, body: {} });
+  j = await r.json();
+  check("undo again swaps back (redo, version 4)", r.status === 200 && j.section.version === 4 && j.section.fields.title.text === "নতুন <b>শিরোনাম</b>");
+  r = await api("/content/homepage", { origin: null });
+  j = await r.json();
+  check("packages still at version 2 after hero undo", j.sections.find((s) => s.id === "packages").version === 2);
+
+  // settings
+  r = await api("/admin/settings");
+  check("GET /admin/settings without token -> 401", r.status === 401);
+  r = await api("/admin/settings", { token: userToken });
+  j = await r.json();
+  check("GET /admin/settings (session) -> defaults v0", r.status === 200 && j.settings.version === 0 && j.settings.siteTitle === M.DEFAULT_SETTINGS.siteTitle);
+  r = await api("/admin/settings", { method: "PUT", token: userToken, body: { ...M.DEFAULT_SETTINGS, version: 0 } });
+  check("non-admin PUT settings -> 403", r.status === 403);
+  for (const [name, body, field] of [
+    ["bad accent", { accentColor: "red" }, "accentColor"], ["short hex", { primaryColor: "#FFF" }, "primaryColor"],
+    ["empty title", { siteTitle: " " }, "siteTitle"], ["bad email", { contactEmail: "nope" }, "contactEmail"], ["bad phone", { contactPhone: "call me" }, "contactPhone"],
+  ]) {
+    r = await api("/admin/settings", { method: "PUT", token: adminToken, body: { ...M.DEFAULT_SETTINGS, ...body, version: 0 } });
+    j = await r.json();
+    check("settings invalid: " + name, r.status === 400 && j.field === field, JSON.stringify(j));
+  }
+  r = await api("/admin/settings", { method: "PUT", token: adminToken, body: { ...M.DEFAULT_SETTINGS, accentColor: "#0b7a55", contactEmail: "hi@webdesigner71.com", version: 0 } });
+  j = await r.json();
+  check("settings saved, colour upper-cased, v1", r.status === 200 && j.settings.version === 1 && j.settings.accentColor === "#0B7A55" && j.settings.updatedBy === ADMIN, JSON.stringify(j));
+  r = await api("/admin/settings", { method: "PUT", token: adminToken, body: { ...M.DEFAULT_SETTINGS, version: 0 } });
+  check("settings stale version -> 409", r.status === 409 && (await r.json()).settings.version === 1);
+  r = await api("/content", { origin: null });
+  check("Phase 1 GET /content accent follows settings", (await r.json()).content.accentColor === "#0B7A55");
+  r = await api("/admin/settings/undo", { method: "POST", token: adminToken, body: { version: 1 } });
+  j = await r.json();
+  check("settings undo -> v2 with previous values", r.status === 200 && j.settings.version === 2 && j.settings.accentColor === "#D4A017" && j.settings.contactEmail === "");
+
+  // media
+  const PNG = Buffer.from("89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d49444154789c6360000002000154a24f5d0000000049454e44ae426082", "hex");
+  const upload = (bytes, name, type, token = adminToken, alt = "পরীক্ষা ছবি") => {
+    const fd = new FormData();
+    fd.append("file", new Blob([bytes], { type }), name);
+    if (alt !== null) fd.append("alt", alt);
+    return fetch(BASE + "/admin/media", { method: "POST", headers: { origin: ORIGIN, ...(token ? { authorization: `Bearer ${token}` } : {}) }, body: fd });
+  };
+  r = await api("/admin/media");
+  check("GET /admin/media without token -> 401", r.status === 401);
+  r = await api("/admin/media", { token: userToken });
+  j = await r.json();
+  check("GET /admin/media (session) -> storage kv, builtin hero illustration", r.status === 200 && j.storage === "kv" && j.items.length === 0 && j.builtin[0].url === "/assets/hero-illustration.svg", JSON.stringify(j));
+  r = await upload(PNG, "a.png", "image/png", null);
+  check("upload without token -> 401", r.status === 401);
+  r = await upload(PNG, "a.png", "image/png", userToken);
+  check("non-admin upload -> 403", r.status === 403);
+  r = await upload(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"/>'), "x.svg", "image/svg+xml");
+  check("SVG upload rejected -> 415", r.status === 415 && (await r.json()).error === "unsupported_type");
+  r = await upload(Buffer.from("<html>not an image</html>"), "fake.png", "image/png");
+  check("fake .png (bad magic bytes) -> 415", r.status === 415);
+  r = await upload(Buffer.concat([PNG, Buffer.alloc(5 * 1024 * 1024)]), "big.png", "image/png");
+  check("> 5 MB -> 413", r.status === 413, r.status);
+  r = await api("/admin/media", { method: "POST", token: adminToken, body: { file: "x" } });
+  check("JSON instead of multipart -> 415", r.status === 415);
+  r = await upload(PNG, "লোগো.png", "application/octet-stream");
+  j = await r.json();
+  const media = j.item;
+  check("PNG upload -> 201, key yyyy-mm-*.png, type sniffed", r.status === 201 && /^\d{4}-\d{2}-[A-Za-z0-9]+\.png$/.test(media.key) && media.contentType === "image/png" && media.alt === "পরীক্ষা ছবি" && media.url === "/media/" + media.key, JSON.stringify(j));
+  r = await upload(Buffer.from("47494638396101000100800000000000ffffff21f90401000000002c00000000010001000002024401003b", "hex"), "a.gif", "image/gif", adminToken, null);
+  const gif = (await r.json()).item;
+  check("GIF upload -> 201", r.status === 201 && gif.contentType === "image/gif");
+  r = await api("/admin/media", { token: adminToken });
+  j = await r.json();
+  check("library lists both uploads", j.items.length === 2 && j.items.some((x) => x.key === media.key));
+  r = await api("/admin/media/" + media.key, { method: "PUT", token: adminToken, body: { alt: "নতুন বিবরণ" } });
+  check("update alt text", r.status === 200 && (await r.json()).item.alt === "নতুন বিবরণ");
+  // use it on the homepage -> delete is blocked unless forced
+  const W = JSON.parse(JSON.stringify(M.DEFAULTS.work));
+  W.fields.items.items[0].image = media.url;
+  r = await sec("work", { ...W, version: 1 });
+  check("image from library saved on a work card", r.status === 200);
+  r = await api("/admin/media", { token: adminToken });
+  check("library shows where it is used", (await r.json()).items.find((x) => x.key === media.key).usedIn.join() === "work.items.items.w1.image");
+  r = await api("/admin/media/" + media.key, { method: "DELETE", token: userToken });
+  check("non-admin delete -> 403", r.status === 403);
+  r = await api("/admin/media/" + media.key, { method: "DELETE", token: adminToken });
+  j = await r.json();
+  check("delete in-use image -> 409 in_use", r.status === 409 && j.error === "in_use" && j.usedIn.length === 1, JSON.stringify(j));
+  r = await api("/admin/media/" + gif.key, { method: "DELETE", token: adminToken });
+  check("delete unused image -> 200", r.status === 200);
+  r = await api("/admin/media/" + media.key + "?force=1", { method: "DELETE", token: adminToken });
+  check("forced delete -> 200", r.status === 200);
+  r = await api("/admin/media/" + media.key, { method: "DELETE", token: adminToken });
+  check("delete missing -> 404", r.status === 404);
+  r = await api("/admin/media/..%2Fx", { method: "DELETE", token: adminToken });
+  check("bad media key -> 404", r.status === 404);
+  r = await api("/admin/media", { token: adminToken });
+  check("library empty again", (await r.json()).items.length === 0);
 
   // --- admin-only management
   r = await api("/admin/users/" + encodeURIComponent(ADMIN) + "/reject", { method: "POST", token: userToken });

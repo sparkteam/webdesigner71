@@ -12,11 +12,15 @@
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
-    // Only the homepage runs the script (CMS rewrite); everything else is served directly.
-    "run_worker_first": ["/", "/index.html"]
+    // Only the homepage (CMS rewrite) and /media/* (uploaded images) run the script; the rest is served directly.
+    "run_worker_first": ["/", "/index.html", "/media/*"]
   },
-  // CMS Phase 1 homepage content (written by the webdesigner71-admin Worker)
+  // CMS homepage content + settings (written by the webdesigner71-admin Worker)
+  // MEDIA: uploaded images. R2 is not enabled on this account yet, so this is a KV namespace
+  // ("webdesigner71-media"). To move to R2 later: enable R2, create bucket webdesigner71-media, replace this
+  // entry with  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "webdesigner71-media" }]  (code handles both).
   "kv_namespaces": [
-    { "binding": "CONTENT", "id": "3f74fcbc2ed24005b175a784968c3c3e" }
+    { "binding": "CONTENT", "id": "3f74fcbc2ed24005b175a784968c3c3e" },
+    { "binding": "MEDIA", "id": "51450a6f4dac48619c4c5ffa2764f1a4" }
   ]
 }

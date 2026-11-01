@@ -1,44 +1,27 @@
 /**
- * WebDesigner71 site Worker (CMS Phase 1).
+ * WebDesigner71 site Worker (CMS Phase 2).
  *
- * Serves the static site from ./public (binding ASSETS). Only "/" and "/index.html" run this script
- * (wrangler.jsonc → assets.run_worker_first); every other path is served straight from assets.
+ * Serves the static site from ./public (binding ASSETS). Only "/", "/index.html" and "/media/*" run this
+ * script (wrangler.jsonc → assets.run_worker_first); every other path is served straight from assets.
  *
- * For the homepage it reads KV CONTENT "content:homepage" and rewrites, with HTMLRewriter:
- *   #hero-title  → heroTitle + " <em>heroHighlight</em>"
- *   #hero-sub    → heroSub
- *   </head>      → <style id="wd71-cms">:root{--gold:…;--gold-2:…}</style>
- * Fail-safe: missing key, bad data or any KV error → the original index.html, unchanged.
+ * Homepage: reads KV CONTENT "content:homepage:v2" (+ "settings:site"; falls back to the Phase 1 key
+ * "content:homepage" through migrateV1) and applies the shared plan from public/cms/model.js with HTMLRewriter.
+ * Fields equal to the defaults produce no edit, so the seed renders the original page (+ the accent style tag).
+ * Fail-safe: no content, bad data, or any KV/plan error → the original index.html, unchanged.
  * `?cms_preview=1` (the admin panel's live preview iframe) skips KV, adds noindex and no-store.
+ *
+ * /media/<key>: uploaded images from the MEDIA binding (Workers KV today; an R2 bucket also works — see
+ * serveMedia). Long immutable cache; only image/jpeg|png|webp|gif is ever served.
  */
-
-/* CMS_TARGETS:BEGIN — field → element mapping. Keep identical to the copy in public/admin/index.html. */
-const CMS_TARGETS = {
-  heroTitle: { selector: "#hero-title", part: "text" },
-  heroHighlight: { selector: "#hero-title", part: "em" },
-  heroSub: { selector: "#hero-sub", fallback: ".hero .sub", part: "text" },
-  accentColor: { cssVar: "--gold", lightVar: "--gold-2", flash: ".hero .btn-gold" },
-};
-const CMS_DEFAULT_ACCENT = "#D4A017";
-const CMS_DEFAULT_ACCENT_LIGHT = "#E9B930";
-// --gold-2 is the lighter hover/highlight shade: the site's original pair for the default, else 10% toward white.
-function cmsLightShade(hex) {
-  if (String(hex).toUpperCase() === CMS_DEFAULT_ACCENT) return CMS_DEFAULT_ACCENT_LIGHT;
-  const n = parseInt(String(hex).slice(1), 16);
-  const ch = (s) => Math.round(((n >> s) & 255) + (255 - ((n >> s) & 255)) * 0.1);
-  return "#" + [16, 8, 0].map((s) => ch(s).toString(16).padStart(2, "0")).join("").toUpperCase();
-}
-/* CMS_TARGETS:END */
-
-const CONTENT_KEY = "content:homepage";
-const COLOR_RE = /^#[0-9A-Fa-f]{6}$/;
-const escText = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+import { KEYS, cleanDoc, cleanSettings, migrateV1, seedDoc, DEFAULT_SETTINGS, plan, toHtml, cssText, MEDIA_KEY_RE, MEDIA_TYPES } from "../../public/cms/model.js";
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const get = request.method === "GET" || request.method === "HEAD";
+    if (get && url.pathname.startsWith("/media/")) return serveMedia(request, env, url);
     const isHome = url.pathname === "/" || url.pathname === "/index.html";
-    if (!isHome || (request.method !== "GET" && request.method !== "HEAD")) return env.ASSETS.fetch(request);
+    if (!isHome || !get) return env.ASSETS.fetch(request);
 
     // Always fetch the full page: a 304 for the static file would hide a KV content change.
     const headers = new Headers(request.headers);
@@ -49,16 +32,6 @@ export default {
     if (asset.status !== 200 || !type.includes("text/html")) return asset;
 
     const preview = url.searchParams.get("cms_preview") === "1";
-    let content = null;
-    if (!preview) {
-      try {
-        content = cleanContent(await env.CONTENT.get(CONTENT_KEY, { type: "json", cacheTtl: 60 }));
-      } catch (err) {
-        console.error(JSON.stringify({ msg: "cms_kv_error", error: String(err) }));
-        content = null;
-      }
-    }
-
     const res = new Response(asset.body, asset);
     res.headers.delete("etag");
     res.headers.delete("content-length");
@@ -70,28 +43,94 @@ export default {
         .transform(res);
     }
     res.headers.set("cache-control", "public, max-age=0, must-revalidate");
-    if (!content) return res; // fail-safe: original page
 
-    const t = CMS_TARGETS;
-    const title = escText(content.heroTitle) + (content.heroHighlight ? " <em>" + escText(content.heroHighlight) + "</em>" : "");
-    const accent = content.accentColor.toUpperCase();
-    return new HTMLRewriter()
-      .on(t.heroTitle.selector, { element(el) { el.setInnerContent(title, { html: true }); } })
-      .on(t.heroSub.selector, { element(el) { el.setInnerContent(escText(content.heroSub), { html: true }); } })
-      .on("head", {
+    let edits = null;
+    try {
+      edits = await buildEdits(env);
+    } catch (err) {
+      console.error(JSON.stringify({ msg: "cms_render_error", error: String(err && err.message ? err.message : err), field: err && err.field }));
+      edits = null;
+    }
+    if (!edits) return res; // fail-safe: original page
+
+    const rw = new HTMLRewriter();
+    for (const e of edits.ops) {
+      rw.on(e.sel, {
         element(el) {
-          el.append(`<style id="wd71-cms">:root{${t.accentColor.cssVar}:${accent};${t.accentColor.lightVar}:${cmsLightShade(accent)}}</style>`, { html: true });
+          if (e.op === "inner") el.setInnerContent(e.html, { html: true });
+          else if (e.op === "replace") el.replace(e.html, { html: true });
+          else if (e.op === "remove") el.remove();
+          else if (e.op === "append") el.append(e.html, { html: true });
+          else if (e.op === "attr") el.setAttribute(e.name, e.value);
         },
-      })
-      .transform(res);
+      });
+    }
+    const style = '<style id="wd71-cms">' + edits.css + "</style>";
+    rw.on("head", { element(el) { el.append(style, { html: true }); } });
+    return rw.transform(res);
   },
 };
 
-// Accepts only well-formed content; anything else → null (serve the original page).
-function cleanContent(c) {
-  if (!c || typeof c !== "object") return null;
-  const str = (v, min, max) => typeof v === "string" && [...v].length >= min && [...v].length <= max;
-  if (!str(c.heroTitle, 1, 120) || !str(c.heroHighlight ?? "", 0, 40) || !str(c.heroSub ?? "", 0, 300)) return null;
-  if (typeof c.accentColor !== "string" || !COLOR_RE.test(c.accentColor)) return null;
-  return { heroTitle: c.heroTitle, heroHighlight: c.heroHighlight ?? "", heroSub: c.heroSub ?? "", accentColor: c.accentColor };
+/** Reads KV and returns pre-rendered edits, or null when there is nothing stored. Throws on bad data. */
+export async function buildEdits(env) {
+  const opt = { type: "json", cacheTtl: 60 };
+  const [rawDoc, rawSettings] = await Promise.all([env.CONTENT.get(KEYS.doc, opt), env.CONTENT.get(KEYS.settings, opt)]);
+  let doc, settings = null;
+  if (rawDoc) doc = cleanDoc(rawDoc);
+  else {
+    const v1 = await env.CONTENT.get(KEYS.v1, opt);
+    if (v1) ({ doc, settings } = migrateV1(v1));
+    else if (rawSettings) doc = cleanDoc(seedDoc());
+    else return null;
+  }
+  settings = rawSettings ? cleanSettings(rawSettings) : settings || DEFAULT_SETTINGS;
+  const ops = [];
+  let css = "";
+  for (const o of plan(doc, settings)) {
+    if (o.op === "css") css = cssText(o.vars);
+    else if (o.op === "restore") continue;
+    else if (o.op === "attr") ops.push({ sel: o.sel, op: "attr", name: o.name, value: o.value });
+    else ops.push({ sel: o.sel, op: o.op, html: o.nodes ? toHtml(o.nodes) : "" });
+  }
+  return { ops, css };
+}
+
+const MEDIA_HEADERS = {
+  "cache-control": "public, max-age=31536000, immutable",
+  "x-content-type-options": "nosniff",
+  "content-security-policy": "default-src 'none'; sandbox",
+  "cross-origin-resource-policy": "same-site",
+};
+function notFound() {
+  return new Response("Not found", { status: 404, headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "public, max-age=60" } });
+}
+/** /media/<key> — KV (value = bytes, metadata.contentType) or R2 (if MEDIA is ever switched to an R2 binding). */
+async function serveMedia(request, env, url) {
+  let key;
+  try { key = decodeURIComponent(url.pathname.slice(7)); } catch { return notFound(); }
+  if (!MEDIA_KEY_RE.test(key) || !env.MEDIA) return notFound();
+  const etag = '"' + key + '"'; // keys are random and never reused → immutable
+  let body = null, type = null, size = null;
+  try {
+    if (typeof env.MEDIA.head === "function") {
+      const obj = await env.MEDIA.get(key);
+      if (!obj) return notFound();
+      body = obj.body; type = obj.httpMetadata && obj.httpMetadata.contentType; size = obj.size;
+    } else {
+      const { value, metadata } = await env.MEDIA.getWithMetadata(key, { type: "stream", cacheTtl: 300 });
+      if (!value) return notFound();
+      body = value; type = metadata && metadata.contentType; size = metadata && metadata.size;
+    }
+  } catch (err) {
+    console.error(JSON.stringify({ msg: "media_error", error: String(err) }));
+    return new Response("Temporarily unavailable", { status: 503, headers: { "retry-after": "30" } });
+  }
+  if (!MEDIA_TYPES[type]) return notFound();
+  const h = new Headers(MEDIA_HEADERS);
+  h.set("content-type", type);
+  h.set("etag", etag);
+  if (request.headers.get("if-none-match") === etag) { if (body.cancel) body.cancel(); return new Response(null, { status: 304, headers: h }); }
+  if (size) h.set("content-length", String(size));
+  if (request.method === "HEAD") { if (body.cancel) body.cancel(); return new Response(null, { status: 200, headers: h }); }
+  return new Response(body, { status: 200, headers: h });
 }
