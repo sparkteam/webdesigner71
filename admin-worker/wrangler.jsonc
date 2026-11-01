@@ -15,7 +15,7 @@
 
   "vars": {
     "ADMIN_EMAIL": "sohelhoo@gmail.com",
-    "GOOGLE_CLIENT_ID": "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
+    "GOOGLE_CLIENT_ID": "641726616941-8qoe6tn0qtvmuidgtgtma9mrlkmqpja4.apps.googleusercontent.com",
     "EMAIL_FROM": "WebDesigner71 Admin <onboarding@resend.dev>",
     "ALLOWED_ORIGINS": "https://webdesigner71.com,https://www.webdesigner71.com"
   },
