@@ -644,9 +644,10 @@ async function deleteMedia(request, env, me, key, url) {
   const { doc } = await loadHomepage(env);
   const usedIn = mediaUsage(doc, "/media/" + key);
   const usedBy = (await mediaUsers(env)).get("/media/" + key) || [];
-  if ((usedIn.length || usedBy.length) && url.searchParams.get("force") !== "1") return json({ error: "in_use", usedIn, usedBy }, 409);
+  // The live homepage can never lose an image (Phase 2 rule); pages/posts may, after an explicit confirm (?force=1).
+  if (usedIn.length || (usedBy.length && url.searchParams.get("force") !== "1")) return json({ error: "in_use", usedIn, usedBy }, 409);
   await store.delete(key);
-  log("media_deleted", { key, by: me.email, forced: usedIn.length + usedBy.length > 0 });
+  log("media_deleted", { key, by: me.email, forced: usedBy.length > 0 });
   return json({ ok: true, deleted: key });
 }
 

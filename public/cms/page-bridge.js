@@ -4,12 +4,16 @@
  * hovers and drag-and-drop moves back. Messages from any other origin/window are ignored.
  *
  * parent → iframe  { type:"pb:render", page:{ title, slug, blocks }, settings, selected }
+ *                  { type:"pb:render", post:{ title, slug, excerpt, image, imageAlt, author, date, categories, tags, blocks },
+ *                    terms, settings, selected }   (Phase 4: the article layout of posts.js around the blocks)
  *                  { type:"pb:select", id }   { type:"pb:drag", payload|null }   { type:"pb:scroll", id }
  * iframe → parent  { type:"pb:ready" }  { type:"pb:select", id }  { type:"pb:hover", id }
  *                  { type:"pb:drop", payload, target, pos }   pos: before | after | inside
  *                  { type:"pb:error", field, reason }   { type:"pb:key", key, shift, meta }
+ *                  { type:"pb:meta" }   (post mode: the title/meta header or featured image was clicked)
  */
 import * as PG from "./pages.js";
+import * as PO from "./posts.js";
 
 const parentWin = window.parent;
 const ORIGIN = location.origin;
@@ -37,8 +41,18 @@ function render(msg) {
   catch (e) { send({ type: "pb:error", field: e.field || "blocks", reason: e.reason || "invalid" }); return; }
   tree = blocks; types = {}; indexTypes(tree);
   const y = window.scrollY;
-  main.innerHTML = PG.renderMain(blocks, { editor: true, page: { title: msg.page.title || "", slug: msg.page.slug || "" }, settings: msg.settings || null });
-  style.textContent = PG.pageCss(blocks);
+  if (msg.post) {
+    // Draft post: only display values are taken over; everything is escaped by the renderer, image URLs are re-checked.
+    const p = msg.post, s = (v) => (typeof v === "string" ? v : "");
+    const post = { id: s(p.id), title: s(p.title), slug: s(p.slug), excerpt: s(p.excerpt), image: (p.image && PG.safeImg(p.image)) || "", imageAlt: s(p.imageAlt),
+      author: s(p.author), date: s(p.date) && Number.isFinite(Date.parse(p.date)) ? p.date : "", categories: Array.isArray(p.categories) ? p.categories : [],
+      tags: Array.isArray(p.tags) ? p.tags : [], blocks };
+    main.innerHTML = PO.renderArticle(post, { editor: true, terms: PO.cleanTerms(msg.terms), settings: msg.settings || null });
+    style.textContent = PG.pageCss(blocks) + PO.POST_CSS;
+  } else {
+    main.innerHTML = PG.renderMain(blocks, { editor: true, page: { title: msg.page.title || "", slug: msg.page.slug || "" }, settings: msg.settings || null });
+    style.textContent = PG.pageCss(blocks);
+  }
   const fh = PG.fontsHref(blocks);
   if (fonts) { if (fh) { if (fonts.getAttribute("href") !== fh) fonts.setAttribute("href", fh); fonts.disabled = false; } else fonts.disabled = true; }
   window.scrollTo(0, y);
@@ -69,7 +83,7 @@ function setHover(el) {
 addEventListener("message", (ev) => {
   if (ev.origin !== ORIGIN || ev.source !== parentWin) return;
   const m = ev.data || {};
-  if (m.type === "pb:render") render(m);
+  if (m.type === "pb:render" && (m.page || m.post)) render(m.post ? { ...m, page: m.post } : m);
   else if (m.type === "pb:select") setSelected(m.id, true);
   else if (m.type === "pb:scroll") setSelected(m.id, true);
   else if (m.type === "pb:drag") dragPayload = m.payload || null;
@@ -81,6 +95,7 @@ main.addEventListener("click", (ev) => {
   if (a) ev.preventDefault();
   const el = blockEl(ev.target);
   const drop = ev.target.closest(".pb-drop");
+  if (!el && !drop && ev.target.closest(".wb-head, .wb-hero-img, .wb-foot")) { ev.preventDefault(); send({ type: "pb:meta" }); return; }
   const id = el ? idOf(el) : drop ? drop.getAttribute("data-drop") : null;
   if (ev.target.closest("summary")) { /* let FAQ open/close, but also select */ } else if (!a) ev.preventDefault();
   send({ type: "pb:select", id: id || null });
