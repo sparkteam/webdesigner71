@@ -44,6 +44,7 @@ function mockApi(ctx, st) {
       { email: "pending@example.com", name: "Pending User", status: "pending", createdAt: "2026-10-30T10:00:00Z" }] });
     if (p.startsWith("/admin/users/")) return json(200, { ok: true });
     if (p === "/admin/pages" && m === "GET") return json(200, { pages: [], limits: { blocks: 200, pages: 100 }, reserved: [] }); // Phase 3 (tested in pages-ui.mjs)
+    if (p === "/admin/posts" && m === "GET") return json(200, { posts: [], terms: { categories: [], tags: [] }, limits: {}, reserved: [], now: new Date().toISOString() }); // Phase 4 (tested in posts-ui.mjs)
     if (p === "/content/homepage") return json(200, { schema: M.SCHEMA, source: "kv", sections: st.sections, settings: st.settings });
     const sm = p.match(/^\/admin\/content\/homepage\/sections\/([a-z]+)(\/undo)?$/);
     if (sm) {
@@ -146,7 +147,7 @@ try {
       await page.waitForSelector(sel, { state: "visible" });
       const on = await page.$eval(`#sideNav a[data-nav="${id}"]`, (a) => a.classList.contains("on") && a.getAttribute("aria-current") === "page");
       check("nav → " + id + " shows page and marks active", on);
-      if (id === "posts") check("posts: placeholder শীঘ্রই আসছে", (await page.textContent("[data-page=posts]")).includes("শীঘ্রই আসছে"));
+      if (id === "posts") { await page.waitForSelector("#postsEmpty"); check("posts: Phase 4 list (empty state, no placeholder)", !(await page.textContent("[data-page=posts]")).includes("শীঘ্রই") && await page.isVisible("#newPost")); }
       if (id === "pages") { await page.waitForSelector("#pagesEmpty"); check("pages: Phase 3 list (empty state)", (await page.textContent("#pagesEmpty")).includes("এখনো কোনো পেজ নেই")); }
     }
     check("users: existing approval list moved here", (await page.$$("#rows tr")).length === 2);

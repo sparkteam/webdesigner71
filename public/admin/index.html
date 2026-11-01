@@ -619,6 +619,81 @@
   }
   @media (max-width:420px){ .pbe-ur .pib{width:32px} .pbe-top .pib{width:32px;height:34px} .pbe-title{max-width:24vw} }
   @media (prefers-reduced-motion:reduce){ .pbe *{transition:none!important;animation:none!important} }
+  /* ===== CMS Phase 4 — posts / blog ===== */
+  .stats:has(#statPosts){grid-template-columns:repeat(5,minmax(0,1fr))}
+  .qbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:0 0 12px}
+  .qtabs{display:flex;gap:4px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px}
+  .qtab{border:0;background:transparent;font:inherit;font-size:14px;padding:7px 12px;border-radius:9px;cursor:pointer;color:#3b4a44;display:inline-flex;gap:6px;align-items:center;min-height:36px}
+  .qtab:hover{background:#f6f2e7}
+  .qtab.on{background:var(--green);color:#fff}
+  .qtab .qc{font-size:12px;background:rgba(0,0,0,.07);border-radius:99px;padding:0 7px}
+  .qtab.on .qc{background:rgba(255,255,255,.2)}
+  .qtools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .qsearch,.inp{font:inherit;font-size:14.5px;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);min-height:40px;box-sizing:border-box}
+  .qsearch{width:240px}
+  .qsearch:focus,.inp:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,160,23,.18)}
+  .qcat{min-height:40px}
+  .qbulk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#fff8e3;border:1px solid #f0dfa8;border-radius:12px;padding:8px 12px;margin:0 0 10px;position:sticky;top:64px;z-index:5}
+  .qbulk b{margin-right:4px;color:#6b5200;font-size:14px}
+  .qtable .qck{width:36px;padding-right:0}
+  .qtable input[type=checkbox]{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
+  .qt{display:flex;gap:12px;align-items:center;min-width:0}
+  .qthumb{width:56px;height:42px;border-radius:8px;overflow:hidden;flex:0 0 auto;background:#f3efe3;display:grid;place-items:center;color:var(--gold);font-size:18px}
+  .qthumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .qtable .psub{flex-wrap:wrap}
+  .pill.qcatp{background:#eef4f1;color:var(--green);font-size:11.5px;padding:1px 8px;border-radius:99px}
+  .pill.st-sched{background:#e8eefc;color:#2a4a9a}
+  .pill.st-trash{background:#fbe9e7;color:#9b2c1f}
+  tr.is-trash .ptitle{color:var(--muted)}
+  .qpager{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+  .qpager .btn{min-width:38px}
+  /* settings dialog */
+  dialog.mdl.wide2 .mbox{width:min(940px,96vw)}
+  .qset{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
+  .qcol{min-width:0}
+  .thumb.qfeat{width:150px;height:96px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+  .chip{display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;font:inherit;font-size:13.5px;cursor:pointer;color:#3b4a44;min-height:34px}
+  .chip:hover{border-color:#e5d6a6}
+  .chip.on{background:#e6f3ee;border-color:#9cc9b6;color:var(--green);font-weight:600}
+  span.chip.on{cursor:default;padding-right:4px}
+  .chip.add{border-style:dashed;color:#8a6400}
+  .chip .cx{border:0;background:transparent;cursor:pointer;color:inherit;font-size:12px;width:24px;height:24px;border-radius:99px;display:inline-grid;place-items:center}
+  .chip .cx:hover{background:rgba(0,0,0,.08)}
+  #psTagIn{width:100%;margin-bottom:12px}
+  .qdate{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .qdate input{flex:1;min-width:200px}
+  /* code field (editor inspector) */
+  .codeta{width:100%;box-sizing:border-box;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:2;background:#0f1f1a;color:#e8f1ec;border:1.5px solid #23463a;border-radius:10px;padding:10px 12px;resize:vertical;min-height:160px;white-space:pre;overflow:auto}
+  .codeta:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,160,23,.25)}
+  /* categories & tags manager */
+  .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  .tcol{padding:0;overflow:hidden}
+  .tcol .card-h{padding:14px 16px 6px;display:flex;justify-content:space-between;align-items:center}
+  .tadd{display:flex;gap:8px;padding:6px 16px 12px;border-bottom:1px solid var(--line)}
+  .tadd .inp{flex:1;min-width:0}
+  .trows .row{flex-wrap:wrap}
+  .trows .acts{display:flex;gap:6px}
+  @media (max-width:1100px){ .stats:has(#statPosts){grid-template-columns:repeat(3,minmax(0,1fr))} }
+  @media (max-width:860px){ .qset{grid-template-columns:1fr} .tgrid{grid-template-columns:1fr} }
+  @media (max-width:720px){
+    .stats:has(#statPosts){grid-template-columns:1fr 1fr}
+    .qbar{flex-direction:column;align-items:stretch}
+    .qtabs{overflow-x:auto;flex-wrap:nowrap}
+    .qtab{white-space:nowrap}
+    .qtools{width:100%}
+    .qsearch{flex:1;width:auto;min-width:0}
+    .qtable tr{position:relative;padding-left:42px}
+    .qtable td.qck{position:absolute;left:12px;top:14px;width:auto;padding:0}
+    .qtable thead{display:table-header-group}
+    .qtable thead tr{display:flex;align-items:center;padding:8px 12px;background:#fbf8f0}
+    .qtable thead th{display:none;padding:0;background:none;border:0}
+    .qtable thead th.qck{display:block}
+    .qtable thead th.qck:after{content:"সব বাছাই";font-size:12.5px;color:var(--muted);margin-left:8px;vertical-align:middle}
+    .qthumb{width:44px;height:34px}
+    .qbulk{top:56px}
+  }
+  #postsTable .pill{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -706,11 +781,8 @@
 
     <!-- Pages (list + visual builder, CMS Phase 3) -->
     <section data-page="pages" id="pPages" class="hidden"></section>
-    <!-- Posts (placeholder) -->
-    <section data-page="posts" class="hidden">
-      <div class="phead"><div class="pico">✎</div><div><h2>পোস্ট</h2><div class="crumb">ব্লগ ও খবর</div></div></div>
-      <div class="card soon"><div class="big">🚧</div><h3>শীঘ্রই আসছে</h3><p>ব্লগ পোস্ট লেখা ও প্রকাশের সুবিধা পরের ধাপে যোগ হবে।</p></div>
-    </section>
+    <!-- Posts (blog, CMS Phase 4) -->
+    <section data-page="posts" id="pPosts" class="hidden"></section>
 
     <!-- Media -->
     <section data-page="media" id="pMedia" class="hidden"></section>
@@ -1204,7 +1276,7 @@
     { id: "dashboard", icon: "⌂", label: "ড্যাশবোর্ড" },
     { id: "homepage", icon: "🏠", label: "হোমপেজ", group: true },
     { id: "pages", icon: "▤", label: "পেজ" },
-    { id: "posts", icon: "✎", label: "পোস্ট", badge: "শীঘ্রই" },
+    { id: "posts", icon: "✎", label: "পোস্ট" },
     { id: "media", icon: "🖼", label: "মিডিয়া" },
     { id: "users", icon: "👥", label: "ইউজার", badgeId: "navPending" },
     { id: "settings", icon: "⚙", label: "সেটিংস" },
@@ -1240,7 +1312,7 @@
     const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
     let page = parts[0] || "dashboard";
     if (!PAGES.includes(page) || (!me.isAdmin && page !== "dashboard")) page = "dashboard";
-    return { page, sub: page === "homepage" || page === "pages" ? parts[1] || "" : "" };
+    return { page, sub: page === "homepage" || page === "pages" || page === "posts" ? parts[1] || "" : "" };
   }
   function markNav() {
     if (!me) return;
@@ -1270,6 +1342,7 @@
     if (page === "media") return renderMedia();
     if (page === "settings") return renderSettings();
     if (page === "pages") return renderPages();
+    if (page === "posts") return renderPosts();
   }
   window.addEventListener("hashchange", route);
 
@@ -1319,13 +1392,17 @@
           h("div", {}, h("div", { class: "n", text: media ? bnNum(media.items.length + media.builtin.length) : "…" }), h("div", { class: "l", text: "মিডিয়া ফাইল" }))),
         h("a", { class: "card stat", href: "#/pages", style: "text-decoration:none", id: "statPages" }, h("div", { class: "ic", style: "background:#e6f3ee;color:var(--green)", text: "▤" }),
           h("div", {}, h("div", { class: "n", text: pagesData ? bnNum(pagesData.pages.length) : "…" }),
-            h("div", { class: "l", text: pagesData ? "পেজ · " + bnNum(pagesData.pages.filter((p) => p.status === "published").length) + "টি প্রকাশিত" : "পেজ" })))));
+            h("div", { class: "l", text: pagesData ? "পেজ · " + bnNum(pagesData.pages.filter((p) => p.status === "published").length) + "টি প্রকাশিত" : "পেজ" }))),
+        h("a", { class: "card stat", href: "#/posts", style: "text-decoration:none", id: "statPosts" }, h("div", { class: "ic", style: "background:#e8eefc;color:#2a4a9a", text: "✎" }),
+          h("div", {}, h("div", { class: "n", text: postsData && PO ? bnNum(postsData.posts.filter((p) => p.status !== "trash").length) : "…" }),
+            h("div", { class: "l", text: postsData && PO ? "পোস্ট · " + bnNum(postsData.posts.filter((p) => PO.postStatus(p) === "published").length) + "টি প্রকাশিত" : "ব্লগ পোস্ট" })))));
       const q = (href, ic, t, s, ext) => h("a", { class: "card qlink", href, target: ext ? "_blank" : null, rel: ext ? "noopener" : null }, h("span", { class: "ic", text: ic }), h("span", {}, h("b", { text: t }), h("small", { text: s })));
       host.append(h("h3", { class: "sec-h", text: "দ্রুত লিংক" }), h("div", { class: "ql" },
         q("#/homepage/hero", "★", "হিরো সেকশন", "শিরোনাম, বাটন, ছবি"),
         q("#/homepage/packages", "৳", "প্যাকেজ ও দাম", "দাম ও ফিচার বদলান"),
         q("#/homepage", "🏠", "পুরো হোমপেজ", "সব সেকশন এক জায়গায়"),
         q("#/pages", "▤", "নতুন পেজ", "ড্র্যাগ-অ্যান্ড-ড্রপ পেজ বিল্ডার"),
+        q("#/posts", "✎", "ব্লগ পোস্ট", "লিখুন, শিডিউল করুন, প্রকাশ করুন"),
         q("#/media", "🖼", "মিডিয়া লাইব্রেরি", "ছবি আপলোড করুন"),
         q("#/settings", "⚙", "সেটিংস", "শিরোনাম, রং, যোগাযোগ"),
         q("/", "↗", "সাইট দেখুন", "webdesigner71.com", true)));
@@ -1342,6 +1419,7 @@
     if (!cms) jobs.push(loadCms().catch(() => null));
     if (!media) jobs.push(loadMedia().catch(() => null));
     if (!pagesData) jobs.push(loadPages().catch(() => null));
+    if (!postsData) jobs.push(loadPosts().catch(() => null));
     if (jobs.length) { await Promise.all(jobs); buildNav(); if (parseHash().page === "dashboard") draw(); }
   }
 
@@ -1923,6 +2001,7 @@
     catch { await promptModal({ title: "লিংক কপি করুন", label: "ছবির লিংক", value: t, max: 600, hint: "সিলেক্ট করে কপি করুন" }); }
   }
   const usedList = (u) => (Array.isArray(u) ? u : u ? [u] : []);
+  const usedByList = (it) => (Array.isArray(it.usedBy) ? it.usedBy.filter((u) => u && (u.kind === "page" || u.kind === "post") && typeof u.title === "string") : []);
   async function renderMedia() {
     const box = $("pMedia");
     if (!media) { box.textContent = ""; box.append(h("div", { class: "card" }, h("div", { class: "spinner" }))); try { await loadMedia(); } catch (e) { box.textContent = ""; box.append(h("div", { class: "card" }, h("p", { text: "মিডিয়া লোড করা যায়নি।" }), h("button", { type: "button", class: "btn btn-sm btn-gold", text: "আবার চেষ্টা", onclick: () => renderMedia() }))); return; } }
@@ -1953,7 +2032,8 @@
         h("div", { class: "mname", title: it.name || it.key, text: builtin ? "সাইটের নিজস্ব ছবি" : it.name || it.key }),
         h("div", { class: "msub", text: builtin ? "SVG · মূল ইলাস্ট্রেশন" : fmtSize(it.size) + " · " + (it.contentType || "").replace("image/", "").toUpperCase() }),
         h("div", { class: "malt" + (it.alt ? "" : " none"), text: it.alt ? "alt: " + it.alt : "alt নেই" }),
-        used.length ? h("div", { class: "mused" }, ...used.map((u) => h("span", { class: "pill", text: "ব্যবহৃত: " + usedLabel(u) }))) : null),
+        used.length || (it.usedBy && it.usedBy.length) ? h("div", { class: "mused" }, ...used.map((u) => h("span", { class: "pill", text: "ব্যবহৃত: " + usedLabel(u) })),
+          ...usedByList(it).map((u) => h("span", { class: "pill", text: (u.kind === "post" ? "পোস্ট: " : "পেজ: ") + u.title }))) : null),
       h("div", { class: "macts" },
         h("button", { type: "button", class: "btn btn-sm btn-line", "data-act": "copy", text: "লিংক কপি", onclick: () => copyText(SITE_ORIGIN + it.url) }),
         builtin ? null : h("button", { type: "button", class: "btn btn-sm btn-line", "data-act": "alt", text: "alt লিখুন", onclick: () => editAlt(it) }),
@@ -1973,12 +2053,16 @@
       if (go) location.hash = "#/homepage/" + String(used[0]).split(".")[0];
       return;
     }
-    const ok = await confirmModal({ title: "ছবিটি মুছবেন?", message: (it.name || it.key) + " স্থায়ীভাবে মুছে যাবে। এই কাজ ফেরানো যাবে না।", okText: "মুছে ফেলুন", cancelText: "বাতিল", danger: true });
+    const by = usedByList(it);
+    const ok = await confirmModal({ title: by.length ? "ছবিটি " + bnNum(by.length) + "টি পেজ/পোস্টে ব্যবহার হচ্ছে" : "ছবিটি মুছবেন?", message: by.length
+      ? "ব্যবহার হচ্ছে: " + by.map((u) => (u.kind === "post" ? "পোস্ট “" : "পেজ “") + u.title + "”").join(", ") + "। মুছলে সেখানে ছবিটি আর দেখা যাবে না। এই কাজ ফেরানো যাবে না।"
+      : (it.name || it.key) + " স্থায়ীভাবে মুছে যাবে। এই কাজ ফেরানো যাবে না।", okText: "মুছে ফেলুন", cancelText: "বাতিল", danger: true });
     if (!ok) return;
-    try { await api("/admin/media/" + encodeURIComponent(it.key), { method: "DELETE" }); toast("ছবি মুছে ফেলা হয়েছে"); media = null; renderMedia(); }
+    try { await api("/admin/media/" + encodeURIComponent(it.key) + (by.length ? "?force=1" : ""), { method: "DELETE" }); toast("ছবি মুছে ফেলা হয়েছে"); media = null; renderMedia(); }
     catch (e) {
       if (e.message === "session") return;
-      if (e.status === 409) { toast("ছবিটি এখন হোমপেজে ব্যবহার হচ্ছে — মোছা হয়নি", 4000); media = null; renderMedia(); }
+      if (e.status === 409 && e.data && !(e.data.usedIn || []).length && (e.data.usedBy || []).length) { toast("ছবিটি এইমাত্র কোনো পেজ/পোস্টে যোগ হয়েছে — আবার দেখে মুছুন", 4500); media = null; renderMedia(); }
+      else if (e.status === 409) { toast("ছবিটি এখন হোমপেজে ব্যবহার হচ্ছে — মোছা হয়নি", 4000); media = null; renderMedia(); }
       else toast("মোছা যায়নি, আবার চেষ্টা করুন");
     }
   }
@@ -2178,7 +2262,7 @@
         h("td", { class: "pa" }, h("div", { class: "acts" },
           h("a", { class: "btn btn-sm btn-green", href: "#/pages/" + p.id, "data-act": "edit", text: "✎ ডিজাইন" }),
           act("seo", "⚙", "btn-line", "পেজ সেটিংস ও SEO", () => listSettings(p)),
-          act("dup", "⧉", "btn-line", "ডুপ্লিকেট", () => duplicatePage(p)),
+          act("dup", "📋", "btn-line", "ডুপ্লিকেট", () => duplicatePage(p)),
           p.status === "published" ? act("unpublish", "⏸", "btn-line", "অপ্রকাশ করুন", () => setPublished(p, false)) : act("publish", "▶ প্রকাশ", "btn-gold", "প্রকাশ করুন", () => setPublished(p, true)),
           act("delete", "🗑", "btn-line danger", "মুছুন", () => deletePageFlow(p))))));
     }
@@ -2358,7 +2442,17 @@
      The visual editor
      ====================================================================== */
   const DEVICES = [["d", "🖥", "ডেস্কটপ", 1280], ["t", "▭", "ট্যাবলেট", 820], ["m", "📱", "মোবাইল", 390]];
-  const GROUPS = [["layout", "লেআউট"], ["basic", "লেখা ও বেসিক"], ["media", "মিডিয়া"], ["sections", "তৈরি সেকশন"]];
+  const GROUPS = [["layout", "লেআউট"], ["basic", "লেখা ও বেসিক"], ["media", "মিডিয়া"], ["sections", "তৈরি সেকশন"], ["blog", "ব্লগ ও আর্টিকেল"]];
+  // Phase 4: the same editor edits pages and blog posts (ED.kind). These helpers hide the differences.
+  const isPostEd = () => !!ED && ED.kind === "post";
+  const edApi = () => (isPostEd() ? "/admin/posts/" : "/admin/pages/");
+  const edDocOf = (r) => (r && (r.post || r.page)) || null;
+  const edPick = (doc) => (isPostEd() ? postPick(doc) : pick(doc));
+  const edSync = (doc) => (isPostEd() ? syncPostIndex(doc) : syncIndex(doc));
+  const edHome = () => (isPostEd() ? "#/posts" : "#/pages");
+  const edNoun = () => (isPostEd() ? "পোস্ট" : "পেজ");
+  const edLiveUrl = (slug) => (isPostEd() ? "/blog/" : "/") + slug;
+  const edGroups = () => (isPostEd() ? ["blog", "basic", "media", "layout", "sections"].map((k) => GROUPS.find((g) => g[0] === k)) : GROUPS);
   function findB(list, id, parent = null) {
     for (let i = 0; i < (list || []).length; i++) {
       const b = list[i];
@@ -2398,36 +2492,41 @@
   async function pbBeforeRoute() {
     if (!ED) return true;
     const { page, sub } = parseHash();
-    if (page === "pages" && sub === ED.id) return true;
+    if (page === (isPostEd() ? "posts" : "pages") && sub === ED.id) return true;
     if (!edDirty()) { closeEditor(); return true; }
-    const id = ED.id;
-    const ok = await confirmModal({ title: "সেভ না করেই বের হবেন?", message: "এই পেজে সেভ না করা পরিবর্তন আছে। বের হলেও সেগুলো এই ব্রাউজারে থেকে যাবে — পরে এডিটর খুললে ফিরিয়ে আনতে পারবেন।", okText: "বের হন", cancelText: "এডিটরে থাকুন", danger: true });
+    const id = ED.id, home = edHome();
+    const ok = await confirmModal({ title: "সেভ না করেই বের হবেন?", message: "এই " + edNoun() + "-এ সেভ না করা পরিবর্তন আছে। বের হলেও সেগুলো এই ব্রাউজারে থেকে যাবে — পরে এডিটর খুললে ফিরিয়ে আনতে পারবেন।", okText: "বের হন", cancelText: "এডিটরে থাকুন", danger: true });
     if (ok) { closeEditor(); return true; }
-    history.replaceState(null, "", "#/pages/" + id);
+    history.replaceState(null, "", home + "/" + id);
     return false;
   }
   window.addEventListener("beforeunload", (e) => { if (edDirty()) { e.preventDefault(); e.returnValue = ""; } });
 
-  async function openEditor(id) {
+  async function openEditor(id, kind = "page") {
     if (ED) closeEditor();
-    const root = h("div", { class: "pbe", id: "pbEditor", "aria-label": "পেজ বিল্ডার" }, h("div", { class: "pbe-load" }, h("div", { class: "spinner" }), h("p", { text: "এডিটর খুলছে…" })));
+    const root = h("div", { class: "pbe" + (kind === "post" ? " pbe-post" : ""), id: "pbEditor", "aria-label": kind === "post" ? "পোস্ট এডিটর" : "পেজ বিল্ডার" }, h("div", { class: "pbe-load" }, h("div", { class: "spinner" }), h("p", { text: "এডিটর খুলছে…" })));
     document.body.append(root); document.body.classList.add("pbe-open");
-    const ed = (ED = { id, root, loading: true });
+    const ed = (ED = { id, root, loading: true, kind });
     let doc;
     try {
       await pagesReady;
-      if (!PG) throw new Error("pages_model");
-      [doc] = await Promise.all([api("/admin/pages/" + id).then((r) => r.page), cms ? null : ensureCms(null).catch(() => null)]);
+      if (kind === "post") await postsReady;
+      if (!PG || (kind === "post" && !PO)) throw new Error("pages_model");
+      const [r] = await Promise.all([api(edApi() + id), cms ? null : ensureCms(null).catch(() => null)]);
+      doc = edDocOf(r);
+      if (kind === "post" && PO) { ed.terms = PO.cleanTerms(r.terms); if (postsData) postsData.terms = ed.terms; }
+      if (kind === "post" && doc.status === "trash") throw Object.assign(new Error("in_trash"), { status: 409 });
     } catch (e) {
       if (ED !== ed) return;
+      const home = edHome();
       closeEditor();
-      if (e.message !== "session") toast(e.status === 404 ? "পেজটি পাওয়া যায়নি" : "এডিটর খোলা যায়নি — আবার চেষ্টা করুন", 3600);
-      location.hash = "#/pages";
+      if (e.message !== "session") toast(e.message === "in_trash" ? "পোস্টটি ট্র্যাশে আছে — আগে ফিরিয়ে আনুন" : e.status === 404 ? (kind === "post" ? "পোস্টটি" : "পেজটি") + " পাওয়া যায়নি" : "এডিটর খোলা যায়নি — আবার চেষ্টা করুন", 3600);
+      location.hash = home;
       return;
     }
     if (ED !== ed) return;
     Object.assign(ed, {
-      doc, draft: pick(doc), savedJson: "", sel: null, device: pbNarrow() ? "m" : "d", tab: "content", left: "blocks", pane: "canvas",
+      doc, draft: kind === "post" ? postPick(doc) : pick(doc), savedJson: "", sel: null, device: pbNarrow() ? "m" : "d", tab: "content", left: "blocks", pane: "canvas",
       hist: [], fut: [], lastKey: "", lastAt: 0, ready: false, err: null, saving: false, conflict: null, collapsed: new Set(), drag: null, loading: false, openItem: "",
     });
     ed.savedJson = JSON.stringify(ed.draft);
@@ -2452,7 +2551,8 @@
     const R = ED.root; R.textContent = ""; R.dataset.pane = ED.pane;
     const U = (ED.ui = {});
     const ib = (act, text, title, fn, cls = "") => h("button", { type: "button", class: "pib " + cls, "data-act": act, title, "aria-label": title, text, onclick: fn });
-    U.title = h("button", { type: "button", class: "pbe-title", id: "pbTitle", title: "পেজ সেটিংস ও SEO", onclick: () => editorSettings() });
+    const setL = isPostEd() ? "পোস্টের তথ্য, ক্যাটাগরি ও SEO" : "পেজ সেটিংস ও SEO";
+    U.title = h("button", { type: "button", class: "pbe-title", id: "pbTitle", title: setL, onclick: () => editorSettings() });
     U.devs = h("div", { class: "seg pbe-dev", role: "group", "aria-label": "ডিভাইস প্রিভিউ", id: "pbDevices" }, ...DEVICES.map(([k, ic, l]) =>
       h("button", { type: "button", "data-dev": k, title: l, "aria-label": l, "aria-pressed": "false", onclick: () => setDevice(k) }, h("span", { class: "di", text: ic }), h("span", { class: "dl", text: l }))));
     U.undo = ib("undo", "↶", "আনডু (Ctrl+Z)", () => undo());
@@ -2463,15 +2563,15 @@
     U.pub = h("button", { type: "button", class: "btn btn-sm btn-gold", id: "pbPublish", onclick: () => publish() });
     U.view = h("a", { class: "pib", id: "pbView", target: "_blank", rel: "noopener", title: "লাইভ পেজ দেখুন", "aria-label": "লাইভ পেজ দেখুন", text: "↗" });
     const top = h("header", { class: "pbe-top" },
-      h("button", { type: "button", class: "pib", id: "pbBack", title: "পেজ তালিকায় ফিরুন", "aria-label": "পেজ তালিকায় ফিরুন", text: "←", onclick: () => { location.hash = "#/pages"; } }),
+      h("button", { type: "button", class: "pib", id: "pbBack", title: edNoun() + " তালিকায় ফিরুন", "aria-label": edNoun() + " তালিকায় ফিরুন", text: "←", onclick: () => { location.hash = edHome(); } }),
       U.title, h("span", { class: "pbe-sp" }), U.devs, h("div", { class: "pbe-ur" }, U.undo, U.redo), U.status, U.view,
-      ib("settings", "⚙", "পেজ সেটিংস ও SEO", () => editorSettings(), "pbe-set"), U.save, U.pub);
+      ib("settings", "⚙", setL, () => editorSettings(), "pbe-set"), U.save, U.pub);
     U.leftTabs = h("div", { class: "pbe-tabs", role: "tablist", "aria-label": "লাইব্রেরি" }, ...[["blocks", "ব্লক"], ["patterns", "প্যাটার্ন"], ["layers", "লেয়ার"]].map(([k, l]) =>
       h("button", { type: "button", role: "tab", "data-ltab": k, text: l, onclick: () => { ED.left = k; drawLeft(); } })));
     U.leftBody = h("div", { class: "pbe-lb" });
     const left = h("aside", { class: "pbe-left", "aria-label": "ব্লক লাইব্রেরি ও লেয়ার" }, U.leftTabs, U.leftBody);
     U.banners = h("div", { class: "pbe-banners" });
-    U.frame = h("iframe", { src: "/__page-preview", title: "পেজের লাইভ প্রিভিউ", id: "pbFrame" });
+    U.frame = h("iframe", { src: "/__page-preview", title: edNoun() + "-এর লাইভ প্রিভিউ", id: "pbFrame" });
     U.fwrap = h("div", { class: "pbe-fw" }, U.frame);
     U.stage = h("div", { class: "pbe-stage" }, U.fwrap);
     const centre = h("main", { class: "pbe-c" }, U.banners, U.stage);
@@ -2518,12 +2618,15 @@
     else if (m.type === "pb:select") select(m.id || null, { fromCanvas: true });
     else if (m.type === "pb:drop") { ED.drag = null; doDrop(m.payload, m.target || null, m.pos); }
     else if (m.type === "pb:key") handleKey(m.key, m.shift, m.meta);
+    else if (m.type === "pb:meta" && isPostEd() && !document.querySelector("dialog.mdl[open]")) editorSettings();
   }
   function post(m) { if (ED && ED.ready && ED.ui && ED.ui.frame.contentWindow) ED.ui.frame.contentWindow.postMessage(m, location.origin); }
   function pushRender() {
     if (!ED || !ED.ready) return;
     cancelAnimationFrame(ED.raf);
-    ED.raf = requestAnimationFrame(() => post({ type: "pb:render", page: { title: ED.draft.title, slug: ED.draft.slug, blocks: ED.draft.blocks }, settings: cms ? cms.settings : null, selected: ED.sel }));
+    ED.raf = requestAnimationFrame(() => post(isPostEd()
+      ? { type: "pb:render", post: { ...ED.draft, id: ED.id }, terms: postTerms(), settings: cms ? cms.settings : null, selected: ED.sel }
+      : { type: "pb:render", page: { title: ED.draft.title, slug: ED.draft.slug, blocks: ED.draft.blocks }, settings: cms ? cms.settings : null, selected: ED.sel }));
   }
 
   /* ---------- state changes + history ---------- */
@@ -2553,7 +2656,7 @@
   const undo = () => histStep(ED.hist, ED.fut, "↶ আনডু");
   const redo = () => histStep(ED.fut, ED.hist, "↷ রিডু");
   function validate() {
-    try { PG.cleanPageInput(ED.draft); ED.err = null; }
+    try { if (isPostEd()) PO.cleanPostInput(ED.draft); else PG.cleanPageInput(ED.draft); ED.err = null; }
     catch (e) { ED.err = e instanceof PG.PageError ? { field: e.field, reason: e.reason } : { field: "page", reason: "type" }; }
   }
   function errLabel(err) {
@@ -2561,6 +2664,7 @@
     const f = String(err.field);
     if (f === "title") return "শিরোনাম: " + reasonText(err.reason);
     if (f === "slug") return "লিংক: " + (SLUG_MSG[err.reason] || reasonText(err.reason));
+    if (POST_FIELD_L[f.split(".")[0]] && isPostEd()) return POST_FIELD_L[f.split(".")[0]] + ": " + reasonText(err.reason);
     if (f.startsWith("seo")) return "SEO: " + reasonText(err.reason);
     const at = blockAtPath(f);
     if (at) return ((PG.BLOCKS[at.b.type] || {}).label || "ব্লক") + ": " + reasonText(err.reason);
@@ -2580,26 +2684,28 @@
   function updateBar() {
     if (!ED || !ED.ui) return;
     const U = ED.ui, dirty = edDirty(), d = ED.doc;
-    U.title.textContent = ""; U.title.append(h("b", { text: ED.draft.title || "শিরোনামহীন" }), h("small", { text: "/" + ED.draft.slug }));
+    U.title.textContent = ""; U.title.append(h("b", { text: ED.draft.title || "শিরোনামহীন" }), h("small", { text: (isPostEd() ? "/blog/" : "/") + ED.draft.slug }));
     U.undo.disabled = !ED.hist.length; U.redo.disabled = !ED.fut.length;
     U.save.disabled = ED.saving || !dirty || !!ED.err;
     const live = d.status === "published", pending = live && (dirty || d.version !== d.publishedVersion);
     U.pub.disabled = ED.saving || !!ED.err || (live && !pending);
-    U.pub.textContent = !live ? "প্রকাশ করুন" : pending ? "আপডেট প্রকাশ" : "প্রকাশিত ✓";
-    U.view.classList.toggle("hidden", !live);
-    if (live) U.view.href = "/" + d.publishedSlug;
+    const future = isPostEd() && ED.draft.date && Date.parse(ED.draft.date) > Date.now();
+    U.pub.textContent = !live ? (future ? "⏱ শিডিউল করুন" : "প্রকাশ করুন") : pending ? (future ? "⏱ আপডেট শিডিউল" : "আপডেট প্রকাশ") : future ? "শিডিউল করা ✓" : "প্রকাশিত ✓";
+    const scheduledNow = isPostEd() && live && d.date && Date.parse(d.date) > Date.now();
+    U.view.classList.toggle("hidden", !live || scheduledNow);
+    if (live) U.view.href = edLiveUrl(d.publishedSlug);
     U.status.textContent = ""; U.status.className = "pbe-st";
     if (ED.err) {
       U.status.classList.add("bad");
       U.status.append(h("button", { type: "button", class: "linkbtn", id: "pbErr", text: "⚠ " + errLabel(ED.err), onclick: () => gotoError() }));
     } else if (ED.saving) U.status.textContent = "সেভ হচ্ছে…";
     else if (dirty) { U.status.textContent = "● সেভ হয়নি"; U.status.title = "পরিবর্তনগুলো এই ব্রাউজারে রাখা আছে"; U.status.classList.add("dirty"); }
-    else U.status.textContent = live ? (pending ? "সেভ হয়েছে · প্রকাশ বাকি" : "✓ প্রকাশিত") : "✓ খসড়া সেভ হয়েছে";
+    else U.status.textContent = live ? (pending ? "সেভ হয়েছে · প্রকাশ বাকি" : scheduledNow ? "⏱ " + fmtDateTime(d.date) + " এ প্রকাশ হবে" : "✓ প্রকাশিত") : "✓ খসড়া সেভ হয়েছে";
   }
   function gotoError() {
     if (!ED.err) return;
     const f = String(ED.err.field);
-    if (f === "title" || f === "slug" || f.startsWith("seo")) return editorSettings();
+    if (f === "title" || f === "slug" || f.startsWith("seo") || (isPostEd() && POST_FIELD_L[f.split(".")[0]])) return editorSettings();
     const at = blockAtPath(f);
     if (at) { ED.tab = at.rest.startsWith("style") ? "style" : at.rest.startsWith("adv") ? "adv" : "content"; ED.sel = null; select(at.b.id, { pane: "edit", keepTab: true }); post({ type: "pb:scroll", id: at.b.id }); }
   }
@@ -2611,7 +2717,7 @@
   function showRestore(local) {
     const stale = local.v !== ED.doc.version;
     const b = banner("warn", "এই ব্রাউজারে " + (local.at ? fmtDateTime(local.at) : "আগের") + " এর সেভ না করা পরিবর্তন পাওয়া গেছে।" + (stale ? " এরপর সার্ভারে নতুন ভার্সন সেভ হয়েছে — ফিরিয়ে এনে সেভ করলে সেটির উপরে বসবে।" : ""),
-      h("button", { type: "button", class: "btn btn-sm btn-gold", id: "pbRestore", text: "ফিরিয়ে আনুন", onclick: () => { b.remove(); mutate((d) => { d.title = local.draft.title; d.slug = local.draft.slug; d.seo = local.draft.seo; d.blocks = local.draft.blocks; }, "", { form: true }); toast("আগের পরিবর্তন ফিরিয়ে আনা হয়েছে"); } }),
+      h("button", { type: "button", class: "btn btn-sm btn-gold", id: "pbRestore", text: "ফিরিয়ে আনুন", onclick: () => { b.remove(); mutate((d) => { for (const k of Object.keys(d)) if (local.draft[k] !== undefined) d[k] = local.draft[k]; }, "", { form: true }); toast("আগের পরিবর্তন ফিরিয়ে আনা হয়েছে"); } }),
       h("button", { type: "button", class: "btn btn-sm btn-line", id: "pbDiscard", text: "বাদ দিন", onclick: () => { b.remove(); try { localStorage.removeItem(LS(ED.id)); } catch {} } }));
     b.id = "pbRestoreBanner";
   }
@@ -2625,40 +2731,42 @@
     const ed = ED, sent = JSON.stringify(ed.draft);
     ed.saving = true; updateBar();
     try {
-      const r = await api("/admin/pages/" + ed.id, { method: "PUT", body: { ...ed.draft, version: ed.doc.version } });
+      const r = await api(edApi() + ed.id, { method: "PUT", body: { ...ed.draft, version: ed.doc.version } });
       if (ED !== ed) return true;
-      ed.doc = r.page;
-      if (JSON.stringify(ed.draft) === sent) ed.draft = pick(r.page); // adopt the canonical form (item ids, trimmed text)
-      ed.savedJson = JSON.stringify(pick(r.page));
-      syncIndex(r.page);
+      const nd = edDocOf(r);
+      ed.doc = nd;
+      if (JSON.stringify(ed.draft) === sent) ed.draft = edPick(nd); // adopt the canonical form (item ids, trimmed text)
+      ed.savedJson = JSON.stringify(edPick(nd));
+      edSync(nd);
       try { if (!edDirty()) localStorage.removeItem(LS(ed.id)); } catch {}
       if (ED.conflict) { ED.conflict.remove(); ED.conflict = null; }
-      if (!silent) toast(r.page.status === "published" ? "সেভ হয়েছে — লাইভ করতে “আপডেট প্রকাশ” চাপুন" : "খসড়া সেভ হয়েছে", 2600);
+      if (!silent) toast(nd.status === "published" ? "সেভ হয়েছে — লাইভ করতে “আপডেট প্রকাশ” চাপুন" : "খসড়া সেভ হয়েছে", 2600);
       pushRender();
       return true;
     } catch (e) {
       if (ED !== ed || e.message === "session") return false;
-      if (e.status === 409 && e.data && e.data.page) showConflict(e.data.page);
+      if (e.status === 409 && edDocOf(e.data)) showConflict(edDocOf(e.data));
+      else if (e.status === 409 && e.message === "in_trash") toast("পোস্টটি ট্র্যাশে সরানো হয়েছে — সেভ হয়নি", 5000);
       else if (e.status === 400 && e.field) { ed.err = { field: e.field, reason: (e.data && e.data.reason) || "type" }; gotoError(); toast("সেভ হয়নি — " + errLabel(ed.err), 4000); }
-      else if (e.status === 404) toast("পেজটি আর নেই — হয়তো অন্য কোথাও মুছে ফেলা হয়েছে", 5000);
+      else if (e.status === 404) toast(edNoun() + "টি আর নেই — হয়তো অন্য কোথাও মুছে ফেলা হয়েছে", 5000);
       else toast("সেভ হয়নি — সংযোগ দেখে আবার চেষ্টা করুন (পরিবর্তন এই ব্রাউজারে রাখা আছে)", 5000);
       return false;
     } finally { if (ED === ed) { ed.saving = false; updateBar(); } }
   }
   function showConflict(server) {
     if (ED.conflict) ED.conflict.remove();
-    const b = banner("err", "এই পেজটি অন্য কোথাও (অন্য ট্যাব বা ডিভাইসে) সেভ হয়েছে — " + fmtDateTime(server.updatedAt) + (server.updatedBy ? " · " + server.updatedBy : "") + "। কোনটি রাখবেন?",
+    const b = banner("err", "এই " + edNoun() + "টি অন্য কোথাও (অন্য ট্যাব বা ডিভাইসে) সেভ হয়েছে — " + fmtDateTime(server.updatedAt) + (server.updatedBy ? " · " + server.updatedBy : "") + "। কোনটি রাখবেন?",
       h("button", { type: "button", class: "btn btn-sm btn-line", id: "pbTheirs", text: "ওই ভার্সন লোড করুন", onclick: () => {
         b.remove(); ED.conflict = null;
         ED.hist.push(JSON.stringify(ED.draft)); ED.fut = [];
-        ED.doc = server; ED.draft = pick(server); ED.savedJson = JSON.stringify(ED.draft);
+        ED.doc = server; ED.draft = edPick(server); ED.savedJson = JSON.stringify(ED.draft);
         if (ED.sel && !findB(ED.draft.blocks, ED.sel)) ED.sel = null;
-        syncIndex(server); changed({ form: true });
+        edSync(server); changed({ form: true });
         toast("সার্ভারের ভার্সন লোড হয়েছে — আনডু করলে আপনার পরিবর্তন ফিরে আসবে", 4000);
       } }),
       h("button", { type: "button", class: "btn btn-sm btn-danger", id: "pbMine", text: "আমারটা রাখুন", onclick: async () => {
         b.remove(); ED.conflict = null;
-        ED.doc = server; ED.savedJson = JSON.stringify(pick(server));
+        ED.doc = server; ED.savedJson = JSON.stringify(edPick(server));
         await save();
       } }));
     b.id = "pbConflict"; ED.conflict = b;
@@ -2670,22 +2778,30 @@
     const ed = ED;
     ed.saving = true; updateBar();
     try {
-      const r = await api("/admin/pages/" + ed.id + "/publish", { method: "POST", body: { version: ed.doc.version } });
+      const r = await api(edApi() + ed.id + "/publish", { method: "POST", body: { version: ed.doc.version } });
       if (ED !== ed) return;
+      const nd = edDocOf(r);
       const keepDraft = JSON.stringify(ed.draft) !== ed.savedJson;
-      ed.doc = r.page; ed.savedJson = JSON.stringify(pick(r.page));
-      if (!keepDraft) ed.draft = pick(r.page);
-      syncIndex(r.page);
+      ed.doc = nd; ed.savedJson = JSON.stringify(edPick(nd));
+      if (!keepDraft) ed.draft = edPick(nd);
+      edSync(nd);
       try { if (!edDirty()) localStorage.removeItem(LS(ed.id)); } catch {}
-      toast("প্রকাশিত হয়েছে — " + location.host + "/" + r.page.slug, 3600);
+      const sched = isPostEd() && nd.date && Date.parse(nd.date) > Date.now();
+      toast(sched ? "শিডিউল হয়েছে — " + fmtDateTime(nd.date) + " এ নিজে থেকেই প্রকাশ হবে" : "প্রকাশিত হয়েছে — " + location.host + edLiveUrl(nd.slug), 3600);
     } catch (e) {
       if (ED !== ed || e.message === "session") return;
-      if (e.status === 409 && e.data && e.data.page) showConflict(e.data.page);
+      if (e.status === 409 && edDocOf(e.data)) showConflict(edDocOf(e.data));
       else if (e.field) { ed.err = { field: e.field, reason: (e.data && e.data.reason) || "type" }; gotoError(); toast("প্রকাশ হয়নি — " + errLabel(ed.err), 4000); }
       else toast("প্রকাশ হয়নি — আবার চেষ্টা করুন", 4000);
     } finally { if (ED === ed) { ed.saving = false; updateBar(); } }
   }
   async function editorSettings() {
+    if (isPostEd()) {
+      const v = await postSettingsDialog(Object.assign({ id: ED.id }, ED.draft), { published: ED.doc.status === "published", publishedSlug: ED.doc.publishedSlug });
+      if (!v || !ED) return;
+      mutate((d) => Object.assign(d, v), "", { form: true });
+      return;
+    }
     const v = await pageSettingsDialog(Object.assign({ id: ED.id }, ED.draft), { published: ED.doc.status === "published", publishedSlug: ED.doc.publishedSlug });
     if (!v || !ED) return;
     mutate((d) => { d.title = v.title; d.slug = v.slug; d.seo = v.seo; }, "");
@@ -2854,7 +2970,7 @@
     B.textContent = "";
     if (ED.left === "blocks") {
       B.append(h("p", { class: "pbe-hint", text: "টেনে এনে ক্যানভাসে বা লেয়ারে ছাড়ুন, অথবা ক্লিক করে বেছে নেওয়া ব্লকের পরে যোগ করুন।" }));
-      for (const [g, gl] of GROUPS) {
+      for (const [g, gl] of edGroups()) {
         const grid = h("div", { class: "lib" });
         for (const [type, def] of Object.entries(PG.BLOCKS)) if (def.group === g) grid.append(libTile({ kind: "new", type }, def.icon, def.label, def.desc));
         B.append(h("div", { class: "lib-g", text: gl }), grid);
@@ -2932,7 +3048,7 @@
       R.append(h("div", { class: "pbe-none", id: "pbNoSel" }, h("div", { class: "big", text: "👆" }), h("h3", { text: "একটি ব্লক বেছে নিন" }),
         h("p", { text: "ক্যানভাসে বা লেয়ারে যেকোনো ব্লকে ক্লিক করলে এখানে তার কনটেন্ট, স্টাইল ও অ্যাডভান্সড সেটিংস দেখাবে।" }),
         h("div", { class: "pbe-kv" }, h("span", { text: "ব্লক" }), h("b", { text: bnNum(PG.countBlocks(ED.draft.blocks)) + " / " + bnNum(PG.LIMITS.blocks) })),
-        h("button", { type: "button", class: "btn btn-sm btn-line", text: "⚙ পেজ সেটিংস ও SEO", onclick: () => editorSettings() }),
+        h("button", { type: "button", class: "btn btn-sm btn-line", text: isPostEd() ? "⚙ পোস্টের তথ্য ও SEO" : "⚙ পেজ সেটিংস ও SEO", onclick: () => editorSettings() }),
         h("p", { class: "note2", text: "শর্টকাট: Ctrl+Z আনডু · Ctrl+Shift+Z রিডু · Ctrl+S সেভ · Ctrl+D ডুপ্লিকেট · Ctrl+C/V কপি-পেস্ট · Delete মুছুন · Esc প্যারেন্ট ব্লক" })));
       return;
     }
@@ -2947,7 +3063,7 @@
       h("div", { class: "pbe-acts", id: "pbActs" },
         ib("up", "↑", "উপরে সরান", () => stepBlock(b.id, -1), loc.i === 0),
         ib("down", "↓", "নিচে সরান", () => stepBlock(b.id, 1), loc.i === loc.list.length - 1),
-        ib("dup", "⧉", "ডুপ্লিকেট (Ctrl+D)", () => duplicateBlock(b.id), isCol),
+        ib("dup", "📋", "ডুপ্লিকেট (Ctrl+D)", () => duplicateBlock(b.id), isCol),
         ib("hide", b.hidden ? "◌" : "👁", b.hidden ? "দেখান" : "লুকান", () => toggleHidden(b.id), isCol),
         ib("copystyle", "🎨", "স্টাইল কপি", () => copyStyle(b.id)),
         ib("pastestyle", "📋", "স্টাইল পেস্ট", () => pasteStyle(b.id), !clipStyle),
@@ -3009,6 +3125,7 @@
         return f.el;
       }
       case "rich": return richCtl(fd.label, val, (v) => set(v), p);
+      case "code": return codeCtl(fd.label, val, fd.max, (v) => set(v), p);
       case "img": return imgCtl(fd.label, val, (v) => set(v, { form: true }), p);
       case "e": {
         const L = fd.labels || {};
@@ -3028,12 +3145,35 @@
     }
     return h("div");
   }
+  /** Code editor field: monospace, LTR, Tab inserts a tab, no spellcheck. */
+  function codeCtl(label, val, max, onSet, path) {
+    const id = "pf" + ++fidN;
+    const ta = h("textarea", { id, class: "codeta", rows: 10, dir: "ltr", spellcheck: "false", autocapitalize: "off", autocomplete: "off", "aria-label": label });
+    ta.value = val || "";
+    const cnt = h("span", { class: "fcnt" });
+    const count = () => { const n = ta.value.length; cnt.textContent = bnNum(n) + "/" + bnNum(max || 20000); cnt.classList.toggle("over", n > (max || 20000)); };
+    ta.addEventListener("input", () => { count(); onSet(ta.value); });
+    let esc = false; // Esc, then Tab, leaves the field (keyboard users are never trapped)
+    ta.addEventListener("blur", () => { esc = false; });
+    ta.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") { esc = true; return; }
+      if (e.key !== "Tab" || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || esc) { esc = false; return; }
+      e.preventDefault();
+      const a = ta.selectionStart, b = ta.selectionEnd;
+      ta.value = ta.value.slice(0, a) + "\t" + ta.value.slice(b); ta.selectionStart = ta.selectionEnd = a + 1;
+      count(); onSet(ta.value);
+    });
+    count();
+    return h("div", { class: "fld", "data-path": path }, h("label", { class: "fl2", for: id, text: label }), ta,
+      h("div", { class: "fmeta" }, h("span", { class: "ferr" }), h("span", { class: "fhint", text: "Tab চাপলে ট্যাব বসবে · Esc তারপর Tab দিয়ে বের হন" }), cnt));
+  }
   let dlN = 0;
   function urlList() {
     const dl = h("datalist", { id: "pbdl" + ++dlN });
     const opts = ["/", "/#contact", "/#packages", "tel:+880", "mailto:", "https://"];
     walkB(ED.draft.blocks, (b) => { if (b.adv && b.adv.anchor) opts.push("#" + b.adv.anchor); });
     if (pagesData) for (const pg of pagesData.pages) if (pg.status === "published" && pg.publishedSlug) opts.push("/" + pg.publishedSlug);
+    if (postsData) { opts.push("/blog"); for (const q of postsData.posts) if (q.status === "published" && q.publishedSlug) opts.push("/blog/" + q.publishedSlug); }
     for (const o of [...new Set(opts)]) dl.append(h("option", { value: o }));
     return dl;
   }
@@ -3127,7 +3267,7 @@
         h("button", { type: "button", class: "rep-t", "aria-expanded": open ? "true" : "false", onclick: () => { ED.openItem = open ? "" : okey + i; drawInspector(); } }, h("span", { class: "car", text: open ? "▾" : "▸" }), h("span", { text: lab })),
         h("button", { type: "button", class: "ib", title: "উপরে", "aria-label": "উপরে", text: "↑", disabled: i === 0 ? true : null, onclick: () => edit((a) => a.splice(i - 1, 0, a.splice(i, 1)[0]), open ? okey + (i - 1) : undefined) }),
         h("button", { type: "button", class: "ib", title: "নিচে", "aria-label": "নিচে", text: "↓", disabled: i === items.length - 1 ? true : null, onclick: () => edit((a) => a.splice(i + 1, 0, a.splice(i, 1)[0]), open ? okey + (i + 1) : undefined) }),
-        h("button", { type: "button", class: "ib", title: "ডুপ্লিকেট", "aria-label": "ডুপ্লিকেট", text: "⧉", disabled: items.length >= fd.max ? true : null, onclick: () => edit((a) => a.splice(i + 1, 0, Object.assign(clone(a[i]), { id: rid() }))) }),
+        h("button", { type: "button", class: "ib", title: "ডুপ্লিকেট", "aria-label": "ডুপ্লিকেট", text: "📋", disabled: items.length >= fd.max ? true : null, onclick: () => edit((a) => a.splice(i + 1, 0, Object.assign(clone(a[i]), { id: rid() }))) }),
         h("button", { type: "button", class: "ib del", title: "মুছুন", "aria-label": "মুছুন", "data-act": "rm", text: "✕", onclick: () => edit((a) => a.splice(i, 1), "") }));
       const item = h("div", { class: "rep-item" + (open ? " open" : ""), "data-path": p + "." + i }, head);
       if (open) { const body = h("div", { class: "rep-b" }); for (const sub of fd.fields) body.append(fieldCtl(id, path.concat([i, sub.k]), sub)); item.append(body); }
@@ -3283,6 +3423,482 @@
   }
 
 
+
+  /* ======================================================================
+     CMS Phase 4 — Posts (blog): list, categories & tags, post settings
+     Posts are edited in the SAME visual editor as pages (ED.kind === "post", see pages-ui).
+     The shared model /cms/posts.js validates, derives reading time and renders the preview
+     exactly like the public /blog pages. Drafts never get a public URL: the editor previews
+     the in-memory draft through the bridge iframe.
+     ====================================================================== */
+  let PO = null;
+  const postsReady = pagesReady.then(() => import("/cms/posts.js")).then((m) => (PO = m)).catch(() => null);
+  let postsData = null; // { posts:[indexEntry], terms:{categories,tags,version}, limits, reserved, now }
+  const PV = { q: "", status: "all", cat: "", sel: new Set(), page: 1 };
+  const POSTS_PER_PAGE = 20;
+  async function loadPosts() {
+    await postsReady;
+    if (!PO) throw new Error("posts_model");
+    postsData = await api("/admin/posts");
+    postsData.terms = PO.cleanTerms(postsData.terms);
+    return postsData;
+  }
+  const POST_FIELD_L = { excerpt: "সারাংশ", image: "ফিচার ছবি", imageAlt: "ছবির বিবরণ", categories: "ক্যাটাগরি", tags: "ট্যাগ", author: "লেখক", date: "প্রকাশের তারিখ" };
+  const POST_ST = { draft: "খসড়া", published: "প্রকাশিত", scheduled: "শিডিউল করা", trash: "ট্র্যাশে" };
+  const POST_SLUG_MSG = { required: "পোস্টের লিংক দিন", too_long: "লিংক সর্বোচ্চ ৬০ অক্ষর", format: "শুধু ইংরেজি ছোট হাতের অক্ষর, সংখ্যা ও হাইফেন (-)", reserved: "এই শব্দটি ব্লগের নিজস্ব ঠিকানা — অন্য লিংক দিন", taken: "এই লিংকে আরেকটি পোস্ট আছে — অন্য লিংক দিন" };
+  const postTerms = () => (postsData && postsData.terms) || (ED && ED.terms) || { categories: [], tags: [], version: 0 };
+  const postPick = (p) => ({
+    title: p.title || "", slug: p.slug || "", excerpt: p.excerpt || "", image: p.image || "", imageAlt: p.imageAlt || "",
+    categories: clone(p.categories || []), tags: clone(p.tags || []), author: p.author || "", date: p.date || "",
+    seo: clone(p.seo || { title: "", description: "", image: "", noindex: false }), blocks: clone(p.blocks || []),
+  });
+  function syncPostIndex(doc) {
+    if (!postsData || !PO) return;
+    const e = PO.indexEntry(doc);
+    const i = postsData.posts.findIndex((x) => x.id === doc.id);
+    if (i < 0) postsData.posts.unshift(e); else postsData.posts[i] = e;
+  }
+  /** Status for display: draft | published | scheduled | trash, plus "changed" (saved edits not yet live). */
+  function postState(p) {
+    const k = PO.postStatus(p);
+    if (k === "published" && p.changed) return { k: "changed", s: k, t: "প্রকাশিত · পরিবর্তন বাকি" };
+    return { k: k === "published" ? "live" : k === "scheduled" ? "sched" : k, s: k, t: POST_ST[k] };
+  }
+  function postsErr(e, fallback) {
+    if (e.message === "session") return;
+    if (e.message === "too_many_posts") return toast("সর্বোচ্চ " + bnNum(PO.POST_LIMITS.posts) + "টি পোস্ট রাখা যায়", 4000);
+    if (e.message === "too_many_terms") return toast("আর নতুন ক্যাটাগরি/ট্যাগ যোগ করা যাবে না (সীমা পূর্ণ)", 4000);
+    if (e.message === "in_trash") return toast("পোস্টটি ট্র্যাশে আছে — আগে ফিরিয়ে আনুন", 4000);
+    if (e.status === 409) return toast("অন্য কোথাও পরিবর্তন হয়েছে — তালিকা নতুন করে লোড হলো", 4000);
+    if (e.status === 404) return toast("পাওয়া যায়নি — হয়তো মুছে ফেলা হয়েছে", 4000);
+    if (e.field) return toast((e.field === "slug" ? "লিংক: " + (POST_SLUG_MSG[e.data && e.data.reason] || "") : (POST_FIELD_L[e.field] || e.field) + ": " + reasonText(e.data && e.data.reason)), 4200);
+    toast(fallback || "ব্যর্থ হয়েছে, আবার চেষ্টা করুন");
+  }
+  /* Dhaka time (UTC+6, no DST) <-> <input type=datetime-local> */
+  const DHAKA_MS = 6 * 3600 * 1000;
+  const toDhakaInput = (iso) => { const t = Date.parse(iso); return Number.isFinite(t) ? new Date(t + DHAKA_MS).toISOString().slice(0, 16) : ""; };
+  const fromDhakaInput = (v) => { if (!v) return ""; const t = Date.parse(v + ":00+06:00"); return Number.isFinite(t) ? new Date(t).toISOString() : null; };
+  const termName = (id) => { const m = PO.termMaps(postTerms()); const t = m.cat.get(id) || m.tag.get(id); return t ? t.name : ""; };
+
+  /* ---------- router entry ---------- */
+  async function renderPosts() {
+    const host = $("pPosts");
+    const { sub } = parseHash();
+    if (!postsData) {
+      host.textContent = ""; host.append(h("div", { class: "card empty" }, h("div", { class: "spinner" })));
+      try { await Promise.all([loadPosts(), pagesData ? null : loadPages().catch(() => null)]); }
+      catch (e) {
+        if (e.message === "session") return;
+        host.textContent = "";
+        host.append(h("div", { class: "card empty", id: "postsErr" }, h("p", { text: PO ? "পোস্টের তালিকা লোড হয়নি।" : "ব্লগের ফাইল (/cms/posts.js) লোড হয়নি।" }),
+          h("button", { type: "button", class: "btn btn-sm btn-gold", text: "আবার চেষ্টা", onclick: () => renderPosts() })));
+        return;
+      }
+    }
+    if (parseHash().page !== "posts") return;
+    if (sub === "terms") return drawTerms();
+    drawPosts();
+    if (sub && (!ED || ED.id !== sub)) openEditor(sub, "post");
+  }
+  async function refreshPosts() { try { await loadPosts(); } catch {} if (parseHash().page === "posts") { if (parseHash().sub === "terms") drawTerms(); else if (!parseHash().sub) drawPosts(); } }
+
+  /* ---------- posts list ---------- */
+  function filteredPosts() {
+    const q = PV.q.trim().toLowerCase();
+    return postsData.posts.filter((p) => {
+      const s = PO.postStatus(p);
+      if (PV.status === "all" ? s === "trash" : s !== PV.status) return false;
+      if (PV.cat && !(p.categories || []).includes(PV.cat)) return false;
+      if (q && !(p.title + " " + p.slug + " " + (p.excerpt || "") + " " + (p.author || "")).toLowerCase().includes(q)) return false;
+      return true;
+    }).sort((a, b) => String(b.date || b.updatedAt).localeCompare(String(a.date || a.updatedAt)));
+  }
+  function drawPosts() {
+    const host = $("pPosts"); host.textContent = "";
+    const all = postsData.posts, cnt = { all: 0, draft: 0, published: 0, scheduled: 0, trash: 0 };
+    for (const p of all) { const s = PO.postStatus(p); cnt[s]++; if (s !== "trash") cnt.all++; }
+    host.append(sectionHead("✎", "পোস্ট", bnNum(cnt.all) + "টি পোস্ট · " + bnNum(cnt.published) + "টি প্রকাশিত" + (cnt.scheduled ? " · " + bnNum(cnt.scheduled) + "টি শিডিউল করা" : "") + " — ব্লগ লিখুন, ক্যাটাগরি দিন, সময় ঠিক করে প্রকাশ করুন",
+      h("a", { class: "btn btn-line btn-sm", href: "#/posts/terms", id: "termsBtn", text: "🏷 ক্যাটাগরি ও ট্যাগ" }),
+      cnt.published ? h("a", { class: "btn btn-line btn-sm", href: "/blog", target: "_blank", rel: "noopener", text: "↗ ব্লগ দেখুন" }) : null,
+      h("button", { type: "button", class: "btn btn-gold", id: "newPost", text: "＋ নতুন পোস্ট", onclick: () => createPostDialog() })));
+    if (!all.length) {
+      host.append(h("div", { class: "card pg-empty", id: "postsEmpty" }, h("div", { class: "big", text: "✎" }), h("h3", { text: "এখনো কোনো পোস্ট নেই" }),
+        h("p", { text: "প্রথম ব্লগ পোস্টটি লিখুন — শিরোনাম দিন, তারপর লেখা, ছবি, কোড বা টিপস বক্স টেনে এনে সাজান। খসড়া শুধু আপনি দেখবেন।" }),
+        h("button", { type: "button", class: "btn btn-gold", text: "＋ প্রথম পোস্ট লিখুন", onclick: () => createPostDialog() })));
+      return;
+    }
+    // filter bar
+    const tabs = h("div", { class: "qtabs", role: "tablist", "aria-label": "অবস্থা অনুযায়ী" });
+    for (const [k, l] of [["all", "সব"], ["published", "প্রকাশিত"], ["scheduled", "শিডিউল"], ["draft", "খসড়া"], ["trash", "ট্র্যাশ"]]) {
+      if (k === "scheduled" && !cnt.scheduled && PV.status !== k) continue;
+      if (k === "trash" && !cnt.trash && PV.status !== k) continue;
+      tabs.append(h("button", { type: "button", role: "tab", class: "qtab" + (PV.status === k ? " on" : ""), "aria-selected": PV.status === k ? "true" : "false", "data-st": k,
+        onclick: () => { PV.status = k; PV.sel.clear(); PV.page = 1; drawPosts(); } }, l, h("span", { class: "qc", text: bnNum(cnt[k]) })));
+    }
+    const search = h("input", { type: "search", id: "postSearch", class: "qsearch", placeholder: "🔍 পোস্ট খুঁজুন…", "aria-label": "পোস্ট খুঁজুন", value: PV.q });
+    let st = 0;
+    search.addEventListener("input", () => { clearTimeout(st); st = setTimeout(() => { PV.q = search.value; PV.page = 1; PV.sel.clear(); drawRows(); }, 160); });
+    const terms = postTerms();
+    const catSel = h("select", { class: "sel qcat", id: "postCat", "aria-label": "ক্যাটাগরি অনুযায়ী" }, h("option", { value: "", text: "সব ক্যাটাগরি" }), ...terms.categories.map((c) => h("option", { value: c.id, text: c.name })));
+    catSel.value = PV.cat;
+    catSel.addEventListener("change", () => { PV.cat = catSel.value; PV.page = 1; PV.sel.clear(); drawRows(); });
+    const bulk = h("div", { class: "qbulk hidden", id: "postBulk", role: "region", "aria-label": "বাছাই করা পোস্ট" });
+    const tableBox = h("div", { class: "card ptcard qcard" });
+    const pager = h("div", { class: "qpager", id: "postPager" });
+    host.append(h("div", { class: "qbar" }, tabs, h("div", { class: "qtools" }, search, terms.categories.length ? catSel : null)), bulk, tableBox, pager,
+      h("p", { class: "note2", text: PV.status === "trash" ? "ট্র্যাশের পোস্ট সাইটে দেখা যায় না। ফিরিয়ে আনলে খসড়া হিসেবে ফেরে; স্থায়ীভাবে মুছলে আর ফেরানো যায় না।"
+        : "খসড়া শুধু এখানে দেখা যায়। প্রকাশ করলে webdesigner71.com/blog/<লিংক> এ লাইভ হয়; ভবিষ্যতের তারিখ দিলে সেই সময়ে নিজে থেকেই প্রকাশ হয়।" }));
+    function drawBulk(list) {
+      const ids = list.filter((p) => PV.sel.has(p.id)).map((p) => p.id);
+      bulk.textContent = ""; bulk.classList.toggle("hidden", !ids.length);
+      if (!ids.length) return;
+      const b = (a, t, cls) => h("button", { type: "button", class: "btn btn-sm " + cls, "data-bulk": a, text: t, onclick: () => bulkAction(a, ids) });
+      bulk.append(h("b", { text: bnNum(ids.length) + "টি বাছাই করা" }),
+        ...(PV.status === "trash" ? [b("restore", "↺ ফিরিয়ে আনুন", "btn-line"), b("delete", "🗑 স্থায়ীভাবে মুছুন", "btn-danger")]
+          : [b("publish", "▶ প্রকাশ", "btn-gold"), b("unpublish", "⏸ অপ্রকাশ", "btn-line"), b("trash", "🗑 ট্র্যাশে সরান", "btn-line danger")]),
+        h("button", { type: "button", class: "btn btn-sm btn-line", text: "বাছাই বাতিল", onclick: () => { PV.sel.clear(); drawRows(); } }));
+    }
+    function drawRows() {
+      const list = filteredPosts();
+      const pages = Math.max(1, Math.ceil(list.length / POSTS_PER_PAGE));
+      if (PV.page > pages) PV.page = pages;
+      const slice = list.slice((PV.page - 1) * POSTS_PER_PAGE, PV.page * POSTS_PER_PAGE);
+      tableBox.textContent = ""; pager.textContent = "";
+      if (!list.length) {
+        tableBox.append(h("div", { class: "pg-empty", id: "postsNone" }, h("p", { text: PV.q || PV.cat ? "এই খোঁজে কোনো পোস্ট পাওয়া যায়নি।" : PV.status === "trash" ? "ট্র্যাশ খালি।" : "এই তালিকায় কোনো পোস্ট নেই।" })));
+        drawBulk([]); return;
+      }
+      const allBox = h("input", { type: "checkbox", id: "postSelAll", "aria-label": "এই পাতার সব পোস্ট বাছাই করুন" });
+      allBox.checked = slice.every((p) => PV.sel.has(p.id));
+      allBox.addEventListener("change", () => { for (const p of slice) { if (allBox.checked) PV.sel.add(p.id); else PV.sel.delete(p.id); } drawRows(); });
+      const tb = h("tbody");
+      for (const p of slice) tb.append(postRow(p, () => drawBulk(list)));
+      tableBox.append(h("table", { class: "ptable qtable", id: "postsTable" },
+        h("thead", {}, h("tr", {}, h("th", { class: "qck" }, allBox), h("th", { text: "শিরোনাম" }), h("th", { text: "অবস্থা" }), h("th", { text: "তারিখ" }), h("th", { text: "" }))), tb));
+      if (pages > 1) for (let i = 1; i <= pages; i++) pager.append(h("button", { type: "button", class: "btn btn-sm " + (i === PV.page ? "btn-green" : "btn-line"), "aria-current": i === PV.page ? "page" : null, text: bnNum(i), onclick: () => { PV.page = i; drawRows(); } }));
+      drawBulk(list);
+    }
+    drawRows();
+  }
+  function postRow(p, onSel) {
+    const s = postState(p), trash = s.s === "trash";
+    const act = (a, text, cls, title, fn) => h("button", { type: "button", class: "btn btn-sm " + cls, "data-act": a, title, "aria-label": title, text, onclick: fn });
+    const ck = h("input", { type: "checkbox", class: "qsel", "aria-label": "বাছাই: " + p.title });
+    ck.checked = PV.sel.has(p.id);
+    ck.addEventListener("change", () => { if (ck.checked) PV.sel.add(p.id); else PV.sel.delete(p.id); const a = $("postSelAll"); if (a && !ck.checked) a.checked = false; onSel(); });
+    const cats = (p.categories || []).map(termName).filter(Boolean);
+    const thumb = h("span", { class: "qthumb" + (p.image ? "" : " none"), "aria-hidden": "true" }, p.image ? h("img", { src: p.image, alt: "", loading: "lazy" }) : "✎");
+    const titleEl = trash ? h("span", { class: "ptitle", text: p.title }) : h("a", { href: "#/posts/" + p.id, class: "ptitle", text: p.title });
+    const live = s.s === "published" && p.publishedSlug;
+    return h("tr", { "data-id": p.id, class: trash ? "is-trash" : null },
+      h("td", { class: "qck" }, ck),
+      h("td", { class: "pt", "data-l": "শিরোনাম" }, h("div", { class: "qt" }, thumb, h("div", { style: "min-width:0" }, titleEl,
+        h("div", { class: "psub" },
+          live ? h("a", { href: "/blog/" + p.publishedSlug, target: "_blank", rel: "noopener", class: "slug", text: "/blog/" + p.slug }) : h("span", { class: "slug", text: "/blog/" + p.slug }),
+          h("span", { text: "⏱ " + bnNum(p.readMin || 1) + " মিনিট" }),
+          ...cats.slice(0, 3).map((c) => h("span", { class: "pill qcatp", text: c })), cats.length > 3 ? h("span", { text: "+" + bnNum(cats.length - 3) }) : null)))),
+      h("td", { "data-l": "অবস্থা" }, h("span", { class: "pill st-" + s.k, text: s.t })),
+      h("td", { class: "pu", "data-l": "তারিখ" }, s.s === "scheduled" ? "⏱ " + fmtDateTime(p.date) : s.s === "published" ? fmtDateTime(p.date || p.publishedAt) : "সম্পাদনা: " + fmtDateTime(trash ? p.trashedAt || p.updatedAt : p.updatedAt)),
+      h("td", { class: "pa" }, h("div", { class: "acts" }, ...(trash ? [
+        act("restore", "↺ ফিরিয়ে আনুন", "btn-line", "ট্র্যাশ থেকে ফিরিয়ে আনুন", () => postAct(p, "restore")),
+        act("delete", "🗑", "btn-line danger", "স্থায়ীভাবে মুছুন", () => postAct(p, "delete")),
+      ] : [
+        h("a", { class: "btn btn-sm btn-green", href: "#/posts/" + p.id, "data-act": "edit", text: "✎ লিখুন" }),
+        act("seo", "⚙", "btn-line", "পোস্টের তথ্য ও SEO", () => listPostSettings(p)),
+        act("dup", "📋", "btn-line", "ডুপ্লিকেট", () => postAct(p, "duplicate")),
+        p.status === "published" ? act("unpublish", "⏸", "btn-line", "অপ্রকাশ করুন", () => postAct(p, "unpublish")) : act("publish", "▶ প্রকাশ", "btn-gold", p.date && Date.parse(p.date) > Date.now() ? "শিডিউল করুন" : "প্রকাশ করুন", () => postAct(p, "publish")),
+        act("trash", "🗑", "btn-line danger", "ট্র্যাশে সরান", () => postAct(p, "trash")),
+      ]))));
+  }
+  async function postAct(p, a) {
+    if (a === "unpublish" && !(await confirmModal({ title: "পোস্টটি অপ্রকাশ করবেন?", message: "/blog/" + (p.publishedSlug || p.slug) + " লিংকটি আর দেখা যাবে না। খসড়া থেকে যাবে।", okText: "অপ্রকাশ করুন", cancelText: "বাতিল" }))) return;
+    if (a === "delete" && !(await confirmModal({ title: "স্থায়ীভাবে মুছবেন?", message: "“" + p.title + "” পোস্টটি চিরতরে মুছে যাবে। এই কাজ ফেরানো যাবে না।", okText: "স্থায়ীভাবে মুছুন", cancelText: "বাতিল", danger: true }))) return;
+    try {
+      if (a === "delete") {
+        await api("/admin/posts/" + p.id + "?version=" + p.version, { method: "DELETE" });
+        postsData.posts = postsData.posts.filter((x) => x.id !== p.id); PV.sel.delete(p.id);
+        try { localStorage.removeItem("wd71_pb_" + p.id); } catch {}
+        toast("পোস্টটি স্থায়ীভাবে মুছে ফেলা হয়েছে");
+      } else {
+        const body = a === "duplicate" ? {} : { version: p.version };
+        const r = await api("/admin/posts/" + p.id + "/" + a, { method: "POST", body });
+        syncPostIndex(r.post);
+        const sched = a === "publish" && PO.postStatus(r.post) === "scheduled";
+        toast({ publish: sched ? "শিডিউল হয়েছে — " + fmtDateTime(r.post.date) + " এ প্রকাশ হবে" : "প্রকাশিত হয়েছে — /blog/" + r.post.slug, unpublish: "পোস্টটি অপ্রকাশিত হয়েছে",
+          trash: "ট্র্যাশে সরানো হয়েছে", restore: "ফিরিয়ে আনা হয়েছে — খসড়া হিসেবে আছে", duplicate: "কপি তৈরি হয়েছে: " + r.post.title }[a], 3600);
+      }
+      drawPosts();
+    } catch (e) { postsErr(e); refreshPosts(); }
+  }
+  async function bulkAction(a, ids) {
+    const L = { publish: "প্রকাশ", unpublish: "অপ্রকাশ", trash: "ট্র্যাশে সরানো", restore: "ফিরিয়ে আনা", delete: "স্থায়ীভাবে মোছা" };
+    if ((a === "delete" || a === "unpublish" || a === "trash") && !(await confirmModal({ title: bnNum(ids.length) + "টি পোস্ট " + L[a] + " হবে", message: a === "delete" ? "বাছাই করা পোস্টগুলো চিরতরে মুছে যাবে। এই কাজ ফেরানো যাবে না।" : a === "trash" ? "প্রকাশিত পোস্টগুলো সাইট থেকে সরে যাবে। পরে ট্র্যাশ থেকে ফিরিয়ে আনা যাবে।" : "প্রকাশিত লিংকগুলো আর দেখা যাবে না।", okText: "হ্যাঁ, " + L[a] + " করুন", cancelText: "বাতিল", danger: a === "delete" }))) return;
+    try {
+      const r = await api("/admin/posts/bulk", { method: "POST", body: { action: a, ids } });
+      postsData.posts = r.posts; PV.sel.clear();
+      if (a === "delete") for (const id of r.done) { try { localStorage.removeItem("wd71_pb_" + id); } catch {} }
+      toast(bnNum(r.done.length) + "টি পোস্ট " + L[a] + " হয়েছে" + (r.failed.length ? " · " + bnNum(r.failed.length) + "টি হয়নি" : ""), 4000);
+      drawPosts();
+    } catch (e) { postsErr(e); refreshPosts(); }
+  }
+  async function listPostSettings(p) {
+    let doc;
+    try { const r = await api("/admin/posts/" + p.id); doc = r.post; postsData.terms = PO.cleanTerms(r.terms); } catch (e) { return postsErr(e); }
+    const v = await postSettingsDialog(Object.assign({ id: doc.id }, postPick(doc)), { published: doc.status === "published", publishedSlug: doc.publishedSlug });
+    if (!v) return;
+    try {
+      const r = await api("/admin/posts/" + p.id, { method: "PUT", body: { ...postPick(doc), ...v, version: doc.version } });
+      syncPostIndex(r.post); toast(r.post.status === "published" ? "সেভ হয়েছে — লাইভ করতে “প্রকাশ” করুন" : "সেভ হয়েছে", 3600); drawPosts();
+    } catch (e) { postsErr(e); refreshPosts(); }
+  }
+
+  /* ---------- create ---------- */
+  async function createPostDialog() {
+    await postsReady;
+    if (!PO) return toast("ব্লগের ফাইল লোড হয়নি");
+    if (postsData && postsData.posts.length >= PO.POST_LIMITS.posts) return toast("সর্বোচ্চ " + bnNum(PO.POST_LIMITS.posts) + "টি পোস্ট রাখা যায়", 4000);
+    const d = makeDialog("");
+    let done = false, busy = false, slugTouched = false, shown = false;
+    const cats = new Set();
+    const finish = () => { if (done || busy) return; done = true; d.close(); };
+    const t = textFld("পোস্টের শিরোনাম", "", { max: PO.POST_LIMITS.title, hint: "যেমন: ছোট ব্যবসার জন্য ওয়েবসাইট কেন দরকার" });
+    const s = textFld("পোস্টের লিংক (ঐচ্ছিক)", "", { max: 60, spell: false, hint: "খালি রাখলে শিরোনাম থেকে নিজে থেকেই তৈরি হবে" });
+    t.inp.id = "cqTitle"; t.el.querySelector("label").setAttribute("for", "cqTitle");
+    s.inp.id = "cqSlug"; s.el.querySelector("label").setAttribute("for", "cqSlug");
+    const go = h("button", { type: "button", class: "btn btn-gold", id: "cqOk", text: "তৈরি করে লেখা শুরু করুন" });
+    const taken = (slug) => postsData && postsData.posts.some((x) => x.slug === slug || x.publishedSlug === slug);
+    function check(force) {
+      const title = cleanText(t.inp.value), slug = s.inp.value.trim();
+      if (force) shown = true;
+      t.setErr(shown && !title ? "শিরোনাম দিন" : charLen(title) > PO.POST_LIMITS.title ? REASON.too_long : "");
+      let sp = slug ? PO.postSlugProblem(slug) : null;
+      if (!sp && slug && taken(slug)) sp = "taken";
+      s.setErr(sp ? POST_SLUG_MSG[sp] : "");
+      s.el.querySelector(".fhint").textContent = slug ? "webdesigner71.com/blog/" + slug : "খালি রাখলে শিরোনাম থেকে নিজে থেকেই তৈরি হবে";
+      return !!title && charLen(title) <= PO.POST_LIMITS.title && !sp;
+    }
+    t.inp.addEventListener("input", () => { if (!slugTouched) { const g = PO.slugify(t.inp.value, ""); s.inp.value = g && !taken(g) && !PO.postSlugProblem(g) ? g : ""; s.count(); } check(); });
+    s.inp.addEventListener("input", () => { slugTouched = !!s.inp.value; s.inp.value = s.inp.value.toLowerCase().replace(/[\s_]+/g, "-"); check(); });
+    const catBox = h("div", { class: "chips", id: "cqCats" });
+    const drawCats = () => {
+      catBox.textContent = "";
+      for (const c of postTerms().categories) catBox.append(h("button", { type: "button", class: "chip" + (cats.has(c.id) ? " on" : ""), "aria-pressed": cats.has(c.id) ? "true" : "false", text: c.name,
+        onclick: () => { if (cats.has(c.id)) cats.delete(c.id); else if (cats.size < PO.POST_LIMITS.postCategories) cats.add(c.id); drawCats(); } }));
+    };
+    drawCats();
+    const banner = h("div", { class: "mbanner err hidden", id: "cqErr" }, h("span"));
+    go.onclick = async () => {
+      if (!check(true)) { (t.el.classList.contains("bad") ? t.inp : s.inp).focus(); return; }
+      busy = true; go.disabled = true; go.textContent = "তৈরি হচ্ছে…"; banner.classList.add("hidden");
+      try {
+        const body = { title: cleanText(t.inp.value), author: (me && me.name) || "", categories: [...cats], blocks: [PG.newBlock("text")] };
+        if (s.inp.value.trim()) body.slug = s.inp.value.trim();
+        const r = await api("/admin/posts", { method: "POST", body });
+        busy = false; syncPostIndex(r.post); finish();
+        toast("পোস্ট তৈরি হয়েছে — এবার লিখুন");
+        location.hash = "#/posts/" + r.post.id;
+      } catch (e) {
+        busy = false; go.disabled = false; go.textContent = "তৈরি করে লেখা শুরু করুন";
+        if (e.message === "session") return;
+        if (e.field === "slug") { s.setErr(POST_SLUG_MSG[e.data && e.data.reason] || POST_SLUG_MSG.format); s.inp.focus(); }
+        else if (e.field === "title") t.setErr(reasonText(e.data && e.data.reason));
+        else { banner.firstChild.textContent = e.message === "too_many_posts" ? "সর্বোচ্চ " + bnNum(PO.POST_LIMITS.posts) + "টি পোস্ট রাখা যায়" : "পোস্ট তৈরি করা যায়নি — আবার চেষ্টা করুন"; banner.classList.remove("hidden"); }
+      }
+    };
+    [t.inp, s.inp].forEach((x) => x.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); go.click(); } }));
+    d.append(h("div", { class: "mbox", role: "dialog", "aria-modal": "true", "aria-label": "নতুন পোস্ট" },
+      h("div", { class: "mhead" }, h("h3", { text: "নতুন পোস্ট" }), h("button", { type: "button", class: "mx", "aria-label": "বন্ধ করুন", text: "✕", onclick: finish })),
+      h("div", { class: "mbody", id: "createPost" }, banner, t.el, s.el,
+        postTerms().categories.length ? h("div", { class: "fld" }, h("div", { class: "fl2", text: "ক্যাটাগরি (ঐচ্ছিক)" }), catBox) : null,
+        h("p", { class: "note2", text: "তারিখ, ফিচার ছবি, ট্যাগ ও SEO পরে এডিটরের ⚙ বাটন থেকে দেওয়া যাবে।" })),
+      h("div", { class: "mfoot" }, h("button", { type: "button", class: "btn btn-line", text: "বাতিল", onclick: finish }), go)));
+    d.addEventListener("cancel", (e) => { e.preventDefault(); finish(); });
+    d.addEventListener("backdrop", finish);
+    d.showModal(); t.inp.focus();
+  }
+
+  /* ---------- terms API (shared by the manager and the settings dialog) ---------- */
+  async function createTermApi(kind, name) {
+    const r = await api("/admin/posts/terms", { method: "POST", body: { kind, name } });
+    const t = PO.cleanTerms(r.terms);
+    if (postsData) postsData.terms = t;
+    if (ED) ED.terms = t;
+    return r.term;
+  }
+
+  /* ---------- post settings (title, link, excerpt, image, categories, tags, author, date, SEO) ---------- */
+  function postSettingsDialog(cur, { published, publishedSlug } = {}) {
+    return new Promise((resolve) => {
+      const d = makeDialog("wide2");
+      let done = false, img = cur.image || "", ogImg = (cur.seo && cur.seo.image) || "";
+      const cats = [...(cur.categories || [])], tags = [...(cur.tags || [])];
+      const finish = (v) => { if (done) return; done = true; d.close(); resolve(v); };
+      const seo = cur.seo || {};
+      const L = PO.POST_LIMITS;
+      const t = textFld("শিরোনাম", cur.title, { max: L.title });
+      const s = textFld("লিংক (স্লাগ)", cur.slug, { max: 60, spell: false });
+      const ex = textFld("সারাংশ (ঐচ্ছিক)", cur.excerpt, { max: L.excerpt, multiline: true, rows: 3, hint: "কার্ড ও শেয়ারে দেখাবে। খালি রাখলে লেখার শুরু থেকে নিজে থেকেই নেওয়া হবে।" });
+      const alt = textFld("ছবির বিবরণ (alt)", cur.imageAlt, { max: 150, hint: "ছবিতে কী আছে এক লাইনে" });
+      const au = textFld("লেখক", cur.author, { max: L.author, hint: "খালি রাখলে লেখকের নাম দেখাবে না" });
+      const mt = textFld("SEO শিরোনাম (ঐচ্ছিক)", seo.title, { max: 120, hint: "খালি রাখলে পোস্টের শিরোনাম" });
+      const md = textFld("মেটা বিবরণ (ঐচ্ছিক)", seo.description, { max: 300, multiline: true, hint: "খালি রাখলে সারাংশ ব্যবহার হবে" });
+      const ids = { psTitle: t, psSlug: s, psExcerpt: ex, psAlt: alt, psAuthor: au, psMetaTitle: mt, psMetaDesc: md };
+      for (const [id, f] of Object.entries(ids)) { f.inp.id = id; f.el.querySelector("label").setAttribute("for", id); }
+      // featured image
+      const thumb = h("div", { class: "thumb qfeat" });
+      const rm = h("button", { type: "button", class: "btn btn-sm btn-line", text: "সরান", onclick: () => { img = ""; drawImg(); } });
+      const drawImg = () => { thumb.textContent = ""; thumb.append(img ? h("img", { src: img, alt: "" }) : h("span", { text: "ফিচার ছবি নেই" })); rm.disabled = !img; alt.el.classList.toggle("hidden", !img); };
+      const pickB = h("button", { type: "button", class: "btn btn-sm btn-line", id: "psImgPick", text: "🖼 ছবি বাছুন", onclick: async () => { const r = await openImagePicker(img); if (r) { img = r.url; if (!alt.inp.value && r.alt) { alt.inp.value = r.alt; alt.count(); } drawImg(); } } });
+      // date (Dhaka)
+      const dateIn = h("input", { type: "datetime-local", id: "psDate", class: "inp", value: toDhakaInput(cur.date), step: "60" });
+      const dateNote = h("span", { class: "fhint", id: "psDateNote" });
+      const dateErr = h("span", { class: "ferr" });
+      const dateFld = h("div", { class: "fld", "data-path": "date" }, h("label", { class: "fl2", for: "psDate", text: "প্রকাশের তারিখ ও সময় (বাংলাদেশ সময়)" }),
+        h("div", { class: "qdate" }, dateIn, h("button", { type: "button", class: "btn btn-sm btn-line", text: "এখন", onclick: () => { dateIn.value = toDhakaInput(new Date().toISOString()); check(); } }),
+          h("button", { type: "button", class: "btn btn-sm btn-line", text: "খালি", onclick: () => { dateIn.value = ""; check(); } })),
+        h("div", { class: "fmeta" }, dateErr, dateNote));
+      // categories (toggle chips + inline create)
+      const catBox = h("div", { class: "chips", id: "psCats" });
+      const drawCats = () => {
+        catBox.textContent = "";
+        for (const c of postTerms().categories) catBox.append(h("button", { type: "button", class: "chip" + (cats.includes(c.id) ? " on" : ""), "aria-pressed": cats.includes(c.id) ? "true" : "false", "data-term": c.id, text: c.name,
+          onclick: () => { const i = cats.indexOf(c.id); if (i >= 0) cats.splice(i, 1); else if (cats.length < L.postCategories) cats.push(c.id); else toast("সর্বোচ্চ " + bnNum(L.postCategories) + "টি ক্যাটাগরি"); drawCats(); } }));
+        catBox.append(h("button", { type: "button", class: "chip add", id: "psCatNew", text: "＋ নতুন ক্যাটাগরি", onclick: async () => {
+          const name = await promptModal({ title: "নতুন ক্যাটাগরি", label: "নাম", value: "", max: L.termName, hint: "যেমন: ওয়েব ডিজাইন" });
+          if (!name || !cleanText(name)) return;
+          try { const term = await createTermApi("category", cleanText(name)); if (!cats.includes(term.id) && cats.length < L.postCategories) cats.push(term.id); drawCats(); } catch (e) { postsErr(e); }
+        } }));
+      };
+      // tags (selected chips + type-to-add with suggestions)
+      const tagBox = h("div", { class: "chips", id: "psTags" });
+      const dl = h("datalist", { id: "psTagList" });
+      const tagIn = h("input", { type: "text", id: "psTagIn", class: "inp", placeholder: "ট্যাগ লিখে Enter চাপুন", list: "psTagList", autocomplete: "off", "aria-label": "ট্যাগ যোগ করুন" });
+      const drawTags = () => {
+        tagBox.textContent = ""; dl.textContent = "";
+        const m = PO.termMaps(postTerms());
+        for (const id of tags) { const tg = m.tag.get(id); if (tg) tagBox.append(h("span", { class: "chip on", "data-term": id }, "#" + tg.name, h("button", { type: "button", class: "cx", "aria-label": tg.name + " সরান", text: "✕", onclick: () => { tags.splice(tags.indexOf(id), 1); drawTags(); } }))); }
+        for (const tg of postTerms().tags) if (!tags.includes(tg.id)) dl.append(h("option", { value: tg.name }));
+      };
+      async function addTag() {
+        const name = cleanText(tagIn.value).replace(/^#+/, "");
+        if (!name) return;
+        if (tags.length >= L.postTags) return toast("সর্বোচ্চ " + bnNum(L.postTags) + "টি ট্যাগ");
+        let tg = postTerms().tags.find((x) => x.name.toLowerCase() === name.toLowerCase());
+        try { if (!tg) tg = await createTermApi("tag", [...name].slice(0, L.termName).join("")); } catch (e) { return postsErr(e); }
+        if (!tags.includes(tg.id)) tags.push(tg.id);
+        tagIn.value = ""; drawTags();
+      }
+      tagIn.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); } });
+      tagIn.addEventListener("change", () => { if (postTerms().tags.some((x) => x.name === tagIn.value)) addTag(); });
+      // SEO image + noindex
+      const noidx = h("input", { type: "checkbox", id: "psNoindex" }); noidx.checked = !!seo.noindex;
+      const ogThumb = h("div", { class: "thumb" });
+      const ogRm = h("button", { type: "button", class: "btn btn-sm btn-line", text: "সরান", onclick: () => { ogImg = ""; drawOg(); } });
+      const drawOg = () => { ogThumb.textContent = ""; ogThumb.append(ogImg ? h("img", { src: ogImg, alt: "" }) : h("span", { text: "ফিচার ছবি ব্যবহার হবে" })); ogRm.disabled = !ogImg; };
+      const ogPick = h("button", { type: "button", class: "btn btn-sm btn-line", text: "🖼 আলাদা ছবি", onclick: async () => { const r = await openImagePicker(ogImg); if (r) { ogImg = r.url; drawOg(); } } });
+      const words = PO.wordCount(cur.blocks || []), mins = PO.readingMinutes(cur.blocks || []);
+      const slugNote = h("div", { class: "mbanner warn hidden", id: "psSlugNote" }, h("span", { text: "এই পোস্টটি প্রকাশিত। নতুন লিংক প্রকাশ করার পর পুরোনো /blog/" + (publishedSlug || cur.slug) + " লিংকটি নতুন লিংকে রিডাইরেক্ট হবে।" }));
+      const ok = h("button", { type: "button", class: "btn btn-gold", id: "psOk", text: "ঠিক আছে" });
+      function check() {
+        const title = cleanText(t.inp.value), slug = s.inp.value.trim();
+        t.setErr(!title ? "শিরোনাম দিন" : charLen(title) > L.title ? REASON.too_long : "");
+        let sp = PO.postSlugProblem(slug);
+        if (!sp && postsData && postsData.posts.some((x) => x.id !== cur.id && (x.slug === slug || x.publishedSlug === slug))) sp = "taken";
+        s.setErr(sp ? POST_SLUG_MSG[sp] : "");
+        s.el.querySelector(".fhint").textContent = "webdesigner71.com/blog/" + (slug || "…");
+        slugNote.classList.toggle("hidden", !(published && slug !== (publishedSlug || cur.slug)));
+        ex.setErr(charLen(ex.inp.value.trim()) > L.excerpt ? REASON.too_long : "");
+        alt.setErr(charLen(alt.inp.value.trim()) > 150 ? REASON.too_long : "");
+        au.setErr(charLen(au.inp.value.trim()) > L.author ? REASON.too_long : "");
+        mt.setErr(charLen(mt.inp.value.trim()) > 120 ? REASON.too_long : "");
+        md.setErr(charLen(md.inp.value.trim()) > 300 ? REASON.too_long : "");
+        const iso = fromDhakaInput(dateIn.value);
+        dateErr.textContent = iso === null ? "সঠিক তারিখ দিন" : "";
+        dateFld.classList.toggle("bad", iso === null);
+        const tms = iso ? Date.parse(iso) : 0;
+        dateNote.textContent = !iso ? "খালি রাখলে প্রকাশের মুহূর্তের সময় বসবে" : tms > Date.now() ? "⏱ ভবিষ্যতের সময় — “শিডিউল” করলে এই সময়ে নিজে থেকেই প্রকাশ হবে" : "এই তারিখ পোস্টে দেখাবে";
+        ok.disabled = [t, s, ex, alt, au, mt, md].some((f) => f.el.classList.contains("bad")) || iso === null;
+      }
+      s.inp.addEventListener("input", () => { s.inp.value = s.inp.value.toLowerCase().replace(/[\s_]+/g, "-"); check(); });
+      [t, ex, alt, au, mt, md].forEach((f) => f.inp.addEventListener("input", check));
+      dateIn.addEventListener("input", check); dateIn.addEventListener("change", check);
+      ok.onclick = () => {
+        check(); if (ok.disabled) return;
+        finish({ title: cleanText(t.inp.value), slug: s.inp.value.trim(), excerpt: ex.inp.value.replace(/\r\n?/g, "\n").trim(), image: img, imageAlt: img ? cleanText(alt.inp.value) : "",
+          categories: cats.filter((id) => postTerms().categories.some((c) => c.id === id)), tags: tags.filter((id) => postTerms().tags.some((c) => c.id === id)),
+          author: cleanText(au.inp.value), date: fromDhakaInput(dateIn.value) || "",
+          seo: { title: cleanText(mt.inp.value), description: md.inp.value.replace(/\s+/g, " ").trim(), image: ogImg, noindex: noidx.checked } });
+      };
+      drawImg(); drawCats(); drawTags(); drawOg();
+      const grp = (title, ...kids) => h("div", { class: "fgroup" }, h("div", { class: "gh", text: title }), ...kids);
+      d.append(h("div", { class: "mbox", role: "dialog", "aria-modal": "true", "aria-label": "পোস্টের তথ্য" },
+        h("div", { class: "mhead" }, h("h3", { text: "পোস্টের তথ্য ও SEO" }), h("button", { type: "button", class: "mx", "aria-label": "বন্ধ করুন", text: "✕", onclick: () => finish(null) })),
+        h("div", { class: "mbody qset", id: "postSettings" },
+          h("div", { class: "qcol" },
+            t.el, s.el, slugNote, ex.el,
+            grp("🖼 ফিচার ছবি", h("div", { class: "imgf" }, thumb, h("div", { class: "imgb" }, pickB, rm)), alt.el),
+            h("p", { class: "note2", id: "psRead", text: "⏱ আনুমানিক পড়ার সময় " + bnNum(mins) + " মিনিট · " + bnNum(words) + " শব্দ (লেখা থেকে নিজে থেকেই হিসাব হয়)" })),
+          h("div", { class: "qcol" },
+            grp("🗂 ক্যাটাগরি", catBox),
+            grp("# ট্যাগ", tagBox, tagIn, dl),
+            grp("✍ লেখক ও তারিখ", au.el, dateFld),
+            grp("🔎 সার্চ ইঞ্জিন ও শেয়ার (SEO)", mt.el, md.el,
+              h("div", { class: "fld" }, h("div", { class: "fl2", text: "শেয়ার করার ছবি (og:image)" }), h("div", { class: "imgf" }, ogThumb, h("div", { class: "imgb" }, ogPick, ogRm))),
+              h("label", { class: "chk" }, noidx, h("span", { text: "সার্চ ইঞ্জিনে দেখাবে না (noindex)" }))))),
+        h("div", { class: "mfoot" }, h("button", { type: "button", class: "btn btn-line", text: "বাতিল", onclick: () => finish(null) }), ok)));
+      d.addEventListener("cancel", (e) => { e.preventDefault(); finish(null); });
+      check(); d.showModal(); t.inp.focus();
+    });
+  }
+
+  /* ---------- categories & tags manager (#/posts/terms) ---------- */
+  function drawTerms() {
+    const host = $("pPosts"); host.textContent = "";
+    const terms = postTerms(), posts = postsData.posts.filter((p) => p.status !== "trash");
+    const uses = (id) => posts.filter((p) => (p.categories || []).includes(id) || (p.tags || []).includes(id)).length;
+    host.append(sectionHead("🏷", "ক্যাটাগরি ও ট্যাগ", "পোস্ট সাজানোর জন্য — প্রতিটির নিজস্ব পাতা থাকে: /blog/category/<লিংক> ও /blog/tag/<লিংক>",
+      h("a", { class: "btn btn-line btn-sm", href: "#/posts", id: "termsBack", text: "← পোস্ট তালিকা" })));
+    const col = (kind, title, list, max) => {
+      const inp = h("input", { type: "text", class: "inp", id: kind === "category" ? "newCatName" : "newTagName", placeholder: kind === "category" ? "নতুন ক্যাটাগরির নাম" : "নতুন ট্যাগের নাম", maxlength: String(PO.POST_LIMITS.termName), "aria-label": title + " যোগ করুন" });
+      const add = h("button", { type: "button", class: "btn btn-sm btn-gold", text: "＋ যোগ করুন", onclick: async () => {
+        const name = cleanText(inp.value); if (!name) return inp.focus();
+        try { const term = await createTermApi(kind, name); toast("যোগ হয়েছে: " + term.name); drawTerms(); } catch (e) { postsErr(e); }
+      } });
+      inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); add.click(); } });
+      const rows = h("div", { class: "rows trows" });
+      for (const tm of list) {
+        const n = uses(tm.id);
+        rows.append(h("div", { class: "row", "data-term": tm.id },
+          h("div", { style: "min-width:0;flex:1" }, h("b", { text: (kind === "tag" ? "#" : "") + tm.name }), h("div", { class: "psub" }, h("span", { class: "slug", text: "/blog/" + kind + "/" + tm.slug }), h("span", { text: bnNum(n) + "টি পোস্ট" }))),
+          h("div", { class: "acts" },
+            h("button", { type: "button", class: "btn btn-sm btn-line", "data-act": "rename", text: "✎ নাম", onclick: () => renameTerm(tm, "name") }),
+            h("button", { type: "button", class: "btn btn-sm btn-line", "data-act": "slug", text: "🔗 লিংক", onclick: () => renameTerm(tm, "slug") }),
+            h("button", { type: "button", class: "btn btn-sm btn-line danger", "data-act": "delete", title: "মুছুন", "aria-label": tm.name + " মুছুন", text: "🗑", onclick: () => deleteTermFlow(tm, n) }))));
+      }
+      if (!list.length) rows.append(h("p", { class: "note2", style: "padding:10px 14px", text: kind === "category" ? "এখনো কোনো ক্যাটাগরি নেই। যেমন: ওয়েব ডিজাইন, এসইও, টিপস।" : "এখনো কোনো ট্যাগ নেই। পোস্ট এডিটর থেকেও ট্যাগ লিখে যোগ করা যায়।" }));
+      return h("div", { class: "card tcol", id: kind === "category" ? "catCard" : "tagCard" },
+        h("div", { class: "card-h" }, h("h2", { text: title }), h("span", { class: "note2", text: bnNum(list.length) + "/" + bnNum(max) })),
+        h("div", { class: "tadd" }, inp, add), rows);
+    };
+    host.append(h("div", { class: "tgrid" }, col("category", "ক্যাটাগরি", terms.categories, PO.POST_LIMITS.categories), col("tag", "ট্যাগ", terms.tags, PO.POST_LIMITS.tags)));
+  }
+  async function renameTerm(tm, field) {
+    const v = await promptModal(field === "name" ? { title: "নাম বদলান", label: "নাম", value: tm.name, max: PO.POST_LIMITS.termName, hint: "পোস্টে ও ব্লগে এই নাম দেখাবে" }
+      : { title: "লিংক বদলান", label: "লিংক", value: tm.slug, max: 40, hint: "শুধু ইংরেজি ছোট হাতের অক্ষর, সংখ্যা ও হাইফেন · পুরোনো লিংক আর কাজ করবে না" });
+    if (v == null) return;
+    const val = field === "name" ? cleanText(v) : v.trim().toLowerCase();
+    if (!val || val === tm[field]) return;
+    if (field === "slug" && PO.termSlugProblem(val)) return toast("লিংক: " + (POST_SLUG_MSG[PO.termSlugProblem(val)] || "সঠিক নয়"), 4000);
+    try { const r = await api("/admin/posts/terms/" + tm.id, { method: "PUT", body: { [field]: val } }); postsData.terms = PO.cleanTerms(r.terms); toast("সেভ হয়েছে"); drawTerms(); }
+    catch (e) { if (e.field === "slug" && e.data && e.data.reason === "taken") toast("এই লিংকে আরেকটি আছে — অন্য লিংক দিন", 4000); else postsErr(e); }
+  }
+  async function deleteTermFlow(tm, n) {
+    const ok = await confirmModal({ title: "“" + tm.name + "” মুছবেন?", message: (n ? bnNum(n) + "টি পোস্ট থেকে এটি সরে যাবে (পোস্টগুলো থাকবে)। " : "") + "এর ব্লগ পাতাটিও আর থাকবে না।", okText: "মুছে ফেলুন", cancelText: "বাতিল", danger: true });
+    if (!ok) return;
+    try { const r = await api("/admin/posts/terms/" + tm.id, { method: "DELETE" }); postsData.terms = PO.cleanTerms(r.terms); toast("মুছে ফেলা হয়েছে"); drawTerms(); }
+    catch (e) { postsErr(e); refreshPosts(); }
+  }
+
   $("tabs").addEventListener("click", (e) => {
     const t = e.target.closest(".tab"); if (!t) return;
     filter = t.dataset.f;
@@ -3291,7 +3907,7 @@
   });
 
   function logout(expired) {
-    sessionStorage.removeItem(TOKEN_KEY); me = null; users = []; cms = null; media = null; lastRoute = "";
+    sessionStorage.removeItem(TOKEN_KEY); me = null; users = []; cms = null; media = null; pagesData = null; postsData = null; lastRoute = "";
     closeDrawer();
     document.querySelectorAll("dialog.mdl").forEach((d) => d.close());
     try { google.accounts.id.disableAutoSelect(); } catch {}
