@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import * as M from "../../public/cms/model.js";
 import * as PG from "../../public/cms/pages.js";
+import * as PO from "../../public/cms/posts.js";
 
 const PORT = 8798;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -268,6 +269,110 @@ try {
   check("deleted page -> 404", r.status === 404);
   ({ r, t } = await get("/sitemap.xml"));
   check("sitemap with no pages = homepage only", (t.match(/<url>/g) || []).length === 1);
+
+  // ---------------------------------------------------------------- Phase 4: blog
+  check("public/cms/posts.js === admin-worker/src/cms-posts.js (import line normalised)", readFileSync("public/cms/posts.js", "utf8") === readFileSync("admin-worker/src/cms-posts.js", "utf8").replace('from "./cms-pages.js"', 'from "./pages.js"'));
+  ({ r, t } = await get("/blog"));
+  check("/blog with no posts -> 200 empty state, noindex", r.status === 200 && t.includes("শীঘ্রই নতুন লেখা আসছে") && /noindex/.test(r.headers.get("x-robots-tag") || ""), r.status);
+  ({ r, t } = await get("/blog/feed.xml"));
+  check("/blog/feed.xml with no posts -> valid empty RSS", r.status === 200 && /rss\+xml/.test(r.headers.get("content-type")) && t.includes("<rss") && !t.includes("<item>"));
+  const T0 = Date.now();
+  const iso = (d) => new Date(T0 + d * 86400000).toISOString();
+  const TERMS = { categories: [{ id: "cdesign01", name: "ডিজাইন", slug: "design" }, { id: "cseo00001", name: "SEO", slug: "seo" }], tags: [{ id: "tbangla01", name: "বাংলা", slug: "bangla" }] };
+  const postBlocks = [
+    { id: "btoc0001", type: "toc", content: {} },
+    { id: "bhead001", type: "heading", content: { text: "শুরু করার আগে", level: "h2" } },
+    { id: "btext001", type: "text", content: { html: "<p>" + "লেখা ".repeat(420) + "</p>" } },
+    { id: "bcode001", type: "code", content: { code: "<script>alert(1)</script>\n\tok();", lang: "html" } },
+    { id: "bcall001", type: "callout", content: { variant: "tip", title: "টিপস", text: "মনে রাখুন" } },
+    { id: "bgal0001", type: "gallery", content: { items: [{ image: "/media/abc.png", alt: "ছবি ১" }, { image: "/media/def.png", alt: "ছবি ২" }], cols: 2 } },
+  ];
+  const snap = (n, d, extra = {}) => ({ schema: 1, id: "qpost0000" + n, slug: "post-" + n, title: "পোস্ট নম্বর " + n + " <b>", excerpt: "সারাংশ " + n, image: n === 1 ? "/media/abc.png" : "", imageAlt: "",
+    categories: n % 2 ? ["cdesign01"] : ["cseo00001", "cgone0001"], tags: n === 1 ? ["tbangla01"] : [], author: "মোশফিক", date: iso(-n), seo: { title: "", description: "", image: "", noindex: false },
+    blocks: postBlocks, readMin: 2, version: 1, publishedAt: iso(-n), updatedAt: iso(-n), ...extra });
+  const snaps = [];
+  for (let n = 1; n <= 11; n++) snaps.push(snap(n, -n));
+  snaps.push(snap(12, 0, { date: iso(2), slug: "future-post", title: "ভবিষ্যতের পোস্ট" })); // scheduled
+  snaps.push(snap(13, 0, { slug: "hidden-post", seo: { title: "", description: "", image: "", noindex: true } }));
+  putKV("posts:public", { posts: snaps.map((s) => ({ ...PO.publicEntry(s) })) });
+  putKV("posts:terms", TERMS);
+  for (const s of [snaps[0], snaps[1], snaps[11], snaps[12]]) putKV("postpub:" + s.slug, s);
+  putKV("postredirect:old-post", { to: "post-1", post: "qpost00001" });
+  putKV("postredirect:evil-post", { to: "//evil.example" });
+
+  ({ r, t } = await get("/blog"));
+  check("/blog: 200, 9 cards, featured first card, pager to page 2", r.status === 200 && (t.match(/<article class="wb-card/g) || []).length === 9 && t.includes("wb-card wb-feat") && t.includes('href="/blog/page/2"') && !(r.headers.get("x-robots-tag") || "").includes("noindex"), (t.match(/<article class="wb-card/g) || []).length);
+  check("/blog: scheduled post hidden, titles escaped, canonical, RSS link, Bengali date", !t.includes("ভবিষ্যতের পোস্ট") && t.includes("পোস্ট নম্বর 1 &lt;b&gt;") && !t.includes("পোস্ট নম্বর 1 <b>") && t.includes('<link rel="canonical" href="http://127.0.0.1:8798/blog">') && t.includes('type="application/rss+xml"') && /[০-৯]+ (জানুয়ারি|ফেব্রুয়ারি|মার্চ|এপ্রিল|মে|জুন|জুলাই|আগস্ট|সেপ্টেম্বর|অক্টোবর|নভেম্বর|ডিসেম্বর) [০-৯]{4}/.test(t));
+  check("/blog: same site header/footer as homepage", t.includes("<header") && t.includes("<footer") && t.includes('<main id="top" class="pb-page">'));
+  ({ r, t } = await get("/blog/"));
+  check("/blog/ -> same list (canonical without slash)", r.status === 200 && t.includes('href="http://127.0.0.1:8798/blog"'));
+  ({ r, t } = await get("/blog/page/2"));
+  check("/blog/page/2: remaining 3 cards, no featured", r.status === 200 && (t.match(/<article class="wb-card/g) || []).length === 3 && !t.includes("wb-card wb-feat"), (t.match(/<article class="wb-card/g) || []).length);
+  ({ r } = await get("/blog/page/1"));
+  check("/blog/page/1 -> 301 /blog", r.status === 301 && r.headers.get("location") === "/blog");
+  ({ r } = await get("/blog/page/3"));
+  check("/blog/page/3 (out of range) -> 404", r.status === 404);
+  ({ r } = await get("/blog/page/0"));
+  check("/blog/page/0 -> 404", r.status === 404);
+  ({ r, t } = await get("/blog/category/design"));
+  check("/blog/category/design: only that category", r.status === 200 && (t.match(/<article class="wb-card/g) || []).length === 7 && t.includes("ডিজাইন"), (t.match(/<article class="wb-card/g) || []).length);
+  ({ r, t } = await get("/blog/tag/bangla"));
+  check("/blog/tag/bangla: one post", r.status === 200 && (t.match(/<article class="wb-card/g) || []).length === 1);
+  ({ r } = await get("/blog/category/nope"));
+  check("/blog/category/<unknown> -> 404", r.status === 404);
+  ({ r } = await get("/blog/category/design/page/2"));
+  check("/blog/category/design/page/2 (out of range) -> 404", r.status === 404);
+
+  ({ r, t } = await get("/blog/post-1"));
+  check("/blog/<slug>: 200 article with title, author, reading time, date", r.status === 200 && t.includes('<h1 class="wb-title">পোস্ট নম্বর 1 &lt;b&gt;</h1>') && t.includes("মোশফিক") && t.includes("মিনিটে পড়া") && t.includes("<time datetime="));
+  check("/blog/<slug>: category + tag links, share links, related posts, prev link", t.includes('href="/blog/category/design"') && t.includes('href="/blog/tag/bangla"') && t.includes("facebook.com/sharer") && t.includes("আরও পড়ুন") && t.includes('rel="prev" href="/blog/post-2"') && !t.includes('rel="next"'));
+  check("/blog/<slug>: og:type article, JSON-LD BlogPosting, canonical, og:image", t.includes('<meta property="og:type" content="article">') && t.includes('"@type":"BlogPosting"') && t.includes('<link rel="canonical" href="http://127.0.0.1:8798/blog/post-1">') && t.includes('og:image" content="http://127.0.0.1:8798/media/abc.png"'));
+  check("/blog/<slug>: toc with heading anchor, code escaped, callout, gallery", t.includes('class="pb-toc') && t.includes('id="h-bhead001"') && t.includes("&lt;script&gt;alert(1)&lt;/script&gt;") && !t.includes("<script>alert(1)") && t.includes("pb-callout") && t.includes("/media/abc.png") && !t.includes("evil.example"));
+  check("/blog/<slug>: JSON-LD can't break out of its script tag", (t.match(/<\/script>/g) || []).length === (t.match(/<script/g) || []).length);
+  ({ r, t } = await get("/blog/post-2"));
+  check("/blog/post-2: deleted category ignored, next + prev links", r.status === 200 && t.includes('href="/blog/category/seo"') && !t.includes("cgone0001") && t.includes('rel="next" href="/blog/post-1"') && t.includes('rel="prev" href="/blog/post-3"'));
+  putKV("postpub:post-3", { ...snaps[2], blocks: [{ id: "bgal0002", type: "gallery", content: { items: [{ image: "https://evil.example/x.png", alt: "x" }] } }] });
+  ({ r, t } = await get("/blog/post-3"));
+  check("tampered snapshot (external image) -> 404, never rendered", r.status === 404 && !t.includes("evil.example"));
+  putKV("postpub:post-3", { ...snaps[2], image: "javascript:alert(1)" });
+  ({ r, t } = await get("/blog/post-3"));
+  check("tampered snapshot (javascript: image) -> 404", r.status === 404 && !t.includes("javascript:"));
+  delKV("postpub:post-3");
+  ({ r } = await get("/blog/future-post"));
+  check("scheduled post (future date) -> 404 until its time", r.status === 404);
+  ({ r, t } = await get("/blog/hidden-post"));
+  check("noindex post -> 200 with noindex", r.status === 200 && /noindex/.test(r.headers.get("x-robots-tag") || "") && t.includes('<meta name="robots" content="noindex">'));
+  ({ r } = await get("/blog/old-post?x=1"));
+  check("post redirect -> 301 /blog/post-1 (query kept)", r.status === 301 && r.headers.get("location") === "/blog/post-1?x=1");
+  ({ r } = await get("/blog/evil-post"));
+  check("bad post redirect target ignored -> 404", r.status === 404);
+  ({ r } = await get("/blog/post-5"));
+  check("listed but no postpub key -> 404", r.status === 404);
+  ({ r } = await get("/blog/Post-1"));
+  check("uppercase / bad slug -> 404", r.status === 404);
+  ({ r } = await get("/blog/a/b/c"));
+  check("deep unknown blog path -> 404", r.status === 404);
+  ({ r } = await get("/post-1"));
+  check("post slug is not a page at the root", r.status === 404);
+  ({ r, t } = await get("/blog/post-1", {}, "HEAD"));
+  check("HEAD /blog/<slug> -> 200, no body", r.status === 200);
+
+  ({ r, t } = await get("/blog/feed.xml"));
+  check("RSS: 12 visible posts (scheduled excluded), absolute links, escaped", r.status === 200 && (t.match(/<item>/g) || []).length === 12 && t.includes("<link>http://127.0.0.1:8798/blog/post-1</link>") && !t.includes("future-post") && t.includes("পোস্ট নম্বর 1 &lt;b&gt;") && t.includes("<dc:creator>"), (t.match(/<item>/g) || []).length);
+  ({ r, t } = await get("/sitemap.xml"));
+  check("sitemap: /blog + visible indexable posts (no scheduled, no noindex)", t.includes("/blog</loc>") && t.includes("/blog/post-1</loc>") && !t.includes("future-post") && !t.includes("hidden-post") && (t.match(/<url>/g) || []).length === 1 + 1 + 11, (t.match(/<url>/g) || []).length);
+  putKV("posts:public", "not json{");
+  ({ r } = await get("/blog"));
+  check("corrupt posts:public -> blog still answers (404 page, no crash)", r.status === 404 || r.status === 200);
+  ({ r, t } = await get("/sitemap.xml"));
+  check("corrupt posts:public -> sitemap still served", r.status === 200 && t.includes("<urlset"));
+  ({ t } = await get("/"));
+  check("homepage byte-identical while posts exist", t === homeBefore);
+  for (const k of ["posts:public", "posts:terms", "postpub:post-1", "postpub:post-2", "postpub:future-post", "postpub:hidden-post", "postredirect:old-post", "postredirect:evil-post"]) delKV(k);
+  ({ r, t } = await get("/blog/post-1"));
+  check("deleted post -> 404", r.status === 404);
+  ({ t } = await get("/"));
+  check("homepage byte-identical after posts removed", t === homeBefore);
 } catch (e) {
   fail++; console.error("ERROR", e, logs.slice(-1500));
 } finally {

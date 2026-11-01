@@ -6,7 +6,10 @@
  * file exists — so /admin/, /old-homepage/, /cms/, /assets/ can never be shadowed — and only reaches this
  * script when NO asset matches. Those requests are handled by servePage (Phase 3, docs/cms-phase3.md):
  *   /<slug> and /<slug>/   published page from KV "pub:<slug>" inside the site's header/footer/CSS
- *   /sitemap.xml           homepage + published, indexable pages (from "pages:index")
+ *   /sitemap.xml           homepage + published, indexable pages (from "pages:index") + /blog and visible posts
+ *   /blog, /blog/page/N    blog list (Phase 4, docs/cms-phase4.md), 9 per page, from "posts:public" + "posts:terms"
+ *   /blog/<slug>           published post "postpub:<slug>" (date in the future = scheduled = 404 until then;
+ *                          "postredirect:<slug>" → 301). /blog/category/<slug>, /blog/tag/<slug>, /blog/feed.xml (RSS 2.0)
  *   /__page-preview        empty editor shell for the admin page builder (noindex, no-store, same-origin frames only)
  *   anything else          styled 404 ("redirect:<slug>" → 301 first). KV errors → the original asset 404.
  *
@@ -20,6 +23,7 @@
  * serveMedia). Long immutable cache; only image/jpeg|png|webp|gif is ever served.
  */
 import * as PG from "../../public/cms/pages.js";
+import * as PO from "../../public/cms/posts.js";
 import { KEYS, cleanDoc, cleanSettings, migrateV1, seedDoc, DEFAULT_SETTINGS, plan, toHtml, cssText, MEDIA_KEY_RE, MEDIA_TYPES } from "../../public/cms/model.js";
 
 export default {
@@ -162,6 +166,7 @@ async function servePage(request, env, url) {
   const p = url.pathname;
   if (p === "/sitemap.xml") return sitemap(request, env, url);
   if (p === "/__page-preview") return previewShell(request, env, url);
+  if (p === "/blog" || p.startsWith("/blog/")) return serveBlog(request, env, url);
   const m = SLUG_PATH.exec(p);
   // Reserved first segments keep their original behaviour exactly (assets decide; we never render there).
   const first = p.split("/")[1] || "";
@@ -232,6 +237,7 @@ async function shell(request, env, url, r, o) {
     rw.on('meta[name="description"]', { element(el) { el.setAttribute("content", r.description); } });
     rw.on('meta[property="og:description"]', { element(el) { el.setAttribute("content", r.description); } });
   }
+  if (r.ogType) rw.on('meta[property="og:type"]', { element(el) { el.setAttribute("content", r.ogType); } });
   rw.on('meta[property="og:url"]', { element(el) { if (o.canonical) el.setAttribute("content", o.canonical); else el.remove(); } });
   const esc = PG.escHtml;
   let head = "";
@@ -241,6 +247,7 @@ async function shell(request, env, url, r, o) {
   head += '<link id="wd71-fonts" rel="stylesheet" href="' + esc(r.fontsHref || "") + '"' + (r.fontsHref ? "" : " disabled") + ">";
   if (edits) head += '<style id="wd71-cms">' + edits.css + "</style>";
   head += '<style id="wd71-page">' + r.css + "</style>";
+  if (r.headExtra) head += r.headExtra; // trusted, pre-escaped by the renderer (RSS link, article meta, JSON-LD)
   if (o.preview) head += '<script type="module" src="/cms/page-bridge.js"></script>';
   rw.on("head", { element(el) { el.append(head, { html: true }); } });
   // 4. the page itself
@@ -267,7 +274,84 @@ async function sitemap(request, env, url) {
     if (p && p.status === "published" && !p.noindex && typeof p.publishedSlug === "string" && !PG.slugProblem(p.publishedSlug))
       urls.push({ loc: origin + "/" + p.publishedSlug, lastmod: typeof p.publishedAt === "string" ? p.publishedAt.slice(0, 10) : null });
   }
+  let posts = [];
+  try { posts = PO.visibleEntries(await readBlogList(env)); } catch (err) { logErr("sitemap_kv_error", err); }
+  if (posts.length) {
+    urls.push({ loc: origin + "/blog", lastmod: String(posts[0].date || "").slice(0, 10) });
+    for (const e of posts) if (!e.noindex && !PO.postSlugProblem(e.slug)) urls.push({ loc: origin + "/blog/" + e.slug, lastmod: String(e.updatedAt || e.date || "").slice(0, 10) });
+  }
   const body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     urls.map((u) => "  <url><loc>" + PG.escHtml(u.loc) + "</loc>" + (u.lastmod && /^\d{4}-\d\d-\d\d$/.test(u.lastmod) ? "<lastmod>" + u.lastmod + "</lastmod>" : "") + "</url>").join("\n") + "\n</urlset>\n";
   return new Response(request.method === "HEAD" ? null : body, { status: 200, headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=300" } });
+}
+
+/* ================================================================== Phase 4: blog */
+const BLOG_RE = /^\/blog(?:\/(?:page\/(\d{1,4})|(category|tag)\/([a-z0-9]+(?:-[a-z0-9]+)*)(?:\/page\/(\d{1,4}))?|([a-z0-9]+(?:-[a-z0-9]+)*)))?\/?$/;
+async function readBlogList(env) {
+  const raw = await env.CONTENT.get(PO.QKEYS.list, PAGE_KV);
+  return raw && Array.isArray(raw.posts) ? raw.posts.filter((e) => e && typeof e === "object" && PO.POST_ID_RE.test(e.id) && typeof e.slug === "string" && !PO.postSlugProblem(e.slug)) : [];
+}
+const moved = (to, url) => new Response(null, { status: 301, headers: { location: to + url.search, "cache-control": "public, max-age=300" } });
+
+async function serveBlog(request, env, url) {
+  const p = url.pathname;
+  if (p === "/blog/feed.xml") return blogFeed(request, env, url);
+  const m = BLOG_RE.exec(p);
+  if (!m) return notFoundPage(request, env, url);
+  const [, listPage, kind, termSlug, termPage, postSlug] = m;
+  const canonicalPath = p.length > 5 && p.endsWith("/") ? p.slice(0, -1) : p;
+  const origin = originFor(url);
+  let list, terms, cms = null;
+  try {
+    [list, terms] = await Promise.all([readBlogList(env), env.CONTENT.get(PO.QKEYS.terms, PAGE_KV)]);
+    terms = PO.cleanTerms(terms);
+  } catch (err) { logErr("blog_kv_error", err); return notFoundPage(request, env, url); }
+  const now = Date.now();
+  const visible = PO.visibleEntries(list, now);
+  try { cms = await loadCms(env); } catch (err) { logErr("cms_render_error", err); }
+  const settings = cms ? cms.settings : DEFAULT_SETTINGS;
+  const cache = "public, max-age=0, must-revalidate";
+
+  if (postSlug) {
+    if (PO.postSlugProblem(postSlug)) return notFoundPage(request, env, url);
+    let snap, redirect = null;
+    try {
+      snap = await env.CONTENT.get(PO.QKEYS.pub(postSlug), PAGE_KV);
+      if (!snap) redirect = await env.CONTENT.get(PO.QKEYS.redirect(postSlug), PAGE_KV);
+    } catch (err) { logErr("post_kv_error", err); return notFoundPage(request, env, url); }
+    if (!snap) {
+      if (redirect && typeof redirect.to === "string" && !PO.postSlugProblem(redirect.to) && redirect.to !== postSlug) return moved("/blog/" + redirect.to, url);
+      return notFoundPage(request, env, url);
+    }
+    // Scheduled: published with a future date stays hidden until then (checked on every request; KV cache ≤ 60 s).
+    if (!snap.date || !(Date.parse(snap.date) <= now) || !Array.isArray(snap.blocks)) return notFoundPage(request, env, url);
+    let r;
+    try { r = PO.renderPost(snap, { terms, list: visible, origin, settings }); }
+    catch (err) { logErr("post_render_error", err); return notFoundPage(request, env, url); }
+    return shell(request, env, url, r, { status: 200, canonical: origin + "/blog/" + postSlug, cms, cache });
+  }
+
+  let page = 1, term = null, k = "all";
+  if (listPage || termPage) {
+    page = Number(listPage || termPage);
+    if (page === 1) return moved(canonicalPath.replace(/\/page\/1$/, ""), url);
+  }
+  if (kind) {
+    k = kind;
+    term = (kind === "category" ? terms.categories : terms.tags).find((t) => t.slug === termSlug);
+    if (!term) return notFoundPage(request, env, url);
+  }
+  let r;
+  try { r = PO.renderBlogList({ list: visible, terms, page, term, kind: k, origin }); }
+  catch (err) { logErr("blog_render_error", err); return notFoundPage(request, env, url); }
+  if (!r) return notFoundPage(request, env, url);
+  return shell(request, env, url, r, { status: 200, canonical: origin + canonicalPath, cms, cache });
+}
+
+async function blogFeed(request, env, url) {
+  let list = [], terms = null;
+  try { [list, terms] = await Promise.all([readBlogList(env), env.CONTENT.get(PO.QKEYS.terms, PAGE_KV)]); }
+  catch (err) { logErr("feed_kv_error", err); }
+  const body = PO.renderFeed(PO.visibleEntries(list), PO.cleanTerms(terms), originFor(url));
+  return new Response(request.method === "HEAD" ? null : body, { status: 200, headers: { "content-type": "application/rss+xml; charset=utf-8", "cache-control": "public, max-age=300", "x-content-type-options": "nosniff" } });
 }

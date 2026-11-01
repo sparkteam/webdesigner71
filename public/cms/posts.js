@@ -188,8 +188,28 @@ export function publicEntry(snap) {
   };
 }
 /** Public entries that are live at `now`, newest first. */
+/** Tolerant clean of one "posts:public" entry (KV data is never trusted by the renderers): null when unusable. */
+export function cleanEntry(e) {
+  if (!isObj(e) || typeof e.id !== "string" || !POST_ID_RE.test(e.id) || typeof e.slug !== "string" || postSlugProblem(e.slug)) return null;
+  if (typeof e.date !== "string" || !Number.isFinite(Date.parse(e.date))) return null;
+  const s = (v, n) => (typeof v === "string" ? [...v].slice(0, n).join("") : "");
+  const ids = (v, p) => (Array.isArray(v) ? v.filter((x) => typeof x === "string" && TERM_ID_RE.test(x) && x[0] === p).slice(0, 20) : []);
+  const rm = Math.round(Number(e.readMin));
+  return {
+    id: e.id, slug: e.slug, title: s(e.title, POST_LIMITS.title) || e.slug, excerpt: s(e.excerpt, POST_LIMITS.excerpt), image: (e.image && PG.safeImg(e.image)) || "",
+    imageAlt: s(e.imageAlt, 150), author: s(e.author, POST_LIMITS.author), date: e.date, categories: ids(e.categories, "c"), tags: ids(e.tags, "t"),
+    readMin: rm >= 1 && rm <= 999 ? rm : 1, updatedAt: typeof e.updatedAt === "string" && Number.isFinite(Date.parse(e.updatedAt)) ? e.updatedAt : e.date, noindex: e.noindex === true,
+  };
+}
+/** Strict clean of a published snapshot ("postpub:<slug>"): same rules as the editor's save. Throws PageError. */
+export function cleanSnapshot(snap) {
+  if (!isObj(snap)) throw new PageError("post", "type");
+  const c = cleanPostInput(Object.fromEntries(POST_KEYS.filter((k) => snap[k] !== undefined).map((k) => [k, snap[k]])));
+  return { ...c, id: typeof snap.id === "string" && POST_ID_RE.test(snap.id) ? snap.id : "", readMin: readingMinutes(c.blocks),
+    publishedAt: typeof snap.publishedAt === "string" && Number.isFinite(Date.parse(snap.publishedAt)) ? snap.publishedAt : c.date };
+}
 export function visibleEntries(list, now = Date.now()) {
-  return (Array.isArray(list) ? list : []).filter((e) => e && e.slug && e.date && Date.parse(e.date) <= now)
+  return (Array.isArray(list) ? list : []).map(cleanEntry).filter((e) => e && Date.parse(e.date) <= now)
     .sort((a, b) => Date.parse(b.date) - Date.parse(a.date) || (a.id < b.id ? 1 : -1));
 }
 
@@ -328,7 +348,8 @@ export function relatedPosts(post, list, n = POST_LIMITS.related) {
   return scored.slice(0, n).map((x) => x.e);
 }
 /** Full public render of one post → shell input (title, description, css, main, headExtra…). */
-export function renderPost(snap, ctx = {}) {
+export function renderPost(raw, ctx = {}) {
+  const snap = cleanSnapshot(raw);
   const origin = ctx.origin || "";
   const seo = snap.seo || {};
   const description = seo.description || snap.excerpt || autoExcerpt(snap.blocks, 155);
