@@ -360,8 +360,10 @@ try {
     r = await api("/admin/pages");
     check("pages: list without token -> 401", r.status === 401);
     r = await api("/admin/pages", { token: userToken });
+    check("pages: non-admin list -> 403 (drafts are admin-only)", r.status === 403);
+    r = await pg("");
     j = await r.json();
-    check("pages: approved user can list (empty)", r.status === 200 && Array.isArray(j.pages) && j.pages.length === 0 && j.limits.blocks === 200, JSON.stringify(j).slice(0, 200));
+    check("pages: admin can list (empty)", r.status === 200 && Array.isArray(j.pages) && j.pages.length === 0 && j.limits.blocks === 200, JSON.stringify(j).slice(0, 200));
     r = await api("/admin/pages", { method: "POST", token: userToken, body: { title: "x", slug: "x" } });
     check("pages: non-admin create -> 403", r.status === 403);
     const bad = async (body, field, reason, name) => {
@@ -401,7 +403,9 @@ try {
     r = await pg("", { method: "POST", body: { title: "Other", slug: "amader-somporke" } });
     check("pages: duplicate slug -> 400 taken", r.status === 400 && (await r.json()).reason === "taken");
     r = await pg("/" + p1.id, { token: userToken });
-    check("pages: get by id (session)", r.status === 200 && (await r.json()).page.id === p1.id);
+    check("pages: non-admin get by id -> 403 (draft stays private)", r.status === 403);
+    r = await pg("/" + p1.id);
+    check("pages: admin get by id", r.status === 200 && (await r.json()).page.id === p1.id);
     r = await pg("/pxxxxxxxx");
     check("pages: unknown id -> 404", r.status === 404);
     r = await pg("/..%2Fusers");

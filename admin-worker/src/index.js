@@ -113,13 +113,13 @@ async function route(request, env, ctx, url) {
   }
 
   /* ---------- Pages (Phase 3, docs/cms-phase3.md) ---------- */
-  if (p === "/admin/pages" && m === "GET") { await requireSession(request, env); return listPages(env); }
+  if (p === "/admin/pages" && m === "GET") { await requireAdmin(request, env); return listPages(env); } // drafts are admin-only
   if (p === "/admin/pages" && m === "POST") return createPage(request, env, await requireAdmin(request, env));
   const pm = p.match(/^\/admin\/pages\/([^/]+)(?:\/(publish|unpublish|duplicate|undo))?$/);
   if (pm) {
     if (!PG.PAGE_ID_RE.test(pm[1])) throw new HttpError(404, "not_found");
     const id = pm[1], act = pm[2];
-    if (!act && m === "GET") { await requireSession(request, env); return json({ page: await loadPage(env, id) }); }
+    if (!act && m === "GET") { await requireAdmin(request, env); return json({ page: await loadPage(env, id) }); }
     if (!act && m === "PUT") return putPage(request, env, await requireAdmin(request, env), id);
     if (!act && m === "DELETE") return deletePage(request, env, await requireAdmin(request, env), id);
     if (act && m === "POST") {

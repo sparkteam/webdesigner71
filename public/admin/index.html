@@ -387,6 +387,230 @@
     .mgrid{grid-template-columns:1fr 1fr;gap:10px}
   }
   @media (prefers-reduced-motion:reduce){ .side,.side-ov{transition:none!important} }
+  /* ===== CMS Phase 3 — pages list ===== */
+  .ptcard{padding:0;overflow:hidden}
+  .ptable{width:100%;border-collapse:collapse;font-size:14.5px}
+  .ptable th{text-align:left;font-size:12.5px;color:var(--muted);font-weight:600;padding:10px 14px;background:#fbf8f0;border-bottom:1px solid var(--line)}
+  .ptable td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .ptable tr:last-child td{border-bottom:0}
+  .ptable tr:hover td{background:#fdfbf6}
+  .ptitle{font-weight:700;color:var(--green);text-decoration:none;font-size:15.5px}
+  .ptitle:hover{text-decoration:underline}
+  .psub{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted);margin-top:3px}
+  .slug{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:#3b4a44;background:#f3efe3;padding:2px 8px;border-radius:6px;text-decoration:none;word-break:break-all}
+  a.slug:hover{background:#ebe5d3}
+  .pu{font-size:13px;color:var(--muted);white-space:nowrap}
+  .pa .acts{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+  .btn.danger:hover{background:#fdecea;color:var(--red);border-color:#f3c3bd}
+  .pill.st-draft{background:#eef0ee;color:#4a5852}
+  .pill.st-changed{background:#fff4d6;color:#8a6400}
+  .pill.st-live{background:#e6f3ee;color:var(--green)}
+  .pill.hid{background:#f3efe3;color:#6b6450}
+  .pg-empty{text-align:center;padding:40px 20px}
+  .pg-empty .big{font-size:40px;color:var(--gold)}
+  .pg-empty p{color:var(--muted);max-width:520px;margin:6px auto 16px}
+  .stats:has(#statPages){grid-template-columns:repeat(4,minmax(0,1fr))}
+  .tpls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:4px 0 14px}
+  .tpl{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:10px 12px;cursor:pointer;font:inherit;color:var(--ink)}
+  .tpl i{font-style:normal;font-size:20px}
+  .tpl b{font-size:14.5px;color:var(--green)}
+  .tpl small{font-size:12px;color:var(--muted)}
+  .tpl:hover{border-color:#e5d6a6}
+  .tpl.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,160,23,.2);background:#fffbef}
+  @media (max-width:900px){ .stats:has(#statPages){grid-template-columns:repeat(2,minmax(0,1fr))} }
+  @media (max-width:720px){
+    .stats:has(#statPages){grid-template-columns:1fr 1fr}
+    .ptable thead{display:none}
+    .ptable,.ptable tbody,.ptable tr,.ptable td{display:block;width:100%}
+    .ptable tr{padding:12px 14px;border-bottom:1px solid var(--line)}
+    .ptable td{padding:3px 0;border:0}
+    .ptable td[data-l]:not(.pt){display:flex;gap:8px;align-items:center;font-size:13px}
+    .ptable td[data-l]:not(.pt):before{content:attr(data-l);color:var(--muted);min-width:64px;font-size:12px}
+    .pa .acts{justify-content:flex-start;margin-top:8px}
+    .tpls{grid-template-columns:1fr 1fr}
+  }
+
+  /* ===== visual page builder (full screen) ===== */
+  body.pbe-open{overflow:hidden}
+  .pbe{position:fixed;inset:0;z-index:60;background:#efe9da;display:flex;flex-direction:column;color:var(--ink);font-size:14px}
+  .pbe-load{margin:auto;text-align:center;color:var(--muted)}
+  .pbe-top{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--green);color:#fff;min-height:54px;flex:0 0 auto}
+  .pib{width:36px;height:36px;border-radius:9px;border:1px solid rgba(0,0,0,.08);background:#fff;color:var(--green);display:inline-grid;place-items:center;cursor:pointer;font-size:16px;flex:0 0 auto;text-decoration:none;padding:0}
+  .pbe-top .pib{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:#fff}
+  .pbe-top .pib:hover{background:rgba(255,255,255,.22)}
+  .pib[disabled],.pib[aria-disabled="true"]{opacity:.35;cursor:not-allowed}
+  .pbe-title{border:0;background:none;color:#fff;font:inherit;font-weight:700;font-size:15.5px;cursor:pointer;max-width:28vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:6px 8px;border-radius:8px;text-align:left}
+  .pbe-title small{display:block;font-weight:400;font-size:11.5px;opacity:.75}
+  .pbe-title:hover{background:rgba(255,255,255,.1)}
+  .pbe-sp{flex:1}
+  .pbe-dev{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+  .pbe-dev button{background:transparent;color:#fff;display:inline-flex;gap:5px;align-items:center}
+  .pbe-dev button.on{background:var(--gold);color:var(--green)}
+  .pbe-ur{display:flex;gap:4px}
+  .pbe-st{font-size:12.5px;opacity:.85;min-width:84px;text-align:right;white-space:nowrap}
+  .pbe-st.dirty{color:var(--gold);opacity:1}
+  .pbe-top .btn-line{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3)}
+  .pbe-top .btn .bi{display:none}
+  .pbe-top .btn{white-space:nowrap}
+  #pbErr{background:#fdecea;color:var(--red);border:0}
+  .pbe-body{flex:1;min-height:0;display:grid;grid-template-columns:272px minmax(0,1fr) 336px}
+  .pbe-left,.pbe-right{background:#fff;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .pbe-left{border-right:1px solid var(--line)}
+  .pbe-right{border-left:1px solid var(--line);overflow-y:auto}
+  .pbe-tabs{display:flex;border-bottom:1px solid var(--line);flex:0 0 auto;background:#fbf8f0}
+  .pbe-tabs button{flex:1;border:0;background:none;padding:11px 6px;font:inherit;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent}
+  .pbe-tabs button.on{color:var(--green);border-bottom-color:var(--gold);background:#fff}
+  .pbe-lb{flex:1;overflow-y:auto;padding:10px 12px 20px}
+  .pbe-hint{font-size:12.5px;color:var(--muted);margin:2px 0 10px;line-height:1.5}
+  .lib-g{font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);margin:12px 0 6px;text-transform:uppercase}
+  .lib{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .ltile{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:9px 8px;cursor:grab;font:inherit;font-size:13px;text-align:left;color:var(--ink);min-width:0}
+  .ltile:hover{border-color:var(--gold);background:#fffbef}
+  .ltile:active{cursor:grabbing}
+  .ltile .li{width:26px;height:26px;border-radius:7px;background:#e6f3ee;color:var(--green);display:grid;place-items:center;flex:0 0 auto;font-weight:700}
+  .ltile .ll{min-width:0;display:flex;flex-direction:column}
+  .ltile .ll b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ltile .ll small{font-size:11.5px;color:var(--muted);line-height:1.35}
+  .pats{display:flex;flex-direction:column;gap:6px}
+  .ltile.pat{padding:10px}
+  .ltile.pat .li{background:#fff4d6;color:#8a6400}
+  .layers{display:flex;flex-direction:column;gap:1px}
+  .lrow{display:flex;align-items:center;gap:6px;padding:5px 6px 5px calc(6px + var(--d,0) * 14px);border-radius:8px;cursor:pointer;position:relative;border:1px solid transparent;user-select:none}
+  .lrow:hover{background:#f7f3e8}
+  .lrow.on{background:#e6f3ee;border-color:#bfe0d2}
+  .lrow.off{opacity:.5}
+  .lrow:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+  .lrow.dragsrc{opacity:.35}
+  .lrow.mk-before:before,.lrow.mk-after:after{content:"";position:absolute;left:calc(6px + var(--d,0) * 14px);right:4px;height:3px;background:var(--gold);border-radius:3px}
+  .lrow.mk-before:before{top:-2px}.lrow.mk-after:after{bottom:-2px}
+  .lrow.mk-inside{background:#fff4d6;border-color:var(--gold);border-style:dashed}
+  .lcar{width:18px;flex:0 0 18px;border:0;background:none;padding:0;cursor:pointer;color:var(--muted);font-size:12px}
+  .lic{width:22px;height:22px;border-radius:6px;background:#f3efe3;color:var(--green);display:grid;place-items:center;font-size:12px;font-weight:700;flex:0 0 auto}
+  .lnm{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+  .lnm b{font-size:13px;font-weight:600}
+  .lnm small{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .leye{border:0;background:none;cursor:pointer;opacity:.45;font-size:13px;padding:2px 4px}
+  .lrow:hover .leye,.lrow.off .leye{opacity:1}
+  .lend{margin-top:8px;border:1.5px dashed var(--line);border-radius:9px;padding:9px;text-align:center;font-size:12px;color:var(--muted)}
+  .lend.over{border-color:var(--gold);background:#fff4d6;color:#7a5600}
+  .pbe-c{display:flex;flex-direction:column;min-width:0;min-height:0}
+  .pbe-banners .mbanner{margin:8px 10px 0;box-shadow:0 4px 14px rgba(11,61,46,.08)}
+  .bbtns{display:flex;gap:6px;flex-wrap:wrap}
+  .pbe-stage{flex:1;min-height:0;overflow:hidden;display:flex;justify-content:center;align-items:flex-start;padding:12px}
+  .pbe-fw{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 10px 40px rgba(11,61,46,.18);background:#fff}
+  .pbe[data-device="t"] .pbe-fw,.pbe[data-device="m"] .pbe-fw{border-radius:18px;outline:6px solid #1f2a26}
+  .pbe-fw iframe{border:0;display:block;transform-origin:0 0;background:#fff}
+  .pbe.dragging .pbe-fw{box-shadow:0 0 0 3px var(--gold),0 10px 40px rgba(11,61,46,.18)}
+  .pbe-none{padding:26px 20px;text-align:center;color:var(--muted)}
+  .pbe-none .big{font-size:34px}
+  .pbe-none h3{color:var(--green);margin:6px 0}
+  .pbe-none .btn{margin-top:12px}
+  .pbe-kv{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:8px 10px;background:#fbf8f0;border-radius:9px;margin-top:12px;text-align:left}
+  .pbe-kv code{font-size:12px;word-break:break-all}
+  .pbe-ih{padding:10px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
+  .pbe-crumb{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px}
+  .pbe-crumb .linkbtn{margin:0;font-size:12px;text-decoration:none;padding:0}
+  .pbe-iht{display:flex;align-items:center;gap:8px}
+  .pbe-iht b{font-size:15.5px;color:var(--green);flex:1}
+  .pbe-desel{width:30px;height:30px;font-size:14px}
+  .pbe-acts{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+  .pbe-acts .pib{width:34px;height:32px;font-size:14px;border-color:var(--line)}
+  .pbe-acts .pib:hover:not([disabled]){background:#f7f3e8}
+  .pbe-acts .pib[data-act=delete]:hover:not([disabled]){background:#fdecea;color:var(--red)}
+  .pbe-right>.pbe-tabs{position:sticky;top:0;z-index:1}
+  .pbe-ib{padding:12px}
+  .pbe-ib .fl input,.pbe-ib .fl textarea{font-size:14.5px}
+  .fl2{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:#3b4a44;margin-bottom:6px}
+  .cval{font-weight:400;color:var(--muted);font-size:12px}
+  .rdev{margin-left:5px;font-size:11px;opacity:.7}
+  .pseg{display:flex;flex-wrap:wrap;width:100%}
+  .pseg button{flex:1 1 auto;padding:6px 8px;font-size:12.5px;border-right:1px solid var(--line)}
+  .pseg button:last-child{border-right:0}
+  .nrow{display:flex;gap:8px;align-items:center}
+  .nrow input[type=range]{flex:1;accent-color:var(--green);min-width:0}
+  .nrow .num{width:72px;font:inherit;font-size:14px;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px}
+  .nrow .unit{font-size:12px;color:var(--muted);min-width:18px}
+  .fld.bad .num{border-color:var(--red)}
+  .cols{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .csw{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);background:var(--c);cursor:pointer;padding:0}
+  .csw.on{box-shadow:0 0 0 2px var(--gold)}
+  .ccus{width:30px;height:28px;border:1px solid var(--line);border-radius:7px;padding:0 2px;background:#fff;cursor:pointer}
+  .ccus.on{box-shadow:0 0 0 2px var(--gold)}
+  .cclr{width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--muted)}
+  .cclr[disabled]{opacity:.35;cursor:default}
+  .icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:4px}
+  .icb{height:34px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;display:grid;place-items:center;color:var(--green);padding:0}
+  .icb svg{width:18px;height:18px}
+  .icb.on{background:#e6f3ee;border-color:var(--green)}
+  .richw{border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+  .fld.bad .richw{border-color:var(--red)}
+  .rtb{display:flex;gap:2px;padding:4px;border-bottom:1px solid var(--line);background:#fbf8f0;flex-wrap:wrap}
+  .rtb button{min-width:30px;height:28px;border:0;border-radius:6px;background:none;cursor:pointer;font-size:13px;color:#3b4a44}
+  .rtb button:hover{background:#ebe5d3}
+  .rich{min-height:120px;max-height:360px;overflow:auto;padding:10px 12px;outline:none;font-size:14.5px;line-height:1.6}
+  .rich:focus{box-shadow:inset 0 0 0 2px rgba(212,160,23,.35)}
+  .rich p{margin:0 0 .6em}
+  .rep .car{display:none}
+  .tscroll{overflow-x:auto}
+  .tgrid{display:grid;gap:4px;align-items:center}
+  .tcell{font:inherit;font-size:13px;padding:6px 7px;border:1px solid var(--line);border-radius:6px;min-width:0}
+  .tcell.th{font-weight:700;background:#fbf8f0}
+  .trow{display:flex;gap:6px;margin-top:8px}
+  .ratios{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .ratio{height:34px;display:flex;gap:3px;padding:5px;border:1.5px solid var(--line);border-radius:8px;background:#fff;cursor:pointer}
+  .ratio i{background:#cfe3da;border-radius:3px;display:block}
+  .ratio.on{border-color:var(--green)}
+  .ratio.on i{background:var(--green)}
+  .devnote{font-size:12.5px;background:#fbf8f0;border-radius:9px;padding:8px 10px;margin-bottom:10px;display:flex;flex-direction:column;gap:2px;color:var(--muted)}
+  .devnote b{color:var(--green)}
+  .devnote.on{background:#fff4d6;color:#6b5000}
+  .sgrp{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff}
+  .sgrp>summary{padding:10px 12px;font-weight:700;color:var(--green);cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+  .sgrp>summary::-webkit-details-marker{display:none}
+  .sgrp>summary:after{content:"▸";color:var(--muted)}
+  .sgrp[open]>summary:after{content:"▾"}
+  .sgb{padding:2px 12px 4px}
+  .boxc{display:grid;grid-template-columns:1fr 1fr;gap:6px;position:relative}
+  .bx{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .bx span{min-width:30px}
+  .bx input{width:100%;min-width:0;font:inherit;font-size:13.5px;padding:6px 7px;border:1.5px solid var(--line);border-radius:8px}
+  .bxlink{grid-column:1/-1;justify-self:start;border:1px solid var(--line);background:#fff;border-radius:7px;padding:2px 10px;cursor:pointer;font-size:12px}
+  .bxlink.on{background:#e6f3ee;border-color:#bfe0d2}
+  .sreset{margin:4px 0 10px}
+  .hiderow{display:flex;flex-direction:column;gap:8px}
+  .fok{color:var(--green);font-weight:600}
+  .pbe-mbar{display:none}
+  .pbe-set{display:inline-grid}
+
+  @media (max-width:1180px){ .pbe-body{grid-template-columns:240px minmax(0,1fr) 300px} .pbe-dev .dl{display:none} }
+  @media (max-width:900px){
+    .pbe-top{gap:5px;padding:6px 8px;min-height:50px}
+    .pbe-title{max-width:30vw;font-size:14px;padding:4px}
+    .pbe-st,.pbe-set,#pbView{display:none}
+    .pbe-top .btn .bl{display:none}.pbe-top .btn .bi{display:inline}
+    #pbSave{padding:6px 9px}
+    #pbPublish{padding:6px 10px;font-size:12.5px}
+    .pbe-dev button{padding:6px 8px}
+    .pbe-body{display:block;position:relative}
+    .pbe-left,.pbe-right,.pbe-c{position:absolute;inset:0;display:none}
+    .pbe[data-pane="add"] .pbe-left{display:flex}
+    .pbe[data-pane="canvas"] .pbe-c{display:flex}
+    .pbe[data-pane="edit"] .pbe-right{display:flex;flex-direction:column}
+    .pbe-left,.pbe-right{border:0}
+    .pbe-stage{padding:8px}
+    .pbe-mbar{display:flex;flex:0 0 auto;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+    .pbe-mbar button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 4px;font:inherit;font-size:17px;color:var(--muted);cursor:pointer;position:relative}
+    .pbe-mbar small{font-size:11.5px;font-weight:600}
+    .pbe-mbar button.on{color:var(--green)}
+    .pbe-mbar button.on:after{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 3px 3px;background:var(--gold)}
+    .pbe-mbar button.ping:before{content:"";position:absolute;top:6px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:var(--gold)}
+    .lib{grid-template-columns:1fr 1fr}
+    .ltile{padding:11px 9px}
+    .lrow{padding-top:8px;padding-bottom:8px}
+    .pbe-acts .pib{width:38px;height:36px}
+  }
+  @media (max-width:420px){ .pbe-ur .pib{width:32px} .pbe-top .pib{width:32px;height:34px} .pbe-title{max-width:24vw} }
+  @media (prefers-reduced-motion:reduce){ .pbe *{transition:none!important;animation:none!important} }
 </style>
 </head>
 <body>
@@ -472,11 +696,9 @@
     <!-- Homepage (overview + one page per section) -->
     <section data-page="homepage" id="pHome" class="hidden"></section>
 
-    <!-- Pages / Posts (placeholders) -->
-    <section data-page="pages" class="hidden">
-      <div class="phead"><div class="pico">▤</div><div><h2>পেজ</h2><div class="crumb">আলাদা পেজ তৈরি ও এডিট</div></div></div>
-      <div class="card soon"><div class="big">🚧</div><h3>শীঘ্রই আসছে</h3><p>নতুন পেজ (যেমন: আমাদের সম্পর্কে, শর্তাবলি) তৈরির সুবিধা পরের ধাপে যোগ হবে।</p></div>
-    </section>
+    <!-- Pages (list + visual builder, CMS Phase 3) -->
+    <section data-page="pages" id="pPages" class="hidden"></section>
+    <!-- Posts (placeholder) -->
     <section data-page="posts" class="hidden">
       <div class="phead"><div class="pico">✎</div><div><h2>পোস্ট</h2><div class="crumb">ব্লগ ও খবর</div></div></div>
       <div class="card soon"><div class="big">🚧</div><h3>শীঘ্রই আসছে</h3><p>ব্লগ পোস্ট লেখা ও প্রকাশের সুবিধা পরের ধাপে যোগ হবে।</p></div>
@@ -973,7 +1195,7 @@
   const NAV = [
     { id: "dashboard", icon: "⌂", label: "ড্যাশবোর্ড" },
     { id: "homepage", icon: "🏠", label: "হোমপেজ", group: true },
-    { id: "pages", icon: "▤", label: "পেজ", badge: "শীঘ্রই" },
+    { id: "pages", icon: "▤", label: "পেজ" },
     { id: "posts", icon: "✎", label: "পোস্ট", badge: "শীঘ্রই" },
     { id: "media", icon: "🖼", label: "মিডিয়া" },
     { id: "users", icon: "👥", label: "ইউজার", badgeId: "navPending" },
@@ -1010,7 +1232,7 @@
     const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
     let page = parts[0] || "dashboard";
     if (!PAGES.includes(page) || (!me.isAdmin && page !== "dashboard")) page = "dashboard";
-    return { page, sub: page === "homepage" ? parts[1] || "" : "" };
+    return { page, sub: page === "homepage" || page === "pages" ? parts[1] || "" : "" };
   }
   function markNav() {
     if (!me) return;
@@ -1026,6 +1248,7 @@
   let lastRoute = "";
   async function route() {
     if (!me) return;
+    if (!(await pbBeforeRoute())) return;
     const { page, sub } = parseHash(), key = page + "/" + sub;
     document.querySelectorAll("[data-page]").forEach((s) => s.classList.toggle("hidden", s.dataset.page !== page));
     markNav();
@@ -1038,6 +1261,7 @@
     if (page === "homepage") return sub ? renderSection(sub) : renderHomeOverview();
     if (page === "media") return renderMedia();
     if (page === "settings") return renderSettings();
+    if (page === "pages") return renderPages();
   }
   window.addEventListener("hashchange", route);
 
@@ -1084,12 +1308,16 @@
         h("a", { class: "card stat", href: "#/users", style: "text-decoration:none", id: "statPending" }, h("div", { class: "ic", style: "background:#fff4d6;color:#8a6400", text: "⏳" }),
           h("div", {}, h("div", { class: "n", text: bnNum(pending) }), h("div", { class: "l", text: "অনুমোদনের অপেক্ষায়" }))),
         h("a", { class: "card stat", href: "#/media", style: "text-decoration:none", id: "statMedia" }, h("div", { class: "ic", style: "background:#fdf3d8;color:#8a6400", text: "🖼" }),
-          h("div", {}, h("div", { class: "n", text: media ? bnNum(media.items.length + media.builtin.length) : "…" }), h("div", { class: "l", text: "মিডিয়া ফাইল" })))));
+          h("div", {}, h("div", { class: "n", text: media ? bnNum(media.items.length + media.builtin.length) : "…" }), h("div", { class: "l", text: "মিডিয়া ফাইল" }))),
+        h("a", { class: "card stat", href: "#/pages", style: "text-decoration:none", id: "statPages" }, h("div", { class: "ic", style: "background:#e6f3ee;color:var(--green)", text: "▤" }),
+          h("div", {}, h("div", { class: "n", text: pagesData ? bnNum(pagesData.pages.length) : "…" }),
+            h("div", { class: "l", text: pagesData ? "পেজ · " + bnNum(pagesData.pages.filter((p) => p.status === "published").length) + "টি প্রকাশিত" : "পেজ" })))));
       const q = (href, ic, t, s, ext) => h("a", { class: "card qlink", href, target: ext ? "_blank" : null, rel: ext ? "noopener" : null }, h("span", { class: "ic", text: ic }), h("span", {}, h("b", { text: t }), h("small", { text: s })));
       host.append(h("h3", { class: "sec-h", text: "দ্রুত লিংক" }), h("div", { class: "ql" },
         q("#/homepage/hero", "★", "হিরো সেকশন", "শিরোনাম, বাটন, ছবি"),
         q("#/homepage/packages", "৳", "প্যাকেজ ও দাম", "দাম ও ফিচার বদলান"),
         q("#/homepage", "🏠", "পুরো হোমপেজ", "সব সেকশন এক জায়গায়"),
+        q("#/pages", "▤", "নতুন পেজ", "ড্র্যাগ-অ্যান্ড-ড্রপ পেজ বিল্ডার"),
         q("#/media", "🖼", "মিডিয়া লাইব্রেরি", "ছবি আপলোড করুন"),
         q("#/settings", "⚙", "সেটিংস", "শিরোনাম, রং, যোগাযোগ"),
         q("/", "↗", "সাইট দেখুন", "webdesigner71.com", true)));
@@ -1105,6 +1333,7 @@
     const jobs = [];
     if (!cms) jobs.push(loadCms().catch(() => null));
     if (!media) jobs.push(loadMedia().catch(() => null));
+    if (!pagesData) jobs.push(loadPages().catch(() => null));
     if (jobs.length) { await Promise.all(jobs); buildNav(); if (parseHash().page === "dashboard") draw(); }
   }
 
@@ -1842,6 +2071,1209 @@
       else toast("ব্যর্থ হয়েছে, আবার চেষ্টা করুন");
     }
   }
+
+
+  /* ======================================================================
+     CMS Phase 3 — Pages list + visual page builder
+     The builder edits a draft { title, slug, seo, blocks } in memory, renders it in a same-origin
+     iframe (/__page-preview + /cms/page-bridge.js) with the SAME renderer the site uses, and saves
+     with optimistic versions. Everything is validated with the shared model (/cms/pages.js).
+     ====================================================================== */
+  let PG = null;
+  const pagesReady = import("/cms/pages.js").then((m) => (PG = m)).catch(() => null);
+  let pagesData = null; // { pages:[indexEntry], limits, reserved }
+  let ED = null;        // the open editor (one at a time)
+  const pbNarrow = () => window.matchMedia("(max-width:900px)").matches; // same breakpoint as the single-pane editor CSS
+  async function loadPages() {
+    await pagesReady;
+    if (!PG) throw new Error("pages_model");
+    pagesData = await api("/admin/pages");
+    return pagesData;
+  }
+  const REASON = {
+    required: "এই ঘরটি খালি রাখা যাবে না", too_long: "লেখাটি অনেক লম্বা", format: "ফরম্যাট সঠিক নয়", reserved: "এই লিংকটি সাইটের নিজস্ব — অন্য নাম দিন",
+    taken: "এই লিংকে আরেকটি পেজ আছে — অন্য নাম দিন", url: "লিংকটি সঠিক নয় (https://…, /পাথ, #অ্যাঙ্কর, mailto: বা tel:)", image: "শুধু মিডিয়া লাইব্রেরির ছবি ব্যবহার করা যায়",
+    video: "শুধু YouTube বা Vimeo লিংক দিন", phone: "সঠিক ফোন নম্বর দিন", email: "সঠিক ইমেইল দিন", color: "সঠিক রং দিন", range: "মানটি সীমার বাইরে",
+    enum: "অপশনটি সঠিক নয়", too_many: "অনেক বেশি আইটেম", too_large: "পেজটি অনেক বড় হয়ে গেছে — কিছু ব্লক কমান", not_allowed: "এখানে এই ব্লক রাখা যায় না",
+    columns: "কলামের সংখ্যা অনুপাতের সাথে মেলে না", duplicate: "একই আইডির দুটি ব্লক", type: "মানটি সঠিক নয়", unknown: "অজানা ঘর",
+  };
+  const reasonText = (r) => REASON[r] || "মানটি সঠিক নয়";
+  const SLUG_MSG = { required: "পেজের লিংক দিন", too_long: "লিংক সর্বোচ্চ ৬০ অক্ষর", format: "শুধু ইংরেজি ছোট হাতের অক্ষর, সংখ্যা ও হাইফেন (-) — যেমন about-us", reserved: REASON.reserved, taken: REASON.taken };
+  function pageStatus(p) {
+    if (p.status !== "published") return { k: "draft", t: "খসড়া" };
+    return p.changed ? { k: "changed", t: "প্রকাশিত · নতুন পরিবর্তন বাকি" } : { k: "live", t: "প্রকাশিত" };
+  }
+  const pick = (p) => ({ title: p.title, slug: p.slug, seo: clone(p.seo || { title: "", description: "", image: "", noindex: false }), blocks: clone(p.blocks || []) });
+  const rid = () => "i" + Math.random().toString(36).slice(2, 8);
+  const plainTxt = (s) => String(s || "").replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
+  function syncIndex(doc) {
+    if (!pagesData || !PG) return;
+    const e = {
+      id: doc.id, title: doc.title, slug: doc.slug, status: doc.status, publishedSlug: doc.publishedSlug || "", changed: doc.status === "published" && doc.version !== doc.publishedVersion,
+      blocks: PG.countBlocks(doc.blocks || []), noindex: !!(doc.seo && doc.seo.noindex), updatedAt: doc.updatedAt, publishedAt: doc.publishedAt || "", version: doc.version,
+    };
+    const i = pagesData.pages.findIndex((x) => x.id === doc.id);
+    if (i < 0) pagesData.pages.unshift(e); else pagesData.pages[i] = e;
+  }
+  function pagesErr(e, fallback) {
+    if (e.message === "session") return;
+    if (e.status === 409 && e.message === "too_many_pages") return toast("সর্বোচ্চ " + bnNum(PG.LIMITS.pages) + "টি পেজ রাখা যায়", 4000);
+    if (e.status === 409) return toast("অন্য কোথাও পরিবর্তন হয়েছে — তালিকা নতুন করে লোড হলো", 4000);
+    if (e.status === 404) return toast("পেজটি পাওয়া যায়নি — হয়তো মুছে ফেলা হয়েছে", 4000);
+    if (e.field) return toast((e.field === "slug" ? "লিংক: " : "") + reasonText(e.data && e.data.reason), 4200);
+    toast(fallback || "ব্যর্থ হয়েছে, আবার চেষ্টা করুন");
+  }
+
+  /* ---------- Pages list ---------- */
+  async function renderPages() {
+    const host = $("pPages");
+    const { sub } = parseHash();
+    if (!pagesData) {
+      host.textContent = ""; host.append(h("div", { class: "card empty" }, h("div", { class: "spinner" })));
+      try { await loadPages(); }
+      catch (e) {
+        if (e.message === "session") return;
+        host.textContent = "";
+        host.append(h("div", { class: "card empty", id: "pagesErr" }, h("p", { text: PG ? "পেজের তালিকা লোড হয়নি।" : "পেজ বিল্ডারের ফাইল (/cms/pages.js) লোড হয়নি — পেজ রিফ্রেশ করুন।" }),
+          h("button", { type: "button", class: "btn btn-sm btn-gold", text: "আবার চেষ্টা", onclick: () => renderPages() })));
+        return;
+      }
+    }
+    if (parseHash().page !== "pages") return;
+    drawPages();
+    if (sub && (!ED || ED.id !== sub)) openEditor(sub);
+  }
+  function drawPages() {
+    const host = $("pPages"); host.textContent = "";
+    const list = pagesData.pages.slice().sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+    const pub = list.filter((p) => p.status === "published").length;
+    host.append(sectionHead("▤", "পেজ", bnNum(list.length) + "টি পেজ · " + bnNum(pub) + "টি প্রকাশিত — ড্র্যাগ-অ্যান্ড-ড্রপে আলাদা পেজ বানান",
+      h("button", { type: "button", class: "btn btn-gold", id: "newPage", text: "＋ নতুন পেজ", onclick: () => createPageDialog() })));
+    if (!list.length) {
+      host.append(h("div", { class: "card pg-empty", id: "pagesEmpty" }, h("div", { class: "big", text: "▤" }), h("h3", { text: "এখনো কোনো পেজ নেই" }),
+        h("p", { text: "“আমাদের সম্পর্কে”, “সেবাসমূহ” বা “যোগাযোগ” — তৈরি টেমপ্লেট থেকে এক ক্লিকে শুরু করুন, তারপর ব্লক টেনে এনে সাজান।" }),
+        h("button", { type: "button", class: "btn btn-gold", text: "＋ প্রথম পেজ বানান", onclick: () => createPageDialog() })));
+      return;
+    }
+    const tb = h("tbody");
+    for (const p of list) {
+      const s = pageStatus(p);
+      const act = (a, text, cls, title, fn) => h("button", { type: "button", class: "btn btn-sm " + cls, "data-act": a, title, "aria-label": title, text, onclick: fn });
+      tb.append(h("tr", { "data-id": p.id },
+        h("td", { class: "pt", "data-l": "শিরোনাম" }, h("a", { href: "#/pages/" + p.id, class: "ptitle", text: p.title }), h("div", { class: "psub" },
+          h("span", { text: bnNum(p.blocks || 0) + "টি ব্লক" }), p.noindex ? h("span", { class: "pill hid", text: "noindex" }) : null)),
+        h("td", { class: "ps", "data-l": "লিংক" }, p.status === "published"
+          ? h("a", { href: "/" + (p.publishedSlug || p.slug), target: "_blank", rel: "noopener", class: "slug", text: "/" + p.slug })
+          : h("span", { class: "slug", text: "/" + p.slug })),
+        h("td", { "data-l": "অবস্থা" }, h("span", { class: "pill st-" + s.k, text: s.t })),
+        h("td", { class: "pu", "data-l": "আপডেট", text: fmtDateTime(p.updatedAt) }),
+        h("td", { class: "pa" }, h("div", { class: "acts" },
+          h("a", { class: "btn btn-sm btn-green", href: "#/pages/" + p.id, "data-act": "edit", text: "✎ ডিজাইন" }),
+          act("seo", "⚙", "btn-line", "পেজ সেটিংস ও SEO", () => listSettings(p)),
+          act("dup", "⧉", "btn-line", "ডুপ্লিকেট", () => duplicatePage(p)),
+          p.status === "published" ? act("unpublish", "⏸", "btn-line", "অপ্রকাশ করুন", () => setPublished(p, false)) : act("publish", "▶ প্রকাশ", "btn-gold", "প্রকাশ করুন", () => setPublished(p, true)),
+          act("delete", "🗑", "btn-line danger", "মুছুন", () => deletePageFlow(p))))));
+    }
+    host.append(h("div", { class: "card ptcard" }, h("table", { class: "ptable", id: "pagesTable" },
+      h("thead", {}, h("tr", {}, h("th", { text: "শিরোনাম" }), h("th", { text: "লিংক" }), h("th", { text: "অবস্থা" }), h("th", { text: "আপডেট" }), h("th", { text: "" }))), tb)));
+    host.append(h("p", { class: "note2", text: "খসড়া পেজ শুধু এখানে দেখা যায়। প্রকাশ করলে webdesigner71.com/<লিংক> ঠিকানায় লাইভ হবে; প্রকাশিত পেজের লিংক বদলালে পুরোনো লিংক নতুনটিতে রিডাইরেক্ট হয়।" }));
+  }
+  async function refreshPages() { try { await loadPages(); } catch {} if (parseHash().page === "pages" && !parseHash().sub) drawPages(); }
+  async function duplicatePage(p) {
+    try { const r = await api("/admin/pages/" + p.id + "/duplicate", { method: "POST", body: {} }); syncIndex(r.page); toast("কপি তৈরি হয়েছে: " + r.page.title); drawPages(); }
+    catch (e) { pagesErr(e); refreshPages(); }
+  }
+  async function setPublished(p, on) {
+    if (!on) {
+      const ok = await confirmModal({ title: "পেজটি অপ্রকাশ করবেন?", message: "/" + (p.publishedSlug || p.slug) + " লিংকটি আর দেখা যাবে না। খসড়া থেকে যাবে, পরে আবার প্রকাশ করা যাবে।", okText: "অপ্রকাশ করুন", cancelText: "বাতিল" });
+      if (!ok) return;
+    }
+    try {
+      const r = await api("/admin/pages/" + p.id + "/" + (on ? "publish" : "unpublish"), { method: "POST", body: { version: p.version } });
+      syncIndex(r.page); toast(on ? "প্রকাশিত হয়েছে — /" + r.page.slug : "পেজটি অপ্রকাশিত হয়েছে", 3600); drawPages();
+    } catch (e) { pagesErr(e); refreshPages(); }
+  }
+  async function deletePageFlow(p) {
+    const ok = await confirmModal({ title: "পেজটি মুছবেন?", message: "“" + p.title + "” পেজটি" + (p.status === "published" ? " ও এর লাইভ লিংক /" + (p.publishedSlug || p.slug) : "") + " স্থায়ীভাবে মুছে যাবে। এই কাজ ফেরানো যাবে না।", okText: "মুছে ফেলুন", cancelText: "বাতিল", danger: true });
+    if (!ok) return;
+    try {
+      await api("/admin/pages/" + p.id + "?version=" + p.version, { method: "DELETE" });
+      pagesData.pages = pagesData.pages.filter((x) => x.id !== p.id);
+      try { localStorage.removeItem("wd71_pb_" + p.id); } catch {}
+      toast("পেজটি মুছে ফেলা হয়েছে"); drawPages();
+    } catch (e) { pagesErr(e); refreshPages(); }
+  }
+
+  /* ---------- small field helpers (same look as the Phase 2 forms) ---------- */
+  let fidN = 0;
+  function textFld(label, value, o = {}) {
+    const id = "pf" + ++fidN;
+    const inp = o.multiline ? h("textarea", { id, placeholder: " ", rows: o.rows || 3 }) : h("input", { type: o.type || "text", id, placeholder: " ", autocomplete: "off", spellcheck: o.spell === false ? "false" : null });
+    inp.value = value == null ? "" : value;
+    const err = h("span", { class: "ferr" }), hint = h("span", { class: "fhint", text: o.hint || "" }), cnt = o.max ? h("span", { class: "fcnt" }) : null;
+    const wrap = h("div", { class: "fld", "data-path": o.path || null }, h("div", { class: "fl" }, inp, h("label", { for: id, text: label })), h("div", { class: "fmeta" }, err, hint, cnt));
+    const count = () => { if (!cnt) return; const n = charLen(inp.value.trim()); cnt.textContent = bnNum(n) + "/" + bnNum(o.max); cnt.classList.toggle("over", n > o.max); };
+    count();
+    inp.addEventListener("input", () => { count(); if (o.onInput) o.onInput(inp.value); });
+    return { el: wrap, inp, setErr(m) { err.textContent = m || ""; wrap.classList.toggle("bad", !!m); }, count };
+  }
+  function selFld(label, values, labels, value, onChange, o = {}) {
+    const id = "pf" + ++fidN;
+    const s = h("select", { id, class: "sel" });
+    values.forEach((v, i) => { const op = h("option", { value: String(i), text: labels && labels[v] != null ? String(labels[v]) : String(v) }); if (v === value) op.selected = true; s.append(op); });
+    s.addEventListener("change", () => onChange(values[+s.value]));
+    return h("div", { class: "fld", "data-path": o.path || null }, h("div", { class: "flsel" }, s, h("label", { for: id }, label)), h("div", { class: "fmeta" }, h("span", { class: "ferr" })));
+  }
+
+  /* ---------- page settings / SEO (used by the list and the editor) ---------- */
+  function pageSettingsDialog(cur, { published, publishedSlug } = {}) {
+    return new Promise((resolve) => {
+      const d = makeDialog("");
+      let done = false, img = (cur.seo && cur.seo.image) || "";
+      const finish = (v) => { if (done) return; done = true; d.close(); resolve(v); };
+      const seo = cur.seo || {};
+      const t = textFld("পেজের শিরোনাম", cur.title, { max: 120 });
+      const s = textFld("পেজের লিংক (স্লাগ)", cur.slug, { max: 60, spell: false, hint: "webdesigner71.com/" + cur.slug });
+      const mt = textFld("SEO শিরোনাম (ঐচ্ছিক)", seo.title, { max: 120, hint: "খালি রাখলে পেজের শিরোনাম ব্যবহার হবে" });
+      const md = textFld("মেটা বিবরণ", seo.description, { max: 300, multiline: true, hint: "গুগল ও শেয়ারে দেখানো ছোট বিবরণ (১৫০–১৬০ অক্ষর ভালো)" });
+      t.inp.id = "psTitle"; s.inp.id = "psSlug"; mt.inp.id = "psMetaTitle"; md.inp.id = "psMetaDesc";
+      [t, s, mt, md].forEach((f) => f.el.querySelector("label").setAttribute("for", f.inp.id));
+      const noidx = h("input", { type: "checkbox", id: "psNoindex" }); noidx.checked = !!seo.noindex;
+      const thumb = h("div", { class: "thumb" });
+      const rm = h("button", { type: "button", class: "btn btn-sm btn-line", text: "সরান", onclick: () => { img = ""; drawImg(); } });
+      const drawImg = () => { thumb.textContent = ""; thumb.append(img ? h("img", { src: img, alt: "" }) : h("span", { text: "ছবি নেই" })); rm.disabled = !img; };
+      const pickB = h("button", { type: "button", class: "btn btn-sm btn-line", id: "psOgPick", text: "🖼 ছবি বাছুন", onclick: async () => { const r = await openImagePicker(img); if (r) { img = r.url; drawImg(); } } });
+      drawImg();
+      const slugNote = h("div", { class: "mbanner warn hidden", id: "psSlugNote" }, h("span", { text: "এই পেজটি প্রকাশিত। নতুন লিংক প্রকাশ করার পর পুরোনো /" + (publishedSlug || cur.slug) + " লিংকটি নতুন লিংকে রিডাইরেক্ট হবে।" }));
+      const ok = h("button", { type: "button", class: "btn btn-gold", id: "psOk", text: "ঠিক আছে" });
+      function check() {
+        const title = cleanText(t.inp.value), slug = s.inp.value.trim();
+        t.setErr(!title ? "শিরোনাম দিন" : charLen(title) > 120 ? REASON.too_long : "");
+        let sp = PG.slugProblem(slug);
+        if (!sp && pagesData && pagesData.pages.some((x) => x.id !== cur.id && (x.slug === slug || x.publishedSlug === slug))) sp = "taken";
+        s.setErr(sp ? SLUG_MSG[sp] : "");
+        s.el.querySelector(".fhint").textContent = "webdesigner71.com/" + (slug || "…");
+        slugNote.classList.toggle("hidden", !(published && slug !== (publishedSlug || cur.slug)));
+        mt.setErr(charLen(mt.inp.value.trim()) > 120 ? REASON.too_long : "");
+        md.setErr(charLen(md.inp.value.trim()) > 300 ? REASON.too_long : "");
+        ok.disabled = [t, s, mt, md].some((f) => f.el.classList.contains("bad"));
+      }
+      s.inp.addEventListener("input", () => { s.inp.value = s.inp.value.toLowerCase().replace(/[\s_]+/g, "-"); check(); });
+      [t, mt, md].forEach((f) => f.inp.addEventListener("input", check));
+      ok.onclick = () => { check(); if (ok.disabled) return; finish({ title: cleanText(t.inp.value), slug: s.inp.value.trim(), seo: { title: cleanText(mt.inp.value), description: md.inp.value.replace(/\s+/g, " ").trim(), image: img, noindex: noidx.checked } }); };
+      d.append(h("div", { class: "mbox", role: "dialog", "aria-modal": "true", "aria-label": "পেজ সেটিংস" },
+        h("div", { class: "mhead" }, h("h3", { text: "পেজ সেটিংস ও SEO" }), h("button", { type: "button", class: "mx", "aria-label": "বন্ধ করুন", text: "✕", onclick: () => finish(null) })),
+        h("div", { class: "mbody", id: "pageSettings" }, t.el, s.el, slugNote,
+          h("div", { class: "fgroup" }, h("div", { class: "gh", text: "🔎 সার্চ ইঞ্জিন ও শেয়ার (SEO)" }), mt.el, md.el,
+            h("div", { class: "fld" }, h("div", { class: "fl2", text: "শেয়ার করার ছবি (og:image)" }), h("div", { class: "imgf" }, thumb, h("div", { class: "imgb" }, pickB, rm))),
+            h("label", { class: "chk" }, noidx, h("span", { text: "সার্চ ইঞ্জিনে দেখাবে না (noindex)" })))),
+        h("div", { class: "mfoot" }, h("button", { type: "button", class: "btn btn-line", text: "বাতিল", onclick: () => finish(null) }), ok)));
+      d.addEventListener("cancel", (e) => { e.preventDefault(); finish(null); });
+      check(); d.showModal(); t.inp.focus();
+    });
+  }
+  async function listSettings(p) {
+    let doc;
+    try { doc = (await api("/admin/pages/" + p.id)).page; } catch (e) { return pagesErr(e); }
+    const v = await pageSettingsDialog(Object.assign({ id: doc.id }, pick(doc)), { published: doc.status === "published", publishedSlug: doc.publishedSlug });
+    if (!v) return;
+    try {
+      const r = await api("/admin/pages/" + p.id, { method: "PUT", body: { ...v, blocks: doc.blocks, version: doc.version } });
+      syncIndex(r.page); toast(r.page.status === "published" ? "সেভ হয়েছে — লাইভ করতে “প্রকাশ” করুন" : "সেটিংস সেভ হয়েছে", 3600); drawPages();
+    } catch (e) { pagesErr(e); refreshPages(); }
+  }
+
+  /* ---------- create dialog ---------- */
+  async function createPageDialog() {
+    await pagesReady;
+    if (!PG) return toast("পেজ বিল্ডারের ফাইল লোড হয়নি");
+    if (pagesData && pagesData.pages.length >= PG.LIMITS.pages) return toast("সর্বোচ্চ " + bnNum(PG.LIMITS.pages) + "টি পেজ রাখা যায়", 4000);
+    const d = makeDialog("");
+    let done = false, slugTouched = false, tpl = "blank", busy = false, shown = false;
+    const finish = () => { if (done || busy) return; done = true; d.close(); };
+    const t = textFld("পেজের শিরোনাম", "", { max: 120, hint: "যেমন: আমাদের সম্পর্কে" });
+    const s = textFld("পেজের লিংক", "", { max: 60, spell: false, hint: "webdesigner71.com/…" });
+    t.inp.id = "cpTitle"; t.el.querySelector("label").setAttribute("for", "cpTitle");
+    s.inp.id = "cpSlug"; s.el.querySelector("label").setAttribute("for", "cpSlug");
+    const go = h("button", { type: "button", class: "btn btn-gold", id: "cpOk", text: "তৈরি করে ডিজাইন শুরু করুন" });
+    function check(force) {
+      const title = cleanText(t.inp.value), slug = s.inp.value.trim();
+      let sp = PG.slugProblem(slug);
+      if (!sp && pagesData && pagesData.pages.some((x) => x.slug === slug || x.publishedSlug === slug)) sp = "taken";
+      if (force) shown = true;
+      t.setErr(shown && !title ? "শিরোনাম দিন" : charLen(title) > 120 ? REASON.too_long : "");
+      s.setErr(sp && (slug || shown) ? SLUG_MSG[sp] : "");
+      s.el.querySelector(".fhint").textContent = "webdesigner71.com/" + (slug || "…");
+      return !!title && charLen(title) <= 120 && !sp;
+    }
+    t.inp.addEventListener("input", () => { if (!slugTouched) { s.inp.value = PG.slugify(t.inp.value); s.count(); } check(); });
+    s.inp.addEventListener("input", () => { slugTouched = !!s.inp.value; s.inp.value = s.inp.value.toLowerCase().replace(/[\s_]+/g, "-"); check(); });
+    s.inp.addEventListener("blur", () => { if (s.inp.value) { s.inp.value = s.inp.value.replace(/-{2,}/g, "-").replace(/^-+|-+$/g, ""); s.count(); check(); } });
+    const tplBox = h("div", { class: "tpls", role: "radiogroup", "aria-label": "টেমপ্লেট" });
+    const TPL_IC = { blank: "＋", about: "👋", services: "🛠", contact: "☎" };
+    for (const [k, def] of Object.entries(PG.TEMPLATES)) {
+      tplBox.append(h("button", { type: "button", class: "tpl" + (k === tpl ? " on" : ""), role: "radio", "aria-checked": k === tpl ? "true" : "false", "data-tpl": k, onclick: () => {
+        tpl = k; tplBox.querySelectorAll(".tpl").forEach((x) => { x.classList.toggle("on", x.dataset.tpl === k); x.setAttribute("aria-checked", x.dataset.tpl === k ? "true" : "false"); });
+        if (!cleanText(t.inp.value) && k !== "blank") { t.inp.value = def.label; t.count(); if (!slugTouched) { s.inp.value = PG.slugify(def.label); s.count(); } check(); }
+      } }, h("i", { text: TPL_IC[k] || "▤" }), h("b", { text: def.label }), h("small", { text: def.desc || "" })));
+    }
+    const banner = h("div", { class: "mbanner err hidden", id: "cpErr" }, h("span"));
+    go.onclick = async () => {
+      if (!check(true)) { (t.el.classList.contains("bad") ? t.inp : s.inp).focus(); return; }
+      busy = true; go.disabled = true; go.textContent = "তৈরি হচ্ছে…"; banner.classList.add("hidden");
+      try {
+        const body = { title: cleanText(t.inp.value), slug: s.inp.value.trim() };
+        if (tpl !== "blank") body.template = tpl;
+        const r = await api("/admin/pages", { method: "POST", body });
+        busy = false; syncIndex(r.page); finish();
+        toast("পেজ তৈরি হয়েছে — এবার ডিজাইন করুন");
+        location.hash = "#/pages/" + r.page.id;
+      } catch (e) {
+        busy = false; go.disabled = false; go.textContent = "তৈরি করে ডিজাইন শুরু করুন";
+        if (e.message === "session") return;
+        if (e.field === "slug") { s.setErr(SLUG_MSG[e.data && e.data.reason] || SLUG_MSG.format); s.inp.focus(); }
+        else if (e.field === "title") t.setErr(reasonText(e.data && e.data.reason));
+        else { banner.firstChild.textContent = e.message === "too_many_pages" ? "সর্বোচ্চ " + bnNum(PG.LIMITS.pages) + "টি পেজ রাখা যায়" : "পেজ তৈরি করা যায়নি — আবার চেষ্টা করুন"; banner.classList.remove("hidden"); }
+      }
+    };
+    [t.inp, s.inp].forEach((x) => x.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); go.click(); } }));
+    d.append(h("div", { class: "mbox", role: "dialog", "aria-modal": "true", "aria-label": "নতুন পেজ" },
+      h("div", { class: "mhead" }, h("h3", { text: "নতুন পেজ" }), h("button", { type: "button", class: "mx", "aria-label": "বন্ধ করুন", text: "✕", onclick: finish })),
+      h("div", { class: "mbody", id: "createPage" }, banner, t.el, s.el, h("div", { class: "fl2", text: "কোথা থেকে শুরু করবেন?" }), tplBox),
+      h("div", { class: "mfoot" }, h("button", { type: "button", class: "btn btn-line", text: "বাতিল", onclick: finish }), go)));
+    d.addEventListener("cancel", (e) => { e.preventDefault(); finish(); });
+    d.addEventListener("backdrop", finish);
+    d.showModal(); t.inp.focus();
+  }
+
+  /* ======================================================================
+     The visual editor
+     ====================================================================== */
+  const DEVICES = [["d", "🖥", "ডেস্কটপ", 1280], ["t", "▭", "ট্যাবলেট", 820], ["m", "📱", "মোবাইল", 390]];
+  const GROUPS = [["layout", "লেআউট"], ["basic", "লেখা ও বেসিক"], ["media", "মিডিয়া"], ["sections", "তৈরি সেকশন"]];
+  function findB(list, id, parent = null) {
+    for (let i = 0; i < (list || []).length; i++) {
+      const b = list[i];
+      if (b.id === id) return { b, list, i, parent };
+      if (b.children) { const r = findB(b.children, id, b); if (r) return r; }
+    }
+    return null;
+  }
+  function walkB(list, fn, depth = 0, parent = null) { for (const b of list || []) { fn(b, depth, parent); walkB(b.children, fn, depth + 1, b); } }
+  function blockSummary(b) {
+    const c = b.content || {};
+    const first = c.items && c.items[0];
+    const t = c.heading || (b.type === "text" ? plainTxt(c.html) : "") || c.text || c.title || c.caption || c.q || c.label || c.name ||
+      (first && (first.title || first.label || first.text || first.q || first.name || first.value)) || (c.buttons && c.buttons[0] && c.buttons[0].label) ||
+      (b.type === "columns" && c.ratio ? c.ratio.replace(/-/g, ":") : "") || c.alt || "";
+    return plainTxt(t).slice(0, 40);
+  }
+  /** Map a validation path (blocks.0.children.2.content.x) to the block and the rest of the path. */
+  function blockAtPath(field) {
+    const parts = String(field || "").split(".");
+    if (parts[0] !== "blocks") return null;
+    let list = ED.draft.blocks, b = null, i = 1;
+    while (i < parts.length) {
+      const n = +parts[i];
+      if (!list || !Number.isInteger(n) || !list[n]) break;
+      b = list[n]; i++;
+      if (parts[i] === "children") { list = b.children; i++; } else break;
+    }
+    return b ? { b, rest: parts.slice(i).join(".") } : null;
+  }
+  function getIn(o, path) { for (const k of path) { if (o == null) return undefined; o = o[k]; } return o; }
+  function setIn(o, path, v) { for (let i = 0; i < path.length - 1; i++) { if (o[path[i]] == null) o[path[i]] = typeof path[i + 1] === "number" ? [] : {}; o = o[path[i]]; } if (v === undefined) delete o[path[path.length - 1]]; else o[path[path.length - 1]] = v; }
+  const edDirty = () => !!ED && !!ED.doc && JSON.stringify(ED.draft) !== ED.savedJson;
+  const LS = (id) => "wd71_pb_" + id;
+
+  /** Called by route() before switching pages: leaving the editor with unsaved changes asks first. */
+  async function pbBeforeRoute() {
+    if (!ED) return true;
+    const { page, sub } = parseHash();
+    if (page === "pages" && sub === ED.id) return true;
+    if (!edDirty()) { closeEditor(); return true; }
+    const id = ED.id;
+    const ok = await confirmModal({ title: "সেভ না করেই বের হবেন?", message: "এই পেজে সেভ না করা পরিবর্তন আছে। বের হলেও সেগুলো এই ব্রাউজারে থেকে যাবে — পরে এডিটর খুললে ফিরিয়ে আনতে পারবেন।", okText: "বের হন", cancelText: "এডিটরে থাকুন", danger: true });
+    if (ok) { closeEditor(); return true; }
+    history.replaceState(null, "", "#/pages/" + id);
+    return false;
+  }
+  window.addEventListener("beforeunload", (e) => { if (edDirty()) { e.preventDefault(); e.returnValue = ""; } });
+
+  async function openEditor(id) {
+    if (ED) closeEditor();
+    const root = h("div", { class: "pbe", id: "pbEditor", "aria-label": "পেজ বিল্ডার" }, h("div", { class: "pbe-load" }, h("div", { class: "spinner" }), h("p", { text: "এডিটর খুলছে…" })));
+    document.body.append(root); document.body.classList.add("pbe-open");
+    const ed = (ED = { id, root, loading: true });
+    let doc;
+    try {
+      await pagesReady;
+      if (!PG) throw new Error("pages_model");
+      [doc] = await Promise.all([api("/admin/pages/" + id).then((r) => r.page), cms ? null : ensureCms(null).catch(() => null)]);
+    } catch (e) {
+      if (ED !== ed) return;
+      closeEditor();
+      if (e.message !== "session") toast(e.status === 404 ? "পেজটি পাওয়া যায়নি" : "এডিটর খোলা যায়নি — আবার চেষ্টা করুন", 3600);
+      location.hash = "#/pages";
+      return;
+    }
+    if (ED !== ed) return;
+    Object.assign(ed, {
+      doc, draft: pick(doc), savedJson: "", sel: null, device: pbNarrow() ? "m" : "d", tab: "content", left: "blocks", pane: "canvas",
+      hist: [], fut: [], lastKey: "", lastAt: 0, ready: false, err: null, saving: false, conflict: null, collapsed: new Set(), drag: null, loading: false, openItem: "",
+    });
+    ed.savedJson = JSON.stringify(ed.draft);
+    buildEditor();
+    let local = null;
+    try { local = JSON.parse(localStorage.getItem(LS(id)) || "null"); } catch {}
+    if (local && local.draft && JSON.stringify(local.draft) !== ed.savedJson) showRestore(local);
+    else if (local) try { localStorage.removeItem(LS(id)); } catch {}
+  }
+  function closeEditor() {
+    if (!ED) return;
+    if (ED.ro) ED.ro.disconnect();
+    clearTimeout(ED.autoT);
+    if (ED.doc && edDirty()) try { localStorage.setItem(LS(ED.id), JSON.stringify({ v: ED.doc.version, at: new Date().toISOString(), draft: ED.draft })); } catch {}
+    window.removeEventListener("message", onBridge);
+    document.removeEventListener("keydown", onEdKey, true);
+    ED.root.remove(); document.body.classList.remove("pbe-open");
+    ED = null;
+  }
+
+  function buildEditor() {
+    const R = ED.root; R.textContent = ""; R.dataset.pane = ED.pane;
+    const U = (ED.ui = {});
+    const ib = (act, text, title, fn, cls = "") => h("button", { type: "button", class: "pib " + cls, "data-act": act, title, "aria-label": title, text, onclick: fn });
+    U.title = h("button", { type: "button", class: "pbe-title", id: "pbTitle", title: "পেজ সেটিংস ও SEO", onclick: () => editorSettings() });
+    U.devs = h("div", { class: "seg pbe-dev", role: "group", "aria-label": "ডিভাইস প্রিভিউ", id: "pbDevices" }, ...DEVICES.map(([k, ic, l]) =>
+      h("button", { type: "button", "data-dev": k, title: l, "aria-label": l, "aria-pressed": "false", onclick: () => setDevice(k) }, h("span", { class: "di", text: ic }), h("span", { class: "dl", text: l }))));
+    U.undo = ib("undo", "↶", "আনডু (Ctrl+Z)", () => undo());
+    U.redo = ib("redo", "↷", "রিডু (Ctrl+Shift+Z)", () => redo());
+    U.undo.id = "pbUndo"; U.redo.id = "pbRedo";
+    U.status = h("span", { class: "pbe-st", id: "pbStatus", role: "status", "aria-live": "polite" });
+    U.save = h("button", { type: "button", class: "btn btn-sm btn-line", id: "pbSave", onclick: () => save() }, h("span", { class: "bl", text: "খসড়া সেভ" }), h("span", { class: "bi", text: "💾" }));
+    U.pub = h("button", { type: "button", class: "btn btn-sm btn-gold", id: "pbPublish", onclick: () => publish() });
+    U.view = h("a", { class: "pib", id: "pbView", target: "_blank", rel: "noopener", title: "লাইভ পেজ দেখুন", "aria-label": "লাইভ পেজ দেখুন", text: "↗" });
+    const top = h("header", { class: "pbe-top" },
+      h("button", { type: "button", class: "pib", id: "pbBack", title: "পেজ তালিকায় ফিরুন", "aria-label": "পেজ তালিকায় ফিরুন", text: "←", onclick: () => { location.hash = "#/pages"; } }),
+      U.title, h("span", { class: "pbe-sp" }), U.devs, h("div", { class: "pbe-ur" }, U.undo, U.redo), U.status, U.view,
+      ib("settings", "⚙", "পেজ সেটিংস ও SEO", () => editorSettings(), "pbe-set"), U.save, U.pub);
+    U.leftTabs = h("div", { class: "pbe-tabs", role: "tablist", "aria-label": "লাইব্রেরি" }, ...[["blocks", "ব্লক"], ["patterns", "প্যাটার্ন"], ["layers", "লেয়ার"]].map(([k, l]) =>
+      h("button", { type: "button", role: "tab", "data-ltab": k, text: l, onclick: () => { ED.left = k; drawLeft(); } })));
+    U.leftBody = h("div", { class: "pbe-lb" });
+    const left = h("aside", { class: "pbe-left", "aria-label": "ব্লক লাইব্রেরি ও লেয়ার" }, U.leftTabs, U.leftBody);
+    U.banners = h("div", { class: "pbe-banners" });
+    U.frame = h("iframe", { src: "/__page-preview", title: "পেজের লাইভ প্রিভিউ", id: "pbFrame" });
+    U.fwrap = h("div", { class: "pbe-fw" }, U.frame);
+    U.stage = h("div", { class: "pbe-stage" }, U.fwrap);
+    const centre = h("main", { class: "pbe-c" }, U.banners, U.stage);
+    U.right = h("aside", { class: "pbe-right", id: "pbInspector", "aria-label": "ব্লক সেটিংস" });
+    U.mbar = h("nav", { class: "pbe-mbar", "aria-label": "এডিটর প্যানেল" }, ...[["add", "＋", "ব্লক যোগ"], ["canvas", "👁", "ক্যানভাস"], ["edit", "✎", "এডিট"]].map(([k, ic, l]) =>
+      h("button", { type: "button", "data-pane": k, onclick: () => setPane(k) }, h("span", { text: ic }), h("small", { text: l }))));
+    R.append(top, h("div", { class: "pbe-body" }, left, centre, U.right), U.mbar);
+    window.addEventListener("message", onBridge);
+    document.addEventListener("keydown", onEdKey, true);
+    ED.ro = new ResizeObserver(() => fitFrame()); ED.ro.observe(U.stage);
+    validate(); drawLeft(); drawInspector(); updateBar(); setPane(ED.pane); setDevice(ED.device, true);
+  }
+  function setPane(k) {
+    ED.pane = k; ED.root.dataset.pane = k;
+    ED.ui.mbar.querySelectorAll("button").forEach((b) => { b.classList.toggle("on", b.dataset.pane === k); if (b.dataset.pane === k) b.classList.remove("ping"); });
+    requestAnimationFrame(fitFrame);
+  }
+  function setDevice(k, init) {
+    ED.device = k;
+    ED.ui.devs.querySelectorAll("button").forEach((b) => { const on = b.dataset.dev === k; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
+    ED.root.dataset.device = k;
+    fitFrame();
+    if (!init && ED.tab === "style") drawInspector();
+  }
+  function fitFrame() {
+    if (!ED || !ED.ui) return;
+    const { stage, fwrap, frame } = ED.ui;
+    const sw = stage.clientWidth - 24, sh = stage.clientHeight - 24;
+    if (sw <= 0 || sh <= 0) return;
+    const devW = DEVICES.find((d) => d[0] === ED.device)[3];
+    const W = ED.device === "d" ? Math.max(devW, sw) : devW;
+    const scale = Math.min(1, sw / W);
+    frame.style.width = W + "px"; frame.style.height = Math.round(sh / scale) + "px";
+    frame.style.transform = scale < 1 ? "scale(" + scale.toFixed(4) + ")" : "";
+    fwrap.style.width = Math.round(W * scale) + "px"; fwrap.style.height = sh + "px";
+    fwrap.dataset.w = String(W);
+  }
+
+  /* ---------- bridge ---------- */
+  function onBridge(ev) {
+    if (!ED || !ED.ui || ev.source !== ED.ui.frame.contentWindow || ev.origin !== location.origin) return;
+    const m = ev.data || {};
+    if (m.type === "pb:ready") { ED.ready = true; pushRender(); }
+    else if (m.type === "pb:select") select(m.id || null, { fromCanvas: true });
+    else if (m.type === "pb:drop") { ED.drag = null; doDrop(m.payload, m.target || null, m.pos); }
+    else if (m.type === "pb:key") handleKey(m.key, m.shift, m.meta);
+  }
+  function post(m) { if (ED && ED.ready && ED.ui && ED.ui.frame.contentWindow) ED.ui.frame.contentWindow.postMessage(m, location.origin); }
+  function pushRender() {
+    if (!ED || !ED.ready) return;
+    cancelAnimationFrame(ED.raf);
+    ED.raf = requestAnimationFrame(() => post({ type: "pb:render", page: { title: ED.draft.title, slug: ED.draft.slug, blocks: ED.draft.blocks }, settings: cms ? cms.settings : null, selected: ED.sel }));
+  }
+
+  /* ---------- state changes + history ---------- */
+  function mutate(fn, key, o = {}) {
+    const before = JSON.stringify(ED.draft);
+    if (fn(ED.draft) === false) { ED.draft = JSON.parse(before); return false; }
+    const after = JSON.stringify(ED.draft);
+    if (before === after) return true;
+    const now = Date.now();
+    if (!(key && ED.lastKey === key && now - ED.lastAt < 1000)) { ED.hist.push(before); if (ED.hist.length > 150) ED.hist.shift(); }
+    ED.fut = []; ED.lastKey = key || ""; ED.lastAt = now;
+    changed(o);
+    return true;
+  }
+  function changed(o = {}) {
+    validate(); pushRender();
+    drawLayersIfOpen();
+    if (o.form) drawInspector(); else markInspectorErrors();
+    updateBar(); scheduleAutosave();
+  }
+  function histStep(from, to, label) {
+    if (!from.length) return;
+    to.push(JSON.stringify(ED.draft)); ED.draft = JSON.parse(from.pop()); ED.lastKey = "";
+    if (ED.sel && !findB(ED.draft.blocks, ED.sel)) ED.sel = null;
+    changed({ form: true }); toast(label, 900);
+  }
+  const undo = () => histStep(ED.hist, ED.fut, "↶ আনডু");
+  const redo = () => histStep(ED.fut, ED.hist, "↷ রিডু");
+  function validate() {
+    try { PG.cleanPageInput(ED.draft); ED.err = null; }
+    catch (e) { ED.err = e instanceof PG.PageError ? { field: e.field, reason: e.reason } : { field: "page", reason: "type" }; }
+  }
+  function errLabel(err) {
+    if (!err) return "";
+    const f = String(err.field);
+    if (f === "title") return "শিরোনাম: " + reasonText(err.reason);
+    if (f === "slug") return "লিংক: " + (SLUG_MSG[err.reason] || reasonText(err.reason));
+    if (f.startsWith("seo")) return "SEO: " + reasonText(err.reason);
+    const at = blockAtPath(f);
+    if (at) return ((PG.BLOCKS[at.b.type] || {}).label || "ব্লক") + ": " + reasonText(err.reason);
+    return reasonText(err.reason);
+  }
+  function scheduleAutosave() {
+    clearTimeout(ED.autoT);
+    const ed = ED;
+    ed.autoT = setTimeout(() => {
+      if (ED !== ed) return;
+      try {
+        if (edDirty()) localStorage.setItem(LS(ed.id), JSON.stringify({ v: ed.doc.version, at: new Date().toISOString(), draft: ed.draft }));
+        else localStorage.removeItem(LS(ed.id));
+      } catch {}
+    }, 500);
+  }
+  function updateBar() {
+    if (!ED || !ED.ui) return;
+    const U = ED.ui, dirty = edDirty(), d = ED.doc;
+    U.title.textContent = ""; U.title.append(h("b", { text: ED.draft.title || "শিরোনামহীন" }), h("small", { text: "/" + ED.draft.slug }));
+    U.undo.disabled = !ED.hist.length; U.redo.disabled = !ED.fut.length;
+    U.save.disabled = ED.saving || !dirty || !!ED.err;
+    const live = d.status === "published", pending = live && (dirty || d.version !== d.publishedVersion);
+    U.pub.disabled = ED.saving || !!ED.err || (live && !pending);
+    U.pub.textContent = !live ? "প্রকাশ করুন" : pending ? "আপডেট প্রকাশ" : "প্রকাশিত ✓";
+    U.view.classList.toggle("hidden", !live);
+    if (live) U.view.href = "/" + d.publishedSlug;
+    U.status.textContent = ""; U.status.className = "pbe-st";
+    if (ED.err) {
+      U.status.classList.add("bad");
+      U.status.append(h("button", { type: "button", class: "linkbtn", id: "pbErr", text: "⚠ " + errLabel(ED.err), onclick: () => gotoError() }));
+    } else if (ED.saving) U.status.textContent = "সেভ হচ্ছে…";
+    else if (dirty) { U.status.textContent = "● সেভ হয়নি"; U.status.title = "পরিবর্তনগুলো এই ব্রাউজারে রাখা আছে"; U.status.classList.add("dirty"); }
+    else U.status.textContent = live ? (pending ? "সেভ হয়েছে · প্রকাশ বাকি" : "✓ প্রকাশিত") : "✓ খসড়া সেভ হয়েছে";
+  }
+  function gotoError() {
+    if (!ED.err) return;
+    const f = String(ED.err.field);
+    if (f === "title" || f === "slug" || f.startsWith("seo")) return editorSettings();
+    const at = blockAtPath(f);
+    if (at) { ED.tab = at.rest.startsWith("style") ? "style" : at.rest.startsWith("adv") ? "adv" : "content"; ED.sel = null; select(at.b.id, { pane: "edit", keepTab: true }); post({ type: "pb:scroll", id: at.b.id }); }
+  }
+  function banner(kind, text, ...btns) {
+    const b = h("div", { class: "mbanner " + kind }, h("span", { text }), h("div", { class: "bbtns" }, ...btns));
+    ED.ui.banners.append(b);
+    return b;
+  }
+  function showRestore(local) {
+    const stale = local.v !== ED.doc.version;
+    const b = banner("warn", "এই ব্রাউজারে " + (local.at ? fmtDateTime(local.at) : "আগের") + " এর সেভ না করা পরিবর্তন পাওয়া গেছে।" + (stale ? " এরপর সার্ভারে নতুন ভার্সন সেভ হয়েছে — ফিরিয়ে এনে সেভ করলে সেটির উপরে বসবে।" : ""),
+      h("button", { type: "button", class: "btn btn-sm btn-gold", id: "pbRestore", text: "ফিরিয়ে আনুন", onclick: () => { b.remove(); mutate((d) => { d.title = local.draft.title; d.slug = local.draft.slug; d.seo = local.draft.seo; d.blocks = local.draft.blocks; }, "", { form: true }); toast("আগের পরিবর্তন ফিরিয়ে আনা হয়েছে"); } }),
+      h("button", { type: "button", class: "btn btn-sm btn-line", id: "pbDiscard", text: "বাদ দিন", onclick: () => { b.remove(); try { localStorage.removeItem(LS(ED.id)); } catch {} } }));
+    b.id = "pbRestoreBanner";
+  }
+
+  /* ---------- save / publish / conflicts ---------- */
+  async function save({ silent } = {}) {
+    if (!ED || !ED.doc || ED.saving) return false;
+    validate();
+    if (ED.err) { updateBar(); gotoError(); toast("আগে ভুলটি ঠিক করুন — " + errLabel(ED.err), 3600); return false; }
+    if (!edDirty()) return true;
+    const ed = ED, sent = JSON.stringify(ed.draft);
+    ed.saving = true; updateBar();
+    try {
+      const r = await api("/admin/pages/" + ed.id, { method: "PUT", body: { ...ed.draft, version: ed.doc.version } });
+      if (ED !== ed) return true;
+      ed.doc = r.page;
+      if (JSON.stringify(ed.draft) === sent) ed.draft = pick(r.page); // adopt the canonical form (item ids, trimmed text)
+      ed.savedJson = JSON.stringify(pick(r.page));
+      syncIndex(r.page);
+      try { if (!edDirty()) localStorage.removeItem(LS(ed.id)); } catch {}
+      if (ED.conflict) { ED.conflict.remove(); ED.conflict = null; }
+      if (!silent) toast(r.page.status === "published" ? "সেভ হয়েছে — লাইভ করতে “আপডেট প্রকাশ” চাপুন" : "খসড়া সেভ হয়েছে", 2600);
+      pushRender();
+      return true;
+    } catch (e) {
+      if (ED !== ed || e.message === "session") return false;
+      if (e.status === 409 && e.data && e.data.page) showConflict(e.data.page);
+      else if (e.status === 400 && e.field) { ed.err = { field: e.field, reason: (e.data && e.data.reason) || "type" }; gotoError(); toast("সেভ হয়নি — " + errLabel(ed.err), 4000); }
+      else if (e.status === 404) toast("পেজটি আর নেই — হয়তো অন্য কোথাও মুছে ফেলা হয়েছে", 5000);
+      else toast("সেভ হয়নি — সংযোগ দেখে আবার চেষ্টা করুন (পরিবর্তন এই ব্রাউজারে রাখা আছে)", 5000);
+      return false;
+    } finally { if (ED === ed) { ed.saving = false; updateBar(); } }
+  }
+  function showConflict(server) {
+    if (ED.conflict) ED.conflict.remove();
+    const b = banner("err", "এই পেজটি অন্য কোথাও (অন্য ট্যাব বা ডিভাইসে) সেভ হয়েছে — " + fmtDateTime(server.updatedAt) + (server.updatedBy ? " · " + server.updatedBy : "") + "। কোনটি রাখবেন?",
+      h("button", { type: "button", class: "btn btn-sm btn-line", id: "pbTheirs", text: "ওই ভার্সন লোড করুন", onclick: () => {
+        b.remove(); ED.conflict = null;
+        ED.hist.push(JSON.stringify(ED.draft)); ED.fut = [];
+        ED.doc = server; ED.draft = pick(server); ED.savedJson = JSON.stringify(ED.draft);
+        if (ED.sel && !findB(ED.draft.blocks, ED.sel)) ED.sel = null;
+        syncIndex(server); changed({ form: true });
+        toast("সার্ভারের ভার্সন লোড হয়েছে — আনডু করলে আপনার পরিবর্তন ফিরে আসবে", 4000);
+      } }),
+      h("button", { type: "button", class: "btn btn-sm btn-danger", id: "pbMine", text: "আমারটা রাখুন", onclick: async () => {
+        b.remove(); ED.conflict = null;
+        ED.doc = server; ED.savedJson = JSON.stringify(pick(server));
+        await save();
+      } }));
+    b.id = "pbConflict"; ED.conflict = b;
+  }
+  async function publish() {
+    if (!ED || !ED.doc || ED.saving) return;
+    if (edDirty() && !(await save({ silent: true }))) return;
+    if (!ED || ED.err) return;
+    const ed = ED;
+    ed.saving = true; updateBar();
+    try {
+      const r = await api("/admin/pages/" + ed.id + "/publish", { method: "POST", body: { version: ed.doc.version } });
+      if (ED !== ed) return;
+      const keepDraft = JSON.stringify(ed.draft) !== ed.savedJson;
+      ed.doc = r.page; ed.savedJson = JSON.stringify(pick(r.page));
+      if (!keepDraft) ed.draft = pick(r.page);
+      syncIndex(r.page);
+      try { if (!edDirty()) localStorage.removeItem(LS(ed.id)); } catch {}
+      toast("প্রকাশিত হয়েছে — " + location.host + "/" + r.page.slug, 3600);
+    } catch (e) {
+      if (ED !== ed || e.message === "session") return;
+      if (e.status === 409 && e.data && e.data.page) showConflict(e.data.page);
+      else if (e.field) { ed.err = { field: e.field, reason: (e.data && e.data.reason) || "type" }; gotoError(); toast("প্রকাশ হয়নি — " + errLabel(ed.err), 4000); }
+      else toast("প্রকাশ হয়নি — আবার চেষ্টা করুন", 4000);
+    } finally { if (ED === ed) { ed.saving = false; updateBar(); } }
+  }
+  async function editorSettings() {
+    const v = await pageSettingsDialog(Object.assign({ id: ED.id }, ED.draft), { published: ED.doc.status === "published", publishedSlug: ED.doc.publishedSlug });
+    if (!v || !ED) return;
+    mutate((d) => { d.title = v.title; d.slug = v.slug; d.seo = v.seo; }, "");
+  }
+
+  /* ---------- selection + structure operations ---------- */
+  function select(id, o = {}) {
+    if (id && !findB(ED.draft.blocks, id)) id = null;
+    if (ED.sel !== id) {
+      ED.sel = id;
+      if (!o.keepTab && ED.tab === "adv") ED.tab = "content";
+      ED.openItem = "";
+      drawInspector();
+    }
+    post({ type: "pb:select", id });
+    drawLayersIfOpen();
+    if (o.pane && pbNarrow()) setPane(o.pane);
+    else if (o.fromCanvas && pbNarrow() && id) ED.ui.mbar.querySelector('[data-pane="edit"]').classList.add("ping");
+  }
+  function nodesFor(payload) {
+    if (!payload) return null;
+    if (payload.kind === "new" && PG.BLOCKS[payload.type] && PG.BLOCKS[payload.type].group !== "hidden") return [PG.newBlock(payload.type, payload.ratio)];
+    if (payload.kind === "pattern" && PG.PATTERNS[payload.key]) return PG.PATTERNS[payload.key].build(ED.draft.title);
+    return null;
+  }
+  /** Insert nodes relative to a target (before | after | inside), climbing to the nearest ancestor that accepts them. */
+  function placeNodes(d, nodes, targetId, pos) {
+    const ok = (ptype) => nodes.every((n) => PG.accepts(ptype, n.type));
+    if (!targetId) { if (!ok("root")) return false; d.blocks.push(...nodes); return true; }
+    let loc = findB(d.blocks, targetId);
+    for (let guard = 0; guard < 8 && loc; guard++) {
+      if (pos === "inside") {
+        const b = loc.b.type === "columns" ? loc.b.children[0] : loc.b;
+        if (b && b.children && ok(b.type)) { b.children.push(...nodes); return true; }
+        pos = "after";
+      }
+      if (ok(loc.parent ? loc.parent.type : "root")) { loc.list.splice(loc.i + (pos === "after" ? 1 : 0), 0, ...nodes); return true; }
+      if (loc.b.type === "column" && ok("column")) { if (pos === "before") loc.b.children.unshift(...nodes); else loc.b.children.push(...nodes); return true; }
+      if (!loc.parent) return false;
+      loc = findB(d.blocks, loc.parent.id);
+    }
+    return false;
+  }
+  const blockLimitMsg = () => toast("একটি পেজে সর্বোচ্চ " + bnNum(PG.LIMITS.blocks) + "টি ব্লক রাখা যায়", 4000);
+  const tooMany = (nodes) => { let n = 0; walkB(nodes, () => n++); return PG.countBlocks(ED.draft.blocks) + n > PG.LIMITS.blocks; };
+  function insert(payload, targetId, pos) {
+    const nodes = nodesFor(payload);
+    if (!nodes || !nodes.length) return;
+    if (tooMany(nodes)) return blockLimitMsg();
+    if (!mutate((d) => placeNodes(d, nodes, targetId, pos), "")) return toast("এখানে এই ব্লক রাখা যায় না", 2600);
+    ED.tab = "content";
+    select(nodes[0].id);
+    post({ type: "pb:scroll", id: nodes[0].id });
+    toast("যোগ হয়েছে: " + (payload.kind === "pattern" ? PG.PATTERNS[payload.key].label : PG.BLOCKS[payload.type].label), 1500);
+  }
+  /** Click-to-add: inside the selected section/column, else after the selected block, else at the end of the page. */
+  function addHere(payload) {
+    const s = ED.sel && findB(ED.draft.blocks, ED.sel);
+    if (!s) return insert(payload, null, "inside");
+    if ((s.b.type === "section" || s.b.type === "column") && payload.kind === "new" && PG.accepts(s.b.type, payload.type)) return insert(payload, s.b.id, "inside");
+    return insert(payload, s.b.id, "after");
+  }
+  function moveBlock(id, targetId, pos) {
+    if (!id || id === targetId) return;
+    let fail = "place";
+    const ok = mutate((d) => {
+      const src = findB(d.blocks, id);
+      if (!src) return false;
+      if (targetId && findB(src.b.children || [], targetId)) { fail = "inner"; return false; }
+      if (src.b.type === "column") {
+        const t = targetId && findB(d.blocks, targetId);
+        if (!t || !t.parent || !src.parent || t.parent.id !== src.parent.id || pos === "inside") { fail = "col"; return false; }
+        const [node] = src.list.splice(src.i, 1);
+        const ti = src.list.findIndex((x) => x.id === targetId);
+        src.list.splice(ti + (pos === "after" ? 1 : 0), 0, node);
+        return true;
+      }
+      const [node] = src.list.splice(src.i, 1);
+      return placeNodes(d, [node], targetId, pos);
+    }, "");
+    if (!ok) return toast(fail === "col" ? "কলাম ঘর শুধু একই সারির ভেতরে সরানো যায়" : fail === "inner" ? "ব্লককে তার নিজের ভেতরে রাখা যায় না" : "এখানে এই ব্লক রাখা যায় না", 2600);
+    ED.sel = null; select(id, { keepTab: true });
+  }
+  function doDrop(payload, targetId, pos) {
+    if (!payload || !ED) return;
+    if (payload.kind === "move") moveBlock(payload.id, targetId, pos);
+    else insert(payload, targetId, pos);
+  }
+  function stepBlock(id, dir) {
+    const loc = findB(ED.draft.blocks, id);
+    if (!loc) return;
+    const j = loc.i + dir;
+    if (j < 0 || j >= loc.list.length) return toast(dir < 0 ? "এটি ইতিমধ্যে সবার উপরে" : "এটি ইতিমধ্যে সবার নিচে", 1400);
+    mutate((d) => { const l = findB(d.blocks, id); const [x] = l.list.splice(l.i, 1); l.list.splice(j, 0, x); }, "", { form: true });
+    post({ type: "pb:scroll", id });
+  }
+  function removeBlock(id) {
+    const loc = findB(ED.draft.blocks, id);
+    if (!loc) return;
+    if (loc.b.type === "column") return toast("কলাম ঘর মুছতে উপরের “কলাম” ব্লকে কলামের সংখ্যা কমান", 3200);
+    const next = loc.list[loc.i + 1] || loc.list[loc.i - 1] || loc.parent;
+    mutate((d) => { const l = findB(d.blocks, id); l.list.splice(l.i, 1); }, "");
+    ED.sel = "__gone"; select(next ? next.id : null);
+    toast("ব্লক মুছে ফেলা হয়েছে — Ctrl+Z চাপলে ফিরে আসবে", 2400);
+  }
+  function duplicateBlock(id) {
+    const loc = findB(ED.draft.blocks, id);
+    if (!loc) return;
+    if (loc.b.type === "column") return toast("কলাম ঘর ডুপ্লিকেট করা যায় না — কলামের সংখ্যা বাড়ান", 3200);
+    const copy = PG.cloneBlock(loc.b);
+    if (tooMany([copy])) return blockLimitMsg();
+    mutate((d) => { const l = findB(d.blocks, id); l.list.splice(l.i + 1, 0, copy); }, "");
+    select(copy.id); post({ type: "pb:scroll", id: copy.id });
+    toast("ডুপ্লিকেট হয়েছে", 1400);
+  }
+  function toggleHidden(id) {
+    mutate((d) => { const l = findB(d.blocks, id); if (l.b.hidden) delete l.b.hidden; else l.b.hidden = true; }, "", { form: true });
+  }
+  let clipStyle = null, clipBlock = null;
+  try { clipStyle = JSON.parse(localStorage.getItem("wd71_pb_style") || "null"); } catch {}
+  function copyStyle(id) {
+    const l = findB(ED.draft.blocks, id); if (!l) return;
+    clipStyle = clone(l.b.style || {});
+    try { localStorage.setItem("wd71_pb_style", JSON.stringify(clipStyle)); } catch {}
+    toast("স্টাইল কপি হয়েছে — অন্য ব্লক বেছে “স্টাইল পেস্ট” করুন", 2400); drawInspector();
+  }
+  function pasteStyle(id) {
+    if (!clipStyle) return toast("আগে কোনো ব্লকের স্টাইল কপি করুন");
+    mutate((d) => { const l = findB(d.blocks, id); l.b.style = clone(clipStyle); }, "", { form: true });
+    toast("স্টাইল পেস্ট হয়েছে", 1600);
+  }
+  function pasteBlock() {
+    if (!clipBlock) return;
+    const copy = PG.cloneBlock(clipBlock);
+    if (tooMany([copy])) return blockLimitMsg();
+    const s = ED.sel && findB(ED.draft.blocks, ED.sel);
+    if (!mutate((d) => placeNodes(d, [copy], s ? s.b.id : null, s ? "after" : "inside"), "")) return toast("এখানে পেস্ট করা যায় না");
+    select(copy.id); post({ type: "pb:scroll", id: copy.id });
+  }
+  function handleKey(key, shift, meta) {
+    if (!ED || !ED.doc || document.querySelector("dialog.mdl[open]")) return;
+    if (meta && key === "z") return shift ? redo() : undo();
+    if (meta && key === "y") return redo();
+    if (meta && key === "s") return save();
+    if (meta && key === "v") return pasteBlock();
+    if (!ED.sel) return;
+    if (meta && key === "d") return duplicateBlock(ED.sel);
+    if (meta && key === "c") { const l = findB(ED.draft.blocks, ED.sel); if (l && l.b.type !== "column") { clipBlock = clone(l.b); toast("ব্লক কপি হয়েছে — Ctrl+V দিয়ে পেস্ট করুন", 1800); } return; }
+    if (key === "delete") return removeBlock(ED.sel);
+    if (key === "escape") { const l = findB(ED.draft.blocks, ED.sel); return select(l && l.parent ? l.parent.id : null); }
+  }
+  function onEdKey(e) {
+    if (!ED || !ED.doc || document.querySelector("dialog.mdl[open]")) return;
+    const t = e.target, typing = t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable);
+    const k = (e.key || "").toLowerCase(), meta = e.ctrlKey || e.metaKey;
+    if (meta && k === "s") { e.preventDefault(); save(); return; }
+    if (typing) return;
+    const key = k === "backspace" ? "delete" : k;
+    if ((meta && ["z", "y", "d", "c", "v"].includes(key)) || (key === "delete" && ED.sel) || (key === "escape" && ED.sel)) { e.preventDefault(); handleKey(key, e.shiftKey, meta); }
+  }
+
+  /* ---------- left panel ---------- */
+  function drawLeft() {
+    const U = ED.ui, B = U.leftBody;
+    U.leftTabs.querySelectorAll("button").forEach((b) => { const on = b.dataset.ltab === ED.left; b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false"); });
+    B.textContent = "";
+    if (ED.left === "blocks") {
+      B.append(h("p", { class: "pbe-hint", text: "টেনে এনে ক্যানভাসে বা লেয়ারে ছাড়ুন, অথবা ক্লিক করে বেছে নেওয়া ব্লকের পরে যোগ করুন।" }));
+      for (const [g, gl] of GROUPS) {
+        const grid = h("div", { class: "lib" });
+        for (const [type, def] of Object.entries(PG.BLOCKS)) if (def.group === g) grid.append(libTile({ kind: "new", type }, def.icon, def.label, def.desc));
+        B.append(h("div", { class: "lib-g", text: gl }), grid);
+      }
+    } else if (ED.left === "patterns") {
+      B.append(h("p", { class: "pbe-hint", text: "তৈরি ডিজাইন — এক ক্লিকে পুরো সেকশন যোগ করুন, তারপর লেখা ও ছবি বদলান।" }));
+      const list = h("div", { class: "pats" });
+      for (const [key, p] of Object.entries(PG.PATTERNS)) list.append(libTile({ kind: "pattern", key }, "▦", p.label, p.desc, "pat"));
+      B.append(list);
+    } else drawLayers();
+  }
+  function libTile(payload, icon, label, desc, cls = "") {
+    const t = h("button", { type: "button", class: "ltile " + cls, draggable: "true", title: desc || label, "data-add": payload.kind === "new" ? payload.type : "pattern:" + payload.key,
+      onclick: () => { addHere(payload); if (pbNarrow()) setPane("canvas"); } },
+      h("span", { class: "li", text: icon }), h("span", { class: "ll" }, h("b", { text: label }), cls === "pat" && desc ? h("small", { text: desc }) : null));
+    t.addEventListener("dragstart", (e) => { ED.drag = payload; e.dataTransfer.effectAllowed = "copy"; try { e.dataTransfer.setData("text/plain", "pb"); } catch {} post({ type: "pb:drag", payload }); ED.root.classList.add("dragging"); });
+    t.addEventListener("dragend", () => { if (ED) { ED.drag = null; ED.root.classList.remove("dragging"); } post({ type: "pb:drag", payload: null }); clearLayerMarks(); });
+    return t;
+  }
+  function drawLayersIfOpen() { if (ED && ED.ui && ED.left === "layers") drawLayers(); }
+  function drawLayers() {
+    const B = ED.ui.leftBody, keep = B.scrollTop;
+    B.textContent = "";
+    if (!ED.draft.blocks.length) { B.append(h("p", { class: "pbe-hint", id: "pbLayersEmpty", text: "পেজটি এখনো খালি। “ব্লক” বা “প্যাটার্ন” ট্যাব থেকে কিছু যোগ করুন।" })); return; }
+    const tree = h("div", { class: "layers", id: "pbLayers", role: "tree", "aria-label": "লেয়ার" });
+    const row = (b, depth, parent) => {
+      const def = PG.BLOCKS[b.type] || {}, hasKids = !!(b.children && b.children.length), col = ED.collapsed.has(b.id);
+      const idx = (parent ? parent.children : ED.draft.blocks).indexOf(b);
+      const label = b.type === "column" ? "কলাম " + bnNum(idx + 1) : def.label;
+      const r = h("div", { class: "lrow" + (ED.sel === b.id ? " on" : "") + (b.hidden ? " off" : ""), role: "treeitem", "aria-selected": ED.sel === b.id ? "true" : "false", "aria-level": String(depth + 1),
+        "data-id": b.id, "data-type": b.type, draggable: "true", style: "--d:" + depth, tabindex: "0" },
+        hasKids ? h("button", { type: "button", class: "lcar", "aria-label": col ? "খুলুন" : "বন্ধ করুন", text: col ? "▸" : "▾", onclick: (e) => { e.stopPropagation(); if (col) ED.collapsed.delete(b.id); else ED.collapsed.add(b.id); drawLayers(); } }) : h("span", { class: "lcar" }),
+        h("span", { class: "lic", text: def.icon || "•" }), h("span", { class: "lnm" }, h("b", { text: label }), h("small", { text: blockSummary(b) })),
+        b.type === "column" ? null : h("button", { type: "button", class: "leye", title: b.hidden ? "দেখান" : "লুকান", "aria-label": b.hidden ? "দেখান" : "লুকান", text: b.hidden ? "◌" : "👁", onclick: (e) => { e.stopPropagation(); toggleHidden(b.id); } }));
+      r.addEventListener("click", () => { select(b.id, { pane: "edit" }); post({ type: "pb:scroll", id: b.id }); });
+      r.addEventListener("keydown", (e) => {
+        if (e.target !== r) return;
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); r.click(); }
+        else if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) { e.preventDefault(); stepBlock(b.id, e.key === "ArrowUp" ? -1 : 1); requestAnimationFrame(() => { const n = ED && ED.ui.leftBody.querySelector('.lrow[data-id="' + b.id + '"]'); if (n) n.focus(); }); }
+      });
+      r.addEventListener("dragstart", (e) => { e.stopPropagation(); ED.drag = { kind: "move", id: b.id }; e.dataTransfer.effectAllowed = "move"; try { e.dataTransfer.setData("text/plain", "pb"); } catch {} post({ type: "pb:drag", payload: ED.drag }); r.classList.add("dragsrc"); });
+      r.addEventListener("dragend", () => { if (ED) ED.drag = null; post({ type: "pb:drag", payload: null }); r.classList.remove("dragsrc"); clearLayerMarks(); });
+      r.addEventListener("dragover", (e) => {
+        if (!ED.drag || (ED.drag.kind === "move" && (ED.drag.id === b.id || isInside(b.id, ED.drag.id)))) return;
+        e.preventDefault();
+        const rc = r.getBoundingClientRect(), f = (e.clientY - rc.top) / rc.height;
+        const container = b.type === "section" || b.type === "column" || b.type === "columns";
+        const pos = container && f > 0.28 && f < 0.72 ? "inside" : f < 0.5 ? "before" : "after";
+        if (r.dataset.pos !== pos) { clearLayerMarks(); r.classList.add("mk-" + pos); r.dataset.pos = pos; }
+      });
+      r.addEventListener("dragleave", (e) => { if (!r.contains(e.relatedTarget)) { r.classList.remove("mk-before", "mk-after", "mk-inside"); delete r.dataset.pos; } });
+      r.addEventListener("drop", (e) => { if (!ED.drag) return; e.preventDefault(); e.stopPropagation(); const p = ED.drag, pos = r.dataset.pos || "after"; ED.drag = null; clearLayerMarks(); post({ type: "pb:drag", payload: null }); doDrop(p, b.id, pos); });
+      tree.append(r);
+      if (hasKids && !col) for (const c of b.children) row(c, depth + 1, b);
+    };
+    for (const b of ED.draft.blocks) row(b, 0, null);
+    const end = h("div", { class: "lend", id: "pbLayersEnd", text: "＋ এখানে ছাড়লে পেজের শেষে যাবে" });
+    end.addEventListener("dragover", (e) => { if (ED.drag) { e.preventDefault(); end.classList.add("over"); } });
+    end.addEventListener("dragleave", () => end.classList.remove("over"));
+    end.addEventListener("drop", (e) => { if (!ED.drag) return; e.preventDefault(); const p = ED.drag; ED.drag = null; end.classList.remove("over"); post({ type: "pb:drag", payload: null }); const last = ED.draft.blocks[ED.draft.blocks.length - 1]; doDrop(p, last ? last.id : null, last ? "after" : "inside"); });
+    tree.append(end);
+    B.append(h("p", { class: "pbe-hint", text: "টেনে সাজান · Alt+↑/↓ দিয়েও সরানো যায় · 👁 দিয়ে লুকান" }), tree);
+    B.scrollTop = keep;
+  }
+  const isInside = (id, ancestorId) => { const a = findB(ED.draft.blocks, ancestorId); return !!(a && findB(a.b.children || [], id)); };
+  function clearLayerMarks() { if (!ED || !ED.ui) return; ED.ui.leftBody.querySelectorAll("[data-pos]").forEach((x) => { x.classList.remove("mk-before", "mk-after", "mk-inside"); delete x.dataset.pos; }); }
+
+  /* ---------- right panel (inspector) ---------- */
+  function drawInspector() {
+    if (!ED || !ED.ui) return;
+    const R = ED.ui.right, prev = R.querySelector(".pbe-ib"), keep = prev && prev.dataset.block === ED.sel && prev.dataset.tab === ED.tab ? prev.scrollTop : 0;
+    R.textContent = "";
+    const loc = ED.sel && findB(ED.draft.blocks, ED.sel);
+    if (!loc) {
+      R.append(h("div", { class: "pbe-none", id: "pbNoSel" }, h("div", { class: "big", text: "👆" }), h("h3", { text: "একটি ব্লক বেছে নিন" }),
+        h("p", { text: "ক্যানভাসে বা লেয়ারে যেকোনো ব্লকে ক্লিক করলে এখানে তার কনটেন্ট, স্টাইল ও অ্যাডভান্সড সেটিংস দেখাবে।" }),
+        h("div", { class: "pbe-kv" }, h("span", { text: "ব্লক" }), h("b", { text: bnNum(PG.countBlocks(ED.draft.blocks)) + " / " + bnNum(PG.LIMITS.blocks) })),
+        h("button", { type: "button", class: "btn btn-sm btn-line", text: "⚙ পেজ সেটিংস ও SEO", onclick: () => editorSettings() }),
+        h("p", { class: "note2", text: "শর্টকাট: Ctrl+Z আনডু · Ctrl+Shift+Z রিডু · Ctrl+S সেভ · Ctrl+D ডুপ্লিকেট · Ctrl+C/V কপি-পেস্ট · Delete মুছুন · Esc প্যারেন্ট ব্লক" })));
+      return;
+    }
+    const b = loc.b, def = PG.BLOCKS[b.type], isCol = b.type === "column";
+    const ib = (act, text, title, fn, dis) => h("button", { type: "button", class: "pib", "data-act": act, title, "aria-label": title, text, disabled: dis ? true : null, onclick: fn });
+    const crumbs = [];
+    for (let l = loc; l && l.parent; l = findB(ED.draft.blocks, l.parent.id)) crumbs.unshift(l.parent);
+    R.append(h("div", { class: "pbe-ih" },
+      crumbs.length ? h("div", { class: "pbe-crumb" }, ...crumbs.map((p) => h("button", { type: "button", class: "linkbtn", text: (PG.BLOCKS[p.type] || {}).label + " ›", onclick: () => select(p.id) }))) : null,
+      h("div", { class: "pbe-iht" }, h("span", { class: "lic", text: def.icon }), h("b", { id: "pbSelLabel", text: isCol ? "কলাম " + bnNum(loc.i + 1) : def.label }), b.hidden ? h("span", { class: "pill hid", text: "লুকানো" }) : null,
+        h("button", { type: "button", class: "mx pbe-desel", title: "বাছাই বাতিল", "aria-label": "বাছাই বাতিল", text: "✕", onclick: () => select(null) })),
+      h("div", { class: "pbe-acts", id: "pbActs" },
+        ib("up", "↑", "উপরে সরান", () => stepBlock(b.id, -1), loc.i === 0),
+        ib("down", "↓", "নিচে সরান", () => stepBlock(b.id, 1), loc.i === loc.list.length - 1),
+        ib("dup", "⧉", "ডুপ্লিকেট (Ctrl+D)", () => duplicateBlock(b.id), isCol),
+        ib("hide", b.hidden ? "◌" : "👁", b.hidden ? "দেখান" : "লুকান", () => toggleHidden(b.id), isCol),
+        ib("copystyle", "🎨", "স্টাইল কপি", () => copyStyle(b.id)),
+        ib("pastestyle", "📋", "স্টাইল পেস্ট", () => pasteStyle(b.id), !clipStyle),
+        ib("delete", "🗑", "মুছুন (Delete)", () => removeBlock(b.id), isCol))));
+    const tabs = h("div", { class: "pbe-tabs", role: "tablist", "aria-label": "ব্লক সেটিংস" }, ...[["content", "কনটেন্ট"], ["style", "স্টাইল"], ["adv", "অ্যাডভান্সড"]].map(([k, l]) =>
+      h("button", { type: "button", role: "tab", "data-itab": k, class: ED.tab === k ? "on" : "", "aria-selected": ED.tab === k ? "true" : "false", text: l, onclick: () => { ED.tab = k; drawInspector(); } })));
+    const body = h("div", { class: "pbe-ib", "data-block": b.id, "data-tab": ED.tab, role: "tabpanel" });
+    if (ED.tab === "content") contentForm(body, b);
+    else if (ED.tab === "style") styleForm(body, b);
+    else advForm(body, b);
+    R.append(tabs, body);
+    body.scrollTop = keep;
+    markInspectorErrors();
+  }
+  function markInspectorErrors() {
+    if (!ED || !ED.ui) return;
+    const R = ED.ui.right;
+    R.querySelectorAll(".bad[data-path]").forEach((x) => { x.classList.remove("bad"); const e = x.querySelector(".ferr"); if (e) e.textContent = ""; });
+    if (!ED.err || !ED.sel) return;
+    const at = blockAtPath(ED.err.field);
+    if (!at || at.b.id !== ED.sel) return;
+    const parts = at.rest.split(".");
+    for (let n = parts.length; n > 0; n--) {
+      const el = R.querySelector('[data-path="' + CSS.escape(parts.slice(0, n).join(".")) + '"]');
+      if (el) { el.classList.add("bad"); const e = el.querySelector(".ferr"); if (e) e.textContent = reasonText(ED.err.reason); break; }
+    }
+  }
+  const setB = (id, path, v, o) => mutate((d) => { const l = findB(d.blocks, id); if (l) setIn(l.b, path, v); }, "f:" + id + ":" + path.join("."), o);
+  const getB = (id, path) => { const l = findB(ED.draft.blocks, id); return l ? getIn(l.b, path) : undefined; };
+
+  function contentForm(box, b) {
+    const def = PG.BLOCKS[b.type];
+    for (const fd of def.fields) {
+      if (fd.when && !Object.entries(fd.when).every(([k, v]) => b.content[k] === v)) continue;
+      if (b.type === "columns" && fd.k === "ratio") { box.append(h("div", { class: "fld", "data-path": "content.ratio" }, h("div", { class: "fl2", text: fd.label }), ratioPicker(b), h("div", { class: "fmeta" }, h("span", { class: "ferr" })))); continue; }
+      box.append(fieldCtl(b.id, ["content", fd.k], fd));
+    }
+    if (b.type === "section" || b.type === "column") box.append(h("p", { class: "note2", text: "ভেতরে ব্লক যোগ করতে বাম পাশ থেকে টেনে এনে এই অংশে ছাড়ুন, বা এটি বেছে রেখে লাইব্রেরির ব্লকে ক্লিক করুন।" }));
+    if (b.type === "columns") box.append(h("p", { class: "note2", text: "কলাম কমালে বাদ পড়া কলামের ব্লকগুলো শেষ কলামে চলে যায়।" }));
+  }
+  function ratioPicker(b) {
+    const box = h("div", { class: "ratios" });
+    for (const [k, parts] of Object.entries(PG.RATIOS)) {
+      box.append(h("button", { type: "button", class: "ratio" + (b.content.ratio === k ? " on" : ""), "data-ratio": k, title: bnNum(parts.length) + " কলাম · " + k.replace(/-/g, " : "), "aria-label": bnNum(parts.length) + " কলাম " + k.replace(/-/g, " : "), "aria-pressed": b.content.ratio === k ? "true" : "false",
+        onclick: () => mutate((d) => { const l = findB(d.blocks, b.id); PG.setColumnsRatio(l.b, k); }, "", { form: true }) }, ...parts.map((p) => h("i", { style: "flex:" + p }))));
+    }
+    return box;
+  }
+  function fieldCtl(id, path, fd) {
+    const p = path.join("."), val = getB(id, path);
+    const set = (v, o) => setB(id, path, v, o);
+    switch (fd.t) {
+      case "s": case "phone": case "email": case "video": case "url": {
+        const max = fd.max || (fd.t === "phone" ? 30 : fd.t === "email" ? 120 : fd.t === "url" || fd.t === "video" ? 500 : 0);
+        const hint = fd.hint || (fd.t === "url" ? "https://…, /পেজ, #অ্যাঙ্কর, tel: বা mailto:" : fd.t === "video" ? "YouTube বা Vimeo-র লিংক" : "");
+        const f = textFld(fd.label, val, { path: p, max: fd.t === "s" ? max : 0, multiline: !!fd.multiline, hint, type: fd.t === "email" ? "email" : fd.t === "phone" ? "tel" : "text", spell: fd.t === "s" ? null : false, onInput: (v) => set(v) });
+        if (fd.t === "url") { const dl = urlList(); f.inp.setAttribute("list", dl.id); f.el.append(dl); }
+        if (fd.t === "video") { const ok = h("span", { class: "fok" }); const upd = () => { const v = PG.parseVideo(f.inp.value.trim()); ok.textContent = !f.inp.value.trim() ? "" : v ? "✓ " + (v.provider === "vimeo" ? "Vimeo" : "YouTube") + " ভিডিও" : ""; }; f.inp.addEventListener("input", upd); upd(); f.el.querySelector(".fmeta").append(ok); }
+        return f.el;
+      }
+      case "rich": return richCtl(fd.label, val, (v) => set(v), p);
+      case "img": return imgCtl(fd.label, val, (v) => set(v, { form: true }), p);
+      case "e": {
+        const L = fd.labels || {};
+        if (fd.values.length <= 4 && fd.values.every((v) => String(L[v] != null ? L[v] : v).length <= 12)) return segCtl(fd.label, fd.values, L, val, (v) => set(v, { form: true }), p);
+        return selFld(fd.label, fd.values, L, val, (v) => set(v, { form: true }), { path: p });
+      }
+      case "n": return numCtl(fd.label, val, fd.min, fd.max, fd.step || 1, (v) => set(v === "" ? (fd.def === "" ? "" : fd.def) : v), p, fd.def === "" ? "" : fd.def);
+      case "b": {
+        const c = h("input", { type: "checkbox" }); c.checked = !!val;
+        c.addEventListener("change", () => set(c.checked, { form: true }));
+        return h("div", { class: "fld", "data-path": p }, h("label", { class: "chk" }, c, h("span", { text: fd.label })), h("div", { class: "fmeta" }, h("span", { class: "ferr" })));
+      }
+      case "c": return colorCtl(fd.label, val, (v) => set(v, { form: true }), p);
+      case "icon": return iconCtl(fd.label, val, (v) => set(v, { form: true }), p);
+      case "items": return itemsCtl(id, path, fd);
+      case "table": return tableCtl(id, path);
+    }
+    return h("div");
+  }
+  let dlN = 0;
+  function urlList() {
+    const dl = h("datalist", { id: "pbdl" + ++dlN });
+    const opts = ["/", "/#contact", "/#packages", "tel:+880", "mailto:", "https://"];
+    walkB(ED.draft.blocks, (b) => { if (b.adv && b.adv.anchor) opts.push("#" + b.adv.anchor); });
+    if (pagesData) for (const pg of pagesData.pages) if (pg.status === "published" && pg.publishedSlug) opts.push("/" + pg.publishedSlug);
+    for (const o of [...new Set(opts)]) dl.append(h("option", { value: o }));
+    return dl;
+  }
+  function segCtl(label, values, labels, val, onSet, path) {
+    const seg = h("div", { class: "seg pseg", role: "group", "aria-label": typeof label === "string" ? label : null });
+    for (const v of values) seg.append(h("button", { type: "button", class: v === val ? "on" : "", "aria-pressed": v === val ? "true" : "false", "data-v": String(v), text: labels && labels[v] != null ? String(labels[v]) : String(v), onclick: () => onSet(v) }));
+    return h("div", { class: "fld", "data-path": path }, h("div", { class: "fl2" }, label), seg, h("div", { class: "fmeta" }, h("span", { class: "ferr" })));
+  }
+  function numCtl(label, val, min, max, step, onSet, path, placeholder, unit) {
+    const has = val !== undefined && val !== null && val !== "";
+    const inp = h("input", { type: "number", min, max, step, inputmode: "decimal", class: "num", placeholder: placeholder === undefined || placeholder === null || placeholder === "" ? "–" : String(placeholder), "aria-label": typeof label === "string" ? label : null });
+    inp.value = has ? String(val) : "";
+    const rng = h("input", { type: "range", min, max, step, "aria-hidden": "true", tabindex: "-1" });
+    rng.value = has ? String(val) : placeholder !== "" && placeholder != null ? String(placeholder) : String(min);
+    const push = (raw, clamp) => {
+      if (raw === "") return onSet("");
+      let n = Number(raw);
+      if (!Number.isFinite(n)) return;
+      if (clamp) { n = Math.min(max, Math.max(min, n)); if (step) n = Math.round(n / step) * step; n = Math.round(n * 100) / 100; inp.value = String(n); }
+      if (n < min || n > max) return; // finish typing first; clamped on change
+      rng.value = String(n); onSet(n);
+    };
+    inp.addEventListener("input", () => push(inp.value, false));
+    inp.addEventListener("change", () => push(inp.value, true));
+    rng.addEventListener("input", () => { inp.value = rng.value; push(rng.value, true); });
+    return h("div", { class: "fld nfld", "data-path": path }, h("div", { class: "fl2" }, label), h("div", { class: "nrow" }, rng, inp, unit ? h("span", { class: "unit", text: unit }) : null), h("div", { class: "fmeta" }, h("span", { class: "ferr" })));
+  }
+  function colorCtl(label, val, onSet, path, inherited) {
+    const row = h("div", { class: "cols" });
+    for (const [k, c] of Object.entries(PG.THEME_COLORS)) row.append(h("button", { type: "button", class: "csw" + (val === k ? " on" : ""), title: c.label, "aria-label": c.label, "aria-pressed": val === k ? "true" : "false", "data-color": k, style: "--c:" + c.hex, onclick: () => onSet(k) }));
+    const custom = h("input", { type: "color", class: "ccus" + (val && val[0] === "#" ? " on" : ""), title: "নিজের রং", "aria-label": "নিজের রং" });
+    custom.value = val && val[0] === "#" ? val.toLowerCase() : "#d4a017";
+    custom.addEventListener("change", () => onSet(custom.value.toUpperCase()));
+    row.append(custom, h("button", { type: "button", class: "cclr", title: "রং সরান", "aria-label": "রং সরান", text: "⨯", disabled: val ? null : true, onclick: () => onSet("") }));
+    const name = val ? (PG.THEME_COLORS[val] ? PG.THEME_COLORS[val].label : val) : inherited ? "উপরের মান: " + (PG.THEME_COLORS[inherited] ? PG.THEME_COLORS[inherited].label : inherited) : "ডিফল্ট";
+    return h("div", { class: "fld", "data-path": path }, h("div", { class: "fl2" }, label, h("span", { class: "cval", text: name })), row, h("div", { class: "fmeta" }, h("span", { class: "ferr" })));
+  }
+  function imgCtl(label, val, onSet, path) {
+    const thumb = h("div", { class: "thumb" }, val ? h("img", { src: val, alt: "" }) : h("span", { text: "ছবি নেই" }));
+    return h("div", { class: "fld", "data-path": path }, h("div", { class: "fl2", text: label }),
+      h("div", { class: "imgf" }, thumb, h("div", { class: "imgb" },
+        h("button", { type: "button", class: "btn btn-sm btn-line", "data-act": "pick", text: "🖼 ছবি বাছুন", onclick: async () => { const r = await openImagePicker(val); if (r && ED) onSet(r.url); } }),
+        val ? h("button", { type: "button", class: "btn btn-sm btn-line", text: "সরান", onclick: () => onSet("") }) : null)),
+      h("div", { class: "fmeta" }, h("span", { class: "ferr" })));
+  }
+  function iconCtl(label, val, onSet, path) {
+    const grid = h("div", { class: "icons" });
+    grid.append(h("button", { type: "button", class: "icb" + (!val ? " on" : ""), title: "আইকন নেই", "aria-label": "আইকন নেই", text: "∅", onclick: () => onSet("") }));
+    for (const [k, ic] of Object.entries(PG.ICONS)) {
+      const b = h("button", { type: "button", class: "icb" + (val === k ? " on" : ""), title: ic.label, "aria-label": ic.label, "data-icon": k, onclick: () => onSet(k) });
+      b.innerHTML = PG.iconSvg(k, "ic"); // built-in static SVG paths only
+      grid.append(b);
+    }
+    return h("div", { class: "fld", "data-path": path }, h("div", { class: "fl2", text: label }), grid, h("div", { class: "fmeta" }, h("span", { class: "ferr" })));
+  }
+  function richCtl(label, val, onSet, path) {
+    const ed = h("div", { class: "rich", contenteditable: "true", role: "textbox", "aria-multiline": "true", "aria-label": label });
+    try { ed.innerHTML = PG.sanitizeRich(val || ""); } catch { ed.textContent = ""; }
+    const sync = () => { try { onSet(PG.sanitizeRich(ed.innerHTML)); } catch { /* too long: the counter shows it */ } };
+    ed.addEventListener("input", sync);
+    ed.addEventListener("paste", (e) => { e.preventDefault(); const t = (e.clipboardData || window.clipboardData).getData("text/plain"); document.execCommand("insertText", false, t); });
+    const cmd = (c, v) => { ed.focus(); document.execCommand(c, false, v); sync(); };
+    const tbtn = (title, kid, fn) => h("button", { type: "button", title, "aria-label": title, onmousedown: (e) => e.preventDefault(), onclick: fn }, kid);
+    const tb = h("div", { class: "rtb", role: "toolbar", "aria-label": "লেখার ফরম্যাট" },
+      tbtn("বোল্ড", h("b", { text: "B" }), () => cmd("bold")),
+      tbtn("ইটালিক", h("i", { text: "I" }), () => cmd("italic")),
+      tbtn("লিংক", "🔗", async () => {
+        const sel = window.getSelection(), range = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+        const url = await promptModal({ title: "লিংক যোগ করুন", label: "লিংক (https://…, /পেজ, #অ্যাঙ্কর)", value: "https://", max: 500 });
+        if (url == null) return;
+        if (!PG.safeHref(url.trim())) return toast(REASON.url, 3600);
+        ed.focus(); if (range) { sel.removeAllRanges(); sel.addRange(range); }
+        cmd("createLink", url.trim());
+      }),
+      tbtn("লিংক সরান", "⛓", () => cmd("unlink")),
+      tbtn("বুলেট লিস্ট", "•≡", () => cmd("insertUnorderedList")),
+      tbtn("নম্বর লিস্ট", "১≡", () => cmd("insertOrderedList")),
+      tbtn("ফরম্যাট মুছুন", "⌫", () => cmd("removeFormat")));
+    return h("div", { class: "fld", "data-path": path }, h("div", { class: "fl2", text: label }), h("div", { class: "richw" }, tb, ed), h("div", { class: "fmeta" }, h("span", { class: "ferr" }), h("span", { class: "fhint", text: "Enter = নতুন প্যারাগ্রাফ · পেস্ট করলে শুধু লেখা আসবে" })));
+  }
+  function itemsCtl(id, path, fd) {
+    const items = getB(id, path) || [];
+    const p = path.join("."), okey = id + ":" + p + ":";
+    const box = h("div", { class: "rep", "data-path": p });
+    box.append(h("div", { class: "rep-top" }, h("b", { text: fd.label }), h("span", { class: "fcnt", text: bnNum(items.length) + "/" + bnNum(fd.max) }), h("span", { class: "ferr" })));
+    const edit = (fn, open) => { mutate((d) => { const l = findB(d.blocks, id); let arr = getIn(l.b, path); if (!arr) { arr = []; setIn(l.b, path, arr); } fn(arr); }, "", {}); if (open !== undefined) ED.openItem = open; drawInspector(); };
+    items.forEach((it, i) => {
+      const lab = plainTxt(it[fd.itemLabel] || "").slice(0, 40) || bnNum(i + 1) + " নং";
+      const open = ED.openItem === okey + i;
+      const head = h("div", { class: "rep-h" },
+        h("button", { type: "button", class: "rep-t", "aria-expanded": open ? "true" : "false", onclick: () => { ED.openItem = open ? "" : okey + i; drawInspector(); } }, h("span", { class: "car", text: open ? "▾" : "▸" }), h("span", { text: lab })),
+        h("button", { type: "button", class: "ib", title: "উপরে", "aria-label": "উপরে", text: "↑", disabled: i === 0 ? true : null, onclick: () => edit((a) => a.splice(i - 1, 0, a.splice(i, 1)[0]), open ? okey + (i - 1) : undefined) }),
+        h("button", { type: "button", class: "ib", title: "নিচে", "aria-label": "নিচে", text: "↓", disabled: i === items.length - 1 ? true : null, onclick: () => edit((a) => a.splice(i + 1, 0, a.splice(i, 1)[0]), open ? okey + (i + 1) : undefined) }),
+        h("button", { type: "button", class: "ib", title: "ডুপ্লিকেট", "aria-label": "ডুপ্লিকেট", text: "⧉", disabled: items.length >= fd.max ? true : null, onclick: () => edit((a) => a.splice(i + 1, 0, Object.assign(clone(a[i]), { id: rid() }))) }),
+        h("button", { type: "button", class: "ib del", title: "মুছুন", "aria-label": "মুছুন", "data-act": "rm", text: "✕", onclick: () => edit((a) => a.splice(i, 1), "") }));
+      const item = h("div", { class: "rep-item" + (open ? " open" : ""), "data-path": p + "." + i }, head);
+      if (open) { const body = h("div", { class: "rep-b" }); for (const sub of fd.fields) body.append(fieldCtl(id, path.concat([i, sub.k]), sub)); item.append(body); }
+      box.append(item);
+    });
+    box.append(h("div", { class: "rep-add" }, h("button", { type: "button", class: "btn btn-sm btn-line", "data-act": "add", text: "＋ যোগ করুন", disabled: items.length >= fd.max ? true : null,
+      onclick: () => edit((a) => a.push(Object.assign({ id: rid() }, clone(fd.add || {}))), okey + items.length) })));
+    return box;
+  }
+  function tableCtl(id, path) {
+    const rows = getB(id, path) || [["", ""]];
+    const w = Math.max(1, ...rows.map((r) => r.length));
+    const edit = (fn) => mutate((d) => { const l = findB(d.blocks, id); let t = getIn(l.b, path); if (!t) { t = [["", ""]]; setIn(l.b, path, t); } fn(t); }, "", { form: true });
+    const grid = h("div", { class: "tgrid", style: "grid-template-columns:repeat(" + w + ",minmax(84px,1fr)) 28px" });
+    rows.forEach((r, i) => {
+      for (let j = 0; j < w; j++) {
+        const inp = h("input", { type: "text", class: "tcell" + (i === 0 ? " th" : ""), "aria-label": "সারি " + bnNum(i + 1) + ", কলাম " + bnNum(j + 1) });
+        inp.value = r[j] || "";
+        inp.addEventListener("input", () => setB(id, path.concat([i, j]), inp.value));
+        grid.append(inp);
+      }
+      grid.append(h("button", { type: "button", class: "ib del", title: "সারি মুছুন", "aria-label": "সারি মুছুন", text: "✕", disabled: rows.length <= 1 ? true : null, onclick: () => edit((t) => t.splice(i, 1)) }));
+    });
+    for (let j = 0; j < w; j++) grid.append(h("button", { type: "button", class: "ib del", title: "কলাম মুছুন", "aria-label": "কলাম মুছুন", text: "✕", disabled: w <= 1 ? true : null, onclick: () => edit((t) => t.forEach((r) => r.splice(j, 1))) }));
+    return h("div", { class: "fld", "data-path": path.join(".") }, h("div", { class: "fl2", text: "টেবিল (প্রথম সারি = হেডার)" }), h("div", { class: "tscroll" }, grid),
+      h("div", { class: "trow" },
+        h("button", { type: "button", class: "btn btn-sm btn-line", text: "＋ সারি", disabled: rows.length >= PG.LIMITS.rows ? true : null, onclick: () => edit((t) => t.push(Array(w).fill(""))) }),
+        h("button", { type: "button", class: "btn btn-sm btn-line", text: "＋ কলাম", disabled: w >= PG.LIMITS.cols ? true : null, onclick: () => edit((t) => t.forEach((r) => { while (r.length < w) r.push(""); r.push(""); })) })),
+      h("div", { class: "fmeta" }, h("span", { class: "ferr" })));
+  }
+
+  /* ---------- style tab (device-aware) ---------- */
+  const DEV_L = { d: "ডেস্কটপ", t: "ট্যাবলেট", m: "মোবাইল" };
+  function styleForm(box, b) {
+    const dev = ED.device, st = b.style || {};
+    const isR = (k) => PG.STYLE_PROPS[k] && PG.STYLE_PROPS[k].r;
+    /** value shown for k on the current device, plus the value it inherits from the wider device */
+    const cur = (k) => (dev !== "d" && isR(k) ? (st[dev] || {})[k] : st[k]);
+    const inh = (k) => { if (dev === "d" || !isR(k)) return undefined; if (dev === "m" && st.t && st.t[k] !== undefined) return st.t[k]; return st[k]; };
+    const put = (k, v, o = {}) => mutate((d) => {
+      const l = findB(d.blocks, b.id); if (!l) return false;
+      const s = l.b.style || (l.b.style = {});
+      const tgt = dev !== "d" && isR(k) ? s[dev] || (s[dev] = {}) : s;
+      if (v === "" || v === undefined || v === null) delete tgt[k]; else tgt[k] = v;
+      for (const x of ["t", "m"]) if (s[x] && !Object.keys(s[x]).length) delete s[x];
+    }, "st:" + b.id + ":" + dev + ":" + k, o);
+    const putF = (k) => (v) => put(k, v, { form: true });
+    const P = (k) => "style." + (dev !== "d" && isR(k) ? dev + "." : "") + k;
+    const lab = (t, k) => h("span", {}, t, isR(k) ? h("span", { class: "rdev", title: "এই মান শুধু " + DEV_L[dev] + "-এর জন্য" + (dev === "d" ? " (ট্যাবলেট/মোবাইলে আলাদা দিতে উপরে ডিভাইস বদলান)" : ""), text: dev === "d" ? "🖥" : dev === "t" ? "▭" : "📱" }) : null);
+    const num = (t, k, unit) => { const sp = PG.STYLE_PROPS[k]; const ph = inh(k); return numCtl(lab(t, k), cur(k), sp.min, sp.max, sp.step, (v) => put(k, v), P(k), ph === undefined ? "" : ph, unit); };
+    const enumSeg = (t, k, labels) => { const sp = PG.STYLE_PROPS[k]; const vals = [""].concat(sp.values); const L = Object.assign({ "": inh(k) !== undefined ? "উপরের মত" : "ডিফল্ট" }, labels); return segCtl(lab(t, k), vals, L, cur(k) === undefined ? "" : cur(k), putF(k), P(k)); };
+    const enumSel = (t, k, labels) => { const sp = PG.STYLE_PROPS[k]; const vals = [""].concat(sp.values); const L = Object.assign({ "": inh(k) !== undefined ? "উপরের মত" : "ডিফল্ট" }, labels); return selFld(t, vals, L, cur(k) === undefined ? "" : cur(k), putF(k), { path: P(k) }); };
+    const color = (t, k) => colorCtl(t, cur(k), putF(k), P(k));
+    const grp = (title, open, ...kids) => { const d = h("details", { class: "sgrp", open: open ? true : null }, h("summary", { text: title }), h("div", { class: "sgb" }, ...kids.filter(Boolean))); return d; };
+    const dirty = (...ks) => ks.some((k) => cur(k) !== undefined);
+
+    box.append(h("div", { class: "devnote" + (dev === "d" ? "" : " on") }, h("b", { text: (dev === "d" ? "🖥 " : dev === "t" ? "▭ " : "📱 ") + DEV_L[dev] + "-এর স্টাইল" }),
+      h("span", { text: dev === "d" ? "সব ডিভাইসে প্রযোজ্য। 🖥 চিহ্নের মানগুলো ট্যাবলেট/মোবাইলে আলাদা করে বদলানো যায়।" : "শুধু 🖥▭📱 চিহ্নের মানগুলো এখানে আলাদা হবে; খালি রাখলে বড় স্ক্রিনের মানই থাকবে।" })));
+
+    const fontL = Object.fromEntries(Object.entries(PG.FONTS).map(([k, v]) => [k, v.label]));
+    const W_L = { 300: "হালকা ৩০০", 400: "সাধারণ ৪০০", 500: "৫০০", 600: "সেমিবোল্ড ৬০০", 700: "বোল্ড ৭০০", 800: "এক্সট্রা ৮০০" };
+    const AL = { left: "বামে", center: "মাঝে", right: "ডানে", justify: "দুই পাশে" };
+    box.append(grp("লেখা", dirty("color", "font", "size", "weight", "lh", "ls", "align") || dev !== "d",
+      dev === "d" ? color("লেখার রং", "color") : null,
+      dev === "d" ? enumSel("ফন্ট", "font", fontL) : null,
+      num("লেখার সাইজ", "size", "px"),
+      dev === "d" ? enumSel("পুরুত্ব", "weight", W_L) : null,
+      dev === "d" ? num("লাইনের উচ্চতা", "lh", "×") : null,
+      dev === "d" ? num("অক্ষরের ফাঁক", "ls", "px") : null,
+      enumSeg("লেখার অবস্থান", "align", AL)));
+
+    if (dev === "d") {
+      const bt = st.bgType || "none";
+      const bgKids = [segCtl("ধরন", ["none", "color", "gradient", "image"], { none: "নেই", color: "রং", gradient: "গ্রেডিয়েন্ট", image: "ছবি" }, bt, (v) => put("bgType", v === "none" ? "" : v, { form: true }), "style.bgType")];
+      if (bt === "color") bgKids.push(color("ব্যাকগ্রাউন্ড রং", "bgColor"));
+      if (bt === "gradient") bgKids.push(color("শুরুর রং", "bgFrom"), color("শেষের রং", "bgTo"), num("কোণ", "bgAngle", "°"));
+      if (bt === "image") bgKids.push(imgCtl("ব্যাকগ্রাউন্ড ছবি", st.bgImage, putF("bgImage"), "style.bgImage"),
+        enumSeg("ছবির সাইজ", "bgSize", { cover: "ঢেকে দিন", contain: "পুরোটা", auto: "আসল" }),
+        enumSel("ছবির অবস্থান", "bgPos", { center: "মাঝে", top: "উপরে", bottom: "নিচে", left: "বামে", right: "ডানে" }),
+        num("গাঢ় পর্দা", "overlay", "%"), color("পর্দার রং", "overlayColor"));
+      box.append(grp("ব্যাকগ্রাউন্ড", bt !== "none", ...bgKids));
+    }
+
+    box.append(grp("স্পেসিং", dirty("pt", "pr", "pb", "pl", "mt", "mr", "mb", "ml"), boxCtl("প্যাডিং (ভেতরের ফাঁক)", "p", cur, inh, put, P), boxCtl("মার্জিন (বাইরের ফাঁক)", "m", cur, inh, put, P)));
+
+    if (dev === "d") {
+      const SH = Object.assign({ "": "নেই" }, Object.fromEntries(Object.entries(PG.SHADOWS).map(([k, v]) => [k, v.label])));
+      box.append(grp("বর্ডার ও ছায়া", dirty("bw", "bs", "bc", "radius", "shadow"),
+        num("বর্ডারের পুরুত্ব", "bw", "px"),
+        cur("bw") ? enumSeg("বর্ডারের ধরন", "bs", { solid: "সোজা", dashed: "ড্যাশ", dotted: "ডট", double: "ডাবল" }) : null,
+        cur("bw") ? color("বর্ডারের রং", "bc") : null,
+        num("কোণ গোল", "radius", "px"),
+        segCtl("ছায়া", [""].concat(Object.keys(PG.SHADOWS)), SH, cur("shadow") || "", putF("shadow"), "style.shadow")));
+    }
+    box.append(grp("সাইজ ও অবস্থান", dirty("w", "maxw", "minh", "boxAlign"),
+      num("প্রস্থ", "w", "%"), num("সর্বোচ্চ প্রস্থ", "maxw", "px"), num("ন্যূনতম উচ্চতা", "minh", "px"),
+      enumSeg("ব্লকের অবস্থান", "boxAlign", { left: "বামে", center: "মাঝে", right: "ডানে" })));
+
+    const hasAny = dev === "d" ? Object.keys(st).some((k) => k !== "t" && k !== "m") : !!(st[dev] && Object.keys(st[dev]).length);
+    box.append(h("div", { class: "sreset" }, h("button", { type: "button", class: "btn btn-sm btn-line", id: "pbStyleReset", disabled: hasAny ? null : true,
+      text: dev === "d" ? "↺ সব স্টাইল রিসেট" : "↺ " + DEV_L[dev] + "-এর স্টাইল রিসেট",
+      onclick: () => mutate((d) => { const l = findB(d.blocks, b.id); if (dev === "d") { const keep = {}; for (const x of ["t", "m"]) if (l.b.style[x]) keep[x] = l.b.style[x]; l.b.style = keep; } else delete l.b.style[dev]; }, "", { form: true }) })));
+  }
+  function boxCtl(title, pre, cur, inh, put, P) {
+    const sides = [["t", "উপরে"], ["r", "ডানে"], ["b", "নিচে"], ["l", "বামে"]];
+    const keys = sides.map(([s]) => pre + s), sp = PG.STYLE_PROPS[keys[0]];
+    const vals = keys.map((k) => cur(k));
+    const linked = ED.boxLink ? ED.boxLink[pre] !== false : true;
+    const grid = h("div", { class: "boxc" + (linked ? " linked" : "") });
+    sides.forEach(([s, l], i) => {
+      const k = keys[i], ph = inh(k);
+      const inp = h("input", { type: "number", min: PG.STYLE_PROPS[k].min, max: PG.STYLE_PROPS[k].max, step: 1, inputmode: "numeric", "aria-label": title + " " + l, placeholder: ph === undefined ? "–" : String(ph), "data-side": s });
+      inp.value = vals[i] === undefined ? "" : String(vals[i]);
+      const apply = (clamp) => {
+        const raw = inp.value.trim();
+        let v = raw === "" ? "" : Number(raw);
+        if (v !== "" && !Number.isFinite(v)) return;
+        const spk = PG.STYLE_PROPS[k];
+        if (v !== "") { if (clamp) { v = Math.round(Math.min(spk.max, Math.max(spk.min, v))); inp.value = String(v); } else if (v < spk.min || v > spk.max) return; }
+        const targets = linked ? keys : [k];
+        mutate((d) => { for (const kk of targets) { const l = findB(d.blocks, ED.sel); const s2 = l.b.style || (l.b.style = {}); const tgt = ED.device !== "d" ? s2[ED.device] || (s2[ED.device] = {}) : s2; if (v === "") delete tgt[kk]; else tgt[kk] = Math.min(PG.STYLE_PROPS[kk].max, Math.max(PG.STYLE_PROPS[kk].min, v)); for (const x of ["t", "m"]) if (s2[x] && !Object.keys(s2[x]).length) delete s2[x]; } }, "box:" + ED.sel + ":" + ED.device + ":" + pre + (linked ? "" : s), {});
+        if (linked) grid.querySelectorAll("input").forEach((x) => { if (x !== inp) x.value = inp.value; });
+      };
+      inp.addEventListener("input", () => apply(false));
+      inp.addEventListener("change", () => apply(true));
+      grid.append(h("label", { class: "bx bx-" + s }, h("span", { text: l }), inp));
+    });
+    const link = h("button", { type: "button", class: "bxlink" + (linked ? " on" : ""), title: linked ? "চার পাশ একসাথে বদলাচ্ছে — আলাদা করতে ক্লিক করুন" : "চার পাশ আলাদা — একসাথে করতে ক্লিক করুন", "aria-pressed": linked ? "true" : "false", "aria-label": "চার পাশ একসাথে", text: linked ? "🔗" : "⛓",
+      onclick: () => { ED.boxLink = Object.assign({}, ED.boxLink, { [pre]: !linked }); drawInspector(); } });
+    grid.append(link);
+    return h("div", { class: "fld", "data-path": P(keys[0]).replace(/[a-z]+$/, "").replace(/\.$/, "") || "style" },
+      h("div", { class: "fl2" }, h("span", {}, title, h("span", { class: "rdev", text: ED.device === "d" ? "🖥" : ED.device === "t" ? "▭" : "📱" })), h("span", { class: "cval", text: "px (" + sp.min + "–" + sp.max + ")" })), grid,
+      h("div", { class: "fmeta" }, h("span", { class: "ferr" })));
+  }
+
+  /* ---------- advanced tab ---------- */
+  function advForm(box, b) {
+    const adv = b.adv || {};
+    const setA = (k, v, o) => mutate((d) => { const l = findB(d.blocks, b.id); const a = l.b.adv || (l.b.adv = {}); if (v === "" || v == null) delete a[k]; else a[k] = v; }, "adv:" + b.id + ":" + k, o);
+    const an = textFld("অ্যাঙ্কর আইডি (#লিংকের জন্য)", adv.anchor || "", { path: "adv.anchor", spell: false, hint: "ইংরেজি ছোট হাতের অক্ষর, সংখ্যা ও - (যেমন: pricing)। লিংকে লিখুন #pricing",
+      onInput: (v) => setA("anchor", v.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/^-+/, "")) });
+    const cl = textFld("CSS ক্লাস (ঐচ্ছিক)", adv.cls || "", { path: "adv.cls", spell: false, hint: "সর্বোচ্চ ৩টি, স্পেস দিয়ে আলাদা; pb-/b-/wd71- দিয়ে শুরু করা যাবে না", onInput: (v) => setA("cls", v.trim().toLowerCase()) });
+    const hide = adv.hide || {};
+    const hideRow = h("div", { class: "hiderow" }, ...[["d", "🖥 ডেস্কটপে লুকান"], ["t", "▭ ট্যাবলেটে লুকান"], ["m", "📱 মোবাইলে লুকান"]].map(([k, l]) => {
+      const c = h("input", { type: "checkbox", "data-hide": k }); c.checked = !!hide[k];
+      c.addEventListener("change", () => mutate((d) => { const x = findB(d.blocks, b.id); const a = x.b.adv || (x.b.adv = {}); const hh = Object.assign({ d: false, t: false, m: false }, a.hide, { [k]: c.checked }); if (hh.d || hh.t || hh.m) a.hide = hh; else delete a.hide; }, "", { form: true }));
+      return h("label", { class: "chk" }, c, h("span", { text: l }));
+    }));
+    box.append(an.el, cl.el, h("div", { class: "fld", "data-path": "adv.hide" }, h("div", { class: "fl2", text: "ডিভাইস অনুযায়ী দেখানো" }), hideRow,
+      h("div", { class: "fmeta" }, h("span", { class: "ferr" }), h("span", { class: "fhint", text: "লুকানো ব্লক এডিটরে আবছা দেখায়, পাবলিক পেজে সেই ডিভাইসে দেখায় না।" }))),
+      h("div", { class: "pbe-kv" }, h("span", { text: "ব্লক আইডি" }), h("code", { text: b.id })));
+    if (b.hidden) box.append(h("p", { class: "note2", text: "👁 এই ব্লকটি পুরোপুরি লুকানো — কোনো ডিভাইসেই প্রকাশ হবে না।" }));
+  }
+
 
   $("tabs").addEventListener("click", (e) => {
     const t = e.target.closest(".tab"); if (!t) return;
