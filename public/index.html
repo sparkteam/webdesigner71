@@ -94,6 +94,7 @@ a{color:inherit}
 .solution p{color:rgba(255,255,255,.88)}
 /* Packages */
 .packages{background:var(--cream-2)}
+.packages .cards{padding-top:22px;margin-top:28px}
 .cards{display:grid;gap:24px;margin-top:40px;align-items:stretch}
 .card{background:#fff;border-radius:22px;padding:30px 26px;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;transition:transform .25s,box-shadow .25s;border:2px solid transparent}
 .card:hover{transform:translateY(-8px);box-shadow:var(--shadow-lg)}
@@ -106,11 +107,20 @@ a{color:inherit}
 .card li.no{color:#8A948F}
 .card li.no .check{background:#E6E2D8;color:#8A948F}
 .card .btn{width:100%}
+.card-icon{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:16px;background:var(--cream-2);font-size:1.65rem;margin-bottom:10px;box-shadow:inset 0 0 0 1px rgba(11,61,46,.08)}
 .card.popular{background:var(--green);color:#fff;border-color:var(--gold);box-shadow:0 24px 50px rgba(11,61,46,.35)}
 .card.popular h3,.card.popular .price{color:#fff}
 .card.popular .for,.card.popular .price small{color:rgba(255,255,255,.75)}
 .card.popular .check{background:var(--gold);color:var(--green)}
-.pop-tag{position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--green);font-weight:700;font-size:.9rem;padding:4px 18px;border-radius:999px;white-space:nowrap;box-shadow:0 6px 14px rgba(212,160,23,.4)}
+.card.popular .btn.btn-green{background:var(--gold);color:var(--green);box-shadow:0 8px 20px rgba(212,160,23,.35)}
+.card.popular .btn.btn-green:hover{background:var(--gold-2);color:var(--green)}
+.card.popular .card-icon{background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+.card-ecommerce.popular{background:linear-gradient(165deg,#0B3D2E 0%,#145A42 55%,#1A6B4F 100%)}
+.card-ecommerce:not(.popular){border-color:rgba(212,160,23,.35)}
+.card-ecommerce:not(.popular) .card-icon{background:linear-gradient(135deg,#fff8e6,#fff);border:1px solid rgba(212,160,23,.25)}
+.cards:has(.card.popular:nth-child(2)) .card.popular{padding-top:38px}
+.pop-tag{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--green);font-weight:700;font-size:clamp(.72rem,2.2vw,.85rem);padding:6px 14px;border-radius:999px;white-space:normal;text-align:center;line-height:1.25;max-width:min(96%,300px);box-shadow:0 6px 14px rgba(212,160,23,.4);letter-spacing:.01em;z-index:2}
+.card-ecommerce .pop-tag{background:linear-gradient(90deg,#f0c040,#ffd86a);box-shadow:0 8px 18px rgba(212,160,23,.45)}
 .note{font-size:.9rem;color:var(--muted);margin-top:18px;text-align:center}
 /* Work */
 .works{display:grid;gap:24px;margin-top:40px}
@@ -194,9 +204,11 @@ a{color:inherit}
   .nav{display:flex}
   .hero{padding:90px 0 110px}
   .hero .container{grid-template-columns:1.25fr .9fr}
-  .cards{grid-template-columns:repeat(2,1fr);align-items:center;max-width:820px;margin-inline:auto}
-  .card.popular{padding:40px 28px;transform:scale(1.04)}
-  .card.popular:hover{transform:scale(1.04) translateY(-8px)}
+  .cards{grid-template-columns:repeat(2,1fr);align-items:stretch;max-width:920px;margin-inline:auto;gap:28px}
+  .cards:has(.card.popular:nth-child(2)) .card.popular{padding:38px 28px 40px;transform:none}
+  .cards:has(.card.popular:nth-child(2)) .card.popular:hover{transform:translateY(-8px)}
+  .cards:not(:has(.card.popular:nth-child(2))) .card.popular{padding:40px 28px;transform:scale(1.04)}
+  .cards:not(:has(.card.popular:nth-child(2))) .card.popular:hover{transform:scale(1.04) translateY(-8px)}
   .steps{grid-template-columns:repeat(4,1fr)}
   .steps::before{content:"";position:absolute;top:52px;left:12%;right:12%;height:0;border-top:3px dashed rgba(212,160,23,.6);z-index:0}
   .step{z-index:1}
@@ -390,10 +402,11 @@ a{color:inherit}
       <div class="stitch" aria-hidden="true"></div>
     </div>
     <div class="cards" data-cms="packages.cards">
-      <article class="card popular reveal">
-        <span class="pop-tag">সবচেয়ে জনপ্রিয়</span>
+      <article class="card card-business popular reveal">
+        <span class="pop-tag">কোম্পানি ওয়েবসাইটে সবচেয়ে জনপ্রিয়</span>
+        <span class="card-icon" aria-hidden="true">🏢</span>
         <h3>স্ট্যান্ডার্ড</h3>
-        <p class="for">বিজনেস ওয়েবসাইট + ফ্রি ডোমেইন ও হোস্টিং</p>
+        <p class="for">কোম্পানি ওয়েবসাইট + ফ্রি ডোমেইন ও হোস্টিং</p>
         <p class="price">৳৩৯০০ <small>/ এককালীন</small></p>
         <ul>
           <li><span class="check" aria-hidden="true">✓</span>প্রফেশনাল ওয়েবসাইট ডিজাইন</li>
@@ -403,7 +416,9 @@ a{color:inherit}
         </ul>
         <a href="#contact" class="btn btn-gold">স্ট্যান্ডার্ড নিন</a>
       </article>
-      <article class="card reveal d1">
+      <article class="card card-ecommerce popular reveal d1">
+        <span class="pop-tag">ই-কমার্সে সবচেয়ে জনপ্রিয়</span>
+        <span class="card-icon" aria-hidden="true">🛒</span>
         <h3>প্রিমিয়াম</h3>
         <p class="for">ই-কমার্স ওয়েবসাইট + অনলাইন বিক্রি</p>
         <p class="price">৳৪৯০০ <small>/ এককালীন</small></p>

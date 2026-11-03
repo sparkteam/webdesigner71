@@ -251,10 +251,10 @@ const RAW_DEFAULTS = {
     title: t("আপনার জন্য সঠিক প্যাকেজ বেছে নিন"),
     sub: t("কোনো লুকানো খরচ নেই। ই-কমার্স বা বিজনেস — দুই ধরনের ওয়েবসাইটই পাবেন।"),
     cards: { items: [
-      { id: "c1", popular: true, tag: "সবচেয়ে জনপ্রিয়", name: "স্ট্যান্ডার্ড", for: "বিজনেস ওয়েবসাইট + ফ্রি ডোমেইন ও হোস্টিং", price: "৳৩৯০০", priceNote: "/ এককালীন",
+      { id: "c1", popular: true, tag: "কোম্পানি ওয়েবসাইটে সবচেয়ে জনপ্রিয়", name: "স্ট্যান্ডার্ড", for: "কোম্পানি ওয়েবসাইট + ফ্রি ডোমেইন ও হোস্টিং", price: "৳৩৯০০", priceNote: "/ এককালীন",
         features: { items: [L("f1", "প্রফেশনাল ওয়েবসাইট ডিজাইন"), L("f2", "মোবাইল-ফ্রেন্ডলি লেআউট"), L("f3", "ফ্রি ডোমেইন (আপনার নামে)"), L("f4", "ফ্রি হোস্টিং")] },
         buttonLabel: "স্ট্যান্ডার্ড নিন", buttonHref: "#contact", buttonStyle: "gold" },
-      { id: "c2", popular: false, tag: "", name: "প্রিমিয়াম", for: "ই-কমার্স ওয়েবসাইট + অনলাইন বিক্রি", price: "৳৪৯০০", priceNote: "/ এককালীন",
+      { id: "c2", popular: true, tag: "ই-কমার্সে সবচেয়ে জনপ্রিয়", name: "প্রিমিয়াম", for: "ই-কমার্স ওয়েবসাইট + অনলাইন বিক্রি", price: "৳৪৯০০", priceNote: "/ এককালীন",
         features: { items: [
           L("f1", "প্রফেশনাল ওয়েবসাইট ডিজাইন"), L("f2", "মোবাইল-ফ্রেন্ডলি লেআউট"), L("f3", "ফ্রি ডোমেইন (আপনার নামে)"), L("f4", "ফ্রি হোস্টিং"),
           L("f5", "অনলাইন শপ ও পণ্য ক্যাটালগ"), L("f6", "কার্ট ও অর্ডার সিস্টেম"), L("f7", "bKash / Nagad / ক্যাশ অন ডেলিভারি"),
@@ -490,12 +490,16 @@ const buttonNode = (b, extraClass) => el("a", linkAttrs(b, "btn btn-" + b.style 
 const visible = (list) => list.filter((x) => !x.hidden);
 const CARD_RENDER = {
   pain: (it, i) => el("article", { class: "pain reveal" + DELAY[i % 3] }, el("div", { class: "ic", "aria-hidden": "true" }, it.icon), el("h3", null, it.title), el("p", null, it.text)),
-  package: (it, i) => el("article", { class: "card" + (it.popular ? " popular" : "") + " reveal" + DELAY[i % 3] },
+  package: (it, i) => {
+    const kind = /প্রিমিয়াম|premium/i.test(it.name || "") ? "card-ecommerce" : "card-business";
+    return el("article", { class: "card " + kind + (it.popular ? " popular" : "") + " reveal" + DELAY[i % 3] },
     it.popular && it.tag ? el("span", { class: "pop-tag" }, it.tag) : null,
+    el("span", { class: "card-icon", "aria-hidden": "true" }, kind === "card-ecommerce" ? "🛒" : "🏢"),
     el("h3", null, it.name), it.for ? el("p", { class: "for" }, it.for) : null,
     el("p", { class: "price" }, it.price, it.priceNote ? [" ", el("small", null, it.priceNote)] : null),
     el("ul", null, visible(it.features.items).map((f) => el("li", null, el("span", { class: "check", "aria-hidden": "true" }, "✓"), f.text))),
-    it.buttonLabel ? el("a", { href: it.buttonHref, class: "btn btn-" + it.buttonStyle }, it.buttonLabel) : null),
+    it.buttonLabel ? el("a", { href: it.buttonHref, class: "btn btn-" + it.buttonStyle }, it.buttonLabel) : null);
+  },
   work: (it, i) => el("article", { class: "work reveal" + DELAY[i % 3] },
     el("div", { class: "work-thumb w" + it.theme, "aria-hidden": "true" },
       it.image ? el("img", { src: it.image, alt: it.imageAlt || "", loading: "lazy", style: "position:absolute;inset:0;width:100%;height:100%;object-fit:cover" }) : null,
