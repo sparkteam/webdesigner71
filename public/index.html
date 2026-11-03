@@ -108,20 +108,22 @@ a{color:inherit}
 .card li.no .check{background:#E6E2D8;color:#8A948F}
 .card .btn{width:100%}
 .card-icon{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:16px;background:var(--cream-2);font-size:1.65rem;margin-bottom:10px;box-shadow:inset 0 0 0 1px rgba(11,61,46,.08)}
-.card.popular{background:var(--green);color:#fff;border-color:var(--gold);box-shadow:0 24px 50px rgba(11,61,46,.35)}
-.card.popular h3,.card.popular .price{color:#fff}
-.card.popular .for,.card.popular .price small{color:rgba(255,255,255,.75)}
-.card.popular .check{background:var(--gold);color:var(--green)}
-.card.popular .btn.btn-green{background:var(--gold);color:var(--green);box-shadow:0 8px 20px rgba(212,160,23,.35)}
-.card.popular .btn.btn-green:hover{background:var(--gold-2);color:var(--green)}
-.card.popular .card-icon{background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
-.card-ecommerce.popular{background:linear-gradient(165deg,#0B3D2E 0%,#145A42 55%,#1A6B4F 100%)}
+.card-ecommerce.popular{background:linear-gradient(165deg,#0B3D2E 0%,#145A42 55%,#1A6B4F 100%);color:#fff;border-color:var(--gold);box-shadow:0 24px 50px rgba(11,61,46,.35)}
+.card-ecommerce.popular h3,.card-ecommerce.popular .price{color:#fff}
+.card-ecommerce.popular .for,.card-ecommerce.popular .price small{color:rgba(255,255,255,.75)}
+.card-ecommerce.popular .check{background:var(--gold);color:var(--green)}
+.card-ecommerce.popular .btn.btn-green{background:var(--gold);color:var(--green);box-shadow:0 8px 20px rgba(212,160,23,.35)}
+.card-ecommerce.popular .btn.btn-green:hover{background:var(--gold-2);color:var(--green)}
+.card-ecommerce.popular .card-icon{background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+.card-business{border-color:rgba(11,61,46,.08)}
 .card-ecommerce:not(.popular){border-color:rgba(212,160,23,.35)}
 .card-ecommerce:not(.popular) .card-icon{background:linear-gradient(135deg,#fff8e6,#fff);border:1px solid rgba(212,160,23,.25)}
-.cards:has(.card.popular:nth-child(2)) .card.popular{padding-top:38px}
+.card-ecommerce.popular{padding-top:38px}
+.card-business{align-self:center}
 .pop-tag{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--green);font-weight:700;font-size:clamp(.72rem,2.2vw,.85rem);padding:6px 14px;border-radius:999px;white-space:normal;text-align:center;line-height:1.25;max-width:min(96%,300px);box-shadow:0 6px 14px rgba(212,160,23,.4);letter-spacing:.01em;z-index:2}
 .card-ecommerce .pop-tag{background:linear-gradient(90deg,#f0c040,#ffd86a);box-shadow:0 8px 18px rgba(212,160,23,.45)}
-.note{font-size:.9rem;color:var(--muted);margin-top:18px;text-align:center}
+.packages .note{font-size:.9rem;color:var(--muted);margin-top:32px;text-align:center;line-height:1.65;max-width:38em;margin-inline:auto}
+.packages .note .note-num,.packages .note strong{font-weight:800;font-size:1.2em;color:var(--green);font-variant-numeric:tabular-nums;display:inline-block;transform:translateY(.02em)}
 /* Work */
 .works{display:grid;gap:24px;margin-top:40px}
 .work{background:#fff;border-radius:22px;overflow:hidden;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
@@ -205,10 +207,10 @@ a{color:inherit}
   .hero{padding:90px 0 110px}
   .hero .container{grid-template-columns:1.25fr .9fr}
   .cards{grid-template-columns:repeat(2,1fr);align-items:stretch;max-width:920px;margin-inline:auto;gap:28px}
-  .cards:has(.card.popular:nth-child(2)) .card.popular{padding:38px 28px 40px;transform:none}
-  .cards:has(.card.popular:nth-child(2)) .card.popular:hover{transform:translateY(-8px)}
-  .cards:not(:has(.card.popular:nth-child(2))) .card.popular{padding:40px 28px;transform:scale(1.04)}
-  .cards:not(:has(.card.popular:nth-child(2))) .card.popular:hover{transform:scale(1.04) translateY(-8px)}
+  .card-ecommerce.popular{padding:40px 28px 42px;transform:scale(1.04);transform-origin:center center}
+  .card-ecommerce.popular:hover{transform:scale(1.04) translateY(-8px)}
+  .card-business{padding:26px 24px 28px}
+  .packages .note{margin-top:48px;padding-top:6px}
   .steps{grid-template-columns:repeat(4,1fr)}
   .steps::before{content:"";position:absolute;top:52px;left:12%;right:12%;height:0;border-top:3px dashed rgba(212,160,23,.6);z-index:0}
   .step{z-index:1}
@@ -402,7 +404,7 @@ a{color:inherit}
       <div class="stitch" aria-hidden="true"></div>
     </div>
     <div class="cards" data-cms="packages.cards">
-      <article class="card card-business popular reveal">
+      <article class="card card-business reveal">
         <span class="pop-tag">কোম্পানি ওয়েবসাইটে সবচেয়ে জনপ্রিয়</span>
         <span class="card-icon" aria-hidden="true">🏢</span>
         <h3>স্ট্যান্ডার্ড</h3>
@@ -438,7 +440,7 @@ a{color:inherit}
         <a href="#contact" class="btn btn-green">ই-কমার্স নিন</a>
       </article>
     </div>
-    <p class="note" data-cms="packages.note">* সাপোর্ট ১ মাসের জন্য, আজীবন নয়। ফ্রি ডোমেইন ও হোস্টিং প্রথম বছরের জন্য।</p>
+    <p class="note" data-cms="packages.note">* সাপোর্ট <span class="note-num" aria-label="এক">১</span> মাসের জন্য, আজীবন নয়। ফ্রি ডোমেইন ও হোস্টিং প্রথম বছরের জন্য।</p>
   </div>
 </section>
 

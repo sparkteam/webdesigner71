@@ -178,7 +178,7 @@ export const SECTIONS = [
     txt("title", "শিরোনাম", 160, { min: 1, rich: true, hideable: false }),
     txt("sub", "সাব-টেক্সট", 300, { long: true }),
     { key: "cards", type: "cards", card: "package", label: "প্যাকেজ", max: 6, itemLabel: "প্যাকেজ" },
-    txt("note", "নিচের নোট", 300, { long: true }),
+    txt("note", "নিচের নোট", 300, { long: true, rich: true, hint: "**১** দিয়ে ১ নম্বরটা জোর দিতে পারেন" }),
   ] },
   { id: "work", label: "কাজের নমুনা", icon: "▦", slot: true, align: "center", fields: [
     txt("eyebrow", "ছোট শিরোনাম", 80),
@@ -262,7 +262,7 @@ const RAW_DEFAULTS = {
         ] },
         buttonLabel: "ই-কমার্স নিন", buttonHref: "#contact", buttonStyle: "green" },
     ] },
-    note: t("* সাপোর্ট ১ মাসের জন্য, আজীবন নয়। ফ্রি ডোমেইন ও হোস্টিং প্রথম বছরের জন্য।"),
+    note: t("* সাপোর্ট **১** মাসের জন্য, আজীবন নয়। ফ্রি ডোমেইন ও হোস্টিং প্রথম বছরের জন্য।"),
   },
   work: {
     eyebrow: t("আমাদের কাজ"),
