@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ব্যবসার ওয়েবসাইট বানিয়ে নিন | WebDesigner71</title>
+<meta name="description" content="ডোমেইন, হোস্টিং ও ডিজাইনের আলাদা বিল নেই। স্ট্যান্ডার্ড মাসে ৳৩২৫, ১২ মাস বাধ্যতামূলক। প্রিমিয়াম মাসে ৳৪২৫, বার্ষিক প্যাকেজ।">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0B3D2E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#0B3D2E;--green-2:#12543F;--gold:#D4A017;--gold-2:#E9B930;
+  --cream:#FAF7F0;--cream-2:#F3EDDF;--ink:#1B2620;--muted:#4A5A52;--white:#fff;
+  --shadow:0 12px 32px rgba(11,61,46,.1);--shadow-lg:0 22px 48px rgba(11,61,46,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:74px}
+body{font-family:'Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;color:var(--ink);background:var(--cream);line-height:1.65;font-size:17px}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+.container{width:100%;max-width:1120px;margin:0 auto;padding:0 20px}
+.section{padding:80px 0}
+.center{text-align:center}
+.eyebrow{display:inline-block;color:var(--gold);font-weight:700;font-size:.95rem;margin-bottom:8px}
+h2{font-size:clamp(1.7rem,3.6vw,2.35rem);line-height:1.3;color:var(--green);font-weight:700}
+.lead{color:var(--muted);max-width:38em;margin:10px auto 0}
+.stitch{height:8px;width:108px;margin:14px auto 0;border-radius:4px;background:repeating-linear-gradient(90deg,var(--gold) 0 12px,transparent 12px 20px);opacity:.7}
+.motif{background-image:
+  radial-gradient(circle at 50% 50%, rgba(212,160,23,.2) 1.6px, transparent 2px),
+  linear-gradient(45deg, transparent 46%, rgba(212,160,23,.1) 47%, rgba(212,160,23,.1) 53%, transparent 54%),
+  linear-gradient(-45deg, transparent 46%, rgba(212,160,23,.1) 47%, rgba(212,160,23,.1) 53%, transparent 54%);
+  background-size:26px 26px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;font-weight:700;font-size:1.05rem;padding:13px 24px;border-radius:999px;border:2px solid transparent;cursor:pointer;transition:transform .2s,background .2s,box-shadow .2s}
+.btn:focus-visible{outline:3px solid var(--gold-2);outline-offset:3px}
+.btn-gold{background:var(--gold);color:var(--green);box-shadow:0 8px 18px rgba(212,160,23,.35)}
+.btn-gold:hover{background:var(--gold-2);transform:translateY(-2px)}
+.btn-ghost{border-color:rgba(255,255,255,.55);color:#fff}
+.btn-ghost:hover{background:rgba(255,255,255,.1)}
+.btn-line{border-color:var(--green);color:var(--green);background:#fff}
+.btn-line:hover{background:var(--green);color:#fff}
+.header{position:sticky;top:0;z-index:40;background:rgba(11,61,46,.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(212,160,23,.28)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{font-weight:700;font-size:1.28rem;color:#fff}
+.logo span{color:var(--gold)}
+.nav{display:none;gap:22px}
+.nav a{color:rgba(255,255,255,.86);font-weight:500}
+.nav a:hover{color:#fff}
+.header .btn{padding:8px 16px;font-size:.95rem}
+.hero{position:relative;background:var(--green);color:#fff;overflow:hidden;padding:64px 0 76px}
+.hero .container{position:relative;z-index:1;display:grid;gap:36px;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(212,160,23,.14);border:1px solid rgba(212,160,23,.55);color:var(--gold-2);padding:5px 14px;border-radius:999px;font-weight:600}
+.hero h1{font-size:clamp(2rem,5.4vw,3.35rem);line-height:1.22;margin:16px 0 12px;font-weight:700}
+.hero h1 em{font-style:normal;color:var(--gold-2)}
+.hero .sub{font-size:1.12rem;color:rgba(255,255,255,.9);max-width:34em}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.trust{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:22px;color:rgba(255,255,255,.82);font-size:.98rem}
+.trust span::before{content:"✓ ";color:var(--gold-2);font-weight:700}
+.stage{position:relative;margin:0 auto;width:100%;max-width:540px}
+.stage svg{width:100%;height:auto;filter:drop-shadow(0 22px 40px rgba(0,0,0,.28))}
+.float{position:absolute;background:#fff;color:var(--green);font-weight:700;border-radius:14px;padding:8px 12px;box-shadow:0 10px 24px rgba(0,0,0,.18);font-size:.92rem}
+.float small{display:block;font-weight:500;color:var(--muted);font-size:.8rem}
+.float.a{left:-6px;bottom:46px}
+.float.b{right:-4px;top:54px}
+.benefits{display:grid;gap:16px;margin-top:32px}
+.benefit{background:#fff;border-radius:22px;padding:22px 20px;box-shadow:var(--shadow)}
+.benefit .ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--cream-2);font-size:1.35rem;margin-bottom:10px}
+.benefit h3{color:var(--green);font-size:1.2rem;margin-bottom:4px}
+.benefit p{color:var(--muted)}
+.packages{background:var(--cream-2)}
+.cards{display:grid;gap:22px;margin-top:34px}
+.card{background:#fff;border-radius:26px;padding:28px 24px 24px;box-shadow:var(--shadow);display:flex;flex-direction:column;border:1px solid rgba(11,61,46,.06);position:relative}
+.card h3{font-size:1.55rem;color:var(--green)}
+.card .for{color:var(--muted);margin-top:2px}
+.price{margin:16px 0 4px;font-size:3rem;font-weight:700;color:var(--green);line-height:1;letter-spacing:-.02em}
+.price small{font-size:1rem;font-weight:600;color:var(--muted);letter-spacing:0}
+.rule{display:inline-block;margin:8px 0 16px;padding:5px 12px;border-radius:999px;border:1.5px solid var(--gold);background:rgba(212,160,23,.12);color:var(--green);font-weight:700;font-size:.95rem}
+.card ul{list-style:none;display:grid;gap:9px;margin:0 0 20px}
+.card li{display:flex;gap:10px;align-items:flex-start}
+.dot{flex:0 0 22px;width:22px;height:22px;border-radius:50%;background:var(--green);color:var(--gold-2);display:grid;place-items:center;font-size:.75rem;font-weight:700;margin-top:2px}
+.card .btn{width:100%;margin-top:auto}
+.card.pop{background:linear-gradient(165deg,#0B3D2E 0%,#14684a 100%);color:#fff;border:2px solid var(--gold);box-shadow:0 24px 48px rgba(11,61,46,.28)}
+.card.pop h3,.card.pop .price{color:#fff}
+.card.pop .for,.card.pop .price small{color:rgba(255,255,255,.78)}
+.card.pop .dot{background:var(--gold);color:var(--green)}
+.card.pop .rule{color:var(--gold-2);border-color:var(--gold-2);background:transparent}
+.card.pop .btn{background:var(--gold);color:var(--green)}
+.ribbon{position:absolute;top:-13px;left:24px;background:var(--gold);color:var(--green);font-weight:700;font-size:.82rem;padding:4px 12px;border-radius:999px}
+.fine{text-align:center;color:var(--muted);margin-top:22px;font-size:.98rem}
+.band{background:var(--green);color:#fff;position:relative;overflow:hidden}
+.band .container{position:relative;z-index:1}
+.band h2{color:#fff}
+.trio{display:grid;gap:14px;margin-top:28px}
+.trio article{background:rgba(255,255,255,.07);border:1px solid rgba(233,185,48,.35);border-radius:18px;padding:18px}
+.trio h3{color:var(--gold-2);font-size:1.15rem;margin-bottom:4px}
+.trio p{color:rgba(255,255,255,.88)}
+.band .quiet{text-align:center;margin-top:18px;color:rgba(255,255,255,.75)}
+.need{display:grid;gap:12px;margin-top:28px}
+.need article{background:#fff;border-radius:18px;padding:18px 18px 16px;box-shadow:var(--shadow);border-top:3px solid var(--gold)}
+.need b{display:block;color:var(--green);font-size:1.08rem}
+.need span{color:var(--muted)}
+.works{display:grid;gap:16px;margin-top:28px}
+.work{background:#fff;border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+.thumb{height:148px;display:grid;place-items:center}
+.t1{background:linear-gradient(135deg,#0B3D2E,#1E6B52)}
+.t2{background:linear-gradient(135deg,#B3541E,#D4A017)}
+.t3{background:linear-gradient(135deg,#5B2A4E,#A3476F)}
+.thumb span{width:68px;height:68px;border-radius:18px;background:#fff;display:grid;place-items:center;font-size:1.7rem;font-weight:700;color:var(--green)}
+.work div.body{padding:16px 16px 18px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.work h3{color:var(--green);font-size:1.05rem;line-height:1.35}
+.work p{color:var(--muted);font-size:.92rem}
+.work .btn{padding:8px 14px;font-size:.92rem}
+.steps{list-style:none;display:grid;gap:14px;margin-top:28px}
+.step{background:#fff;border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.num{width:42px;height:42px;border-radius:50%;background:var(--green);color:var(--gold-2);display:grid;place-items:center;font-weight:700;border:3px solid var(--gold);margin-bottom:8px}
+.step h3{color:var(--green);font-size:1.1rem}
+.step p{color:var(--muted)}
+.faq{background:var(--cream-2)}
+.faq-list{max-width:760px;margin:26px auto 0;display:grid;gap:10px}
+.faq-item{background:#fff;border-radius:14px;overflow:hidden;border:1px solid transparent}
+.faq-item.open{border-color:rgba(212,160,23,.65)}
+.faq-q{width:100%;text-align:left;background:none;border:0;font-family:inherit;font-size:1.05rem;font-weight:600;color:var(--green);padding:16px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center;cursor:pointer}
+.faq-q:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+.pm{width:28px;height:28px;border-radius:50%;background:var(--cream-2);display:grid;place-items:center;flex:0 0 auto}
+.faq-item.open .pm{background:var(--gold)}
+.faq-a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s ease}
+.faq-item.open .faq-a{grid-template-rows:1fr}
+.faq-a>div{overflow:hidden}
+.faq-a p{padding:0 18px 16px;color:var(--muted)}
+.faq-a strong{color:var(--green)}
+.final{background:var(--green);color:#fff;text-align:center;position:relative;overflow:hidden}
+.final .container{position:relative;z-index:1}
+.final h2{color:#fff;font-size:clamp(1.8rem,4vw,2.6rem)}
+.final h2 em{font-style:normal;color:var(--gold-2)}
+.final .lead{color:rgba(255,255,255,.88)}
+.final .btn{margin-top:22px}
+.row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:14px}
+.small{margin-top:16px;color:rgba(255,255,255,.72);font-size:.95rem}
+.footer{background:#072A20;color:rgba(255,255,255,.72);text-align:center;padding:26px 0}
+.footer a{color:var(--gold-2)}
+.fab{position:fixed;right:16px;bottom:16px;z-index:50;width:56px;height:56px;border-radius:50%;background:var(--gold);color:var(--green);display:grid;place-items:center;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.fab svg{width:28px;height:28px}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+@media (min-width:760px){
+  .benefits,.trio,.need,.works{grid-template-columns:repeat(3,1fr)}
+  .steps{grid-template-columns:repeat(4,1fr)}
+  .cards{grid-template-columns:1fr 1fr;align-items:stretch;max-width:920px;margin-left:auto;margin-right:auto}
+}
+@media (min-width:980px){
+  .nav{display:flex}
+  .hero{padding:88px 0 100px}
+  .hero .container{grid-template-columns:1.08fr .92fr}
+  .fab{display:none}
+  .float.a{left:-18px}
+  .float.b{right:-12px}
+}
+@media (max-width:420px){
+  .float{display:none}
+  .price{font-size:2.5rem}
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="container">
+    <a class="logo" href="#top">WebDesigner<span>71</span></a>
+    <nav class="nav" aria-label="প্রধান মেনু">
+      <a href="#gain">সুবিধা</a>
+      <a href="#packages">প্যাকেজ</a>
+      <a href="#work">নমুনা</a>
+      <a href="#faq">প্রশ্ন</a>
+    </nav>
+    <a class="btn btn-gold" href="#contact">মেসেজ করুন</a>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="motif" style="position:absolute;inset:0;opacity:.5" aria-hidden="true"></div>
+  <div class="container">
+    <div>
+      <p class="badge">৫–৭ কর্মদিবসে চালু</p>
+      <h1>গ্রাহক যেন আপনাকে <em>অনলাইনে</em> খুঁজে পায়</h1>
+      <p class="sub">তার জন্য আমরা ওয়েবসাইট বানিয়ে দিই। ডোমেইন, হোস্টিং আর ডিজাইনের আলাদা বিল নেই। আপনি দেবেন শুধু মাসিক সার্ভিস চার্জ, এক বছরের জন্য।</p>
+      <div class="hero-actions">
+        <a class="btn btn-gold" href="#packages">প্যাকেজ দেখুন</a>
+        <a class="btn btn-ghost" href="#work">নমুনা দেখুন</a>
+      </div>
+      <div class="trust">
+        <span>ডোমেইন আপনার নামে</span>
+        <span>ফোনেও ঠিকমতো খোলে</span>
+        <span>বিকাশ, নগদ বা ব্যাংক</span>
+      </div>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <svg viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg">
+        <rect x="24" y="28" width="472" height="384" rx="18" fill="#FAF7F0"/>
+        <path d="M42 28h436a18 18 0 0 1 18 18v16H24V46a18 18 0 0 1 18-18z" fill="#E7E0CF"/>
+        <circle cx="48" cy="45" r="5" fill="#E0685A"/><circle cx="64" cy="45" r="5" fill="#E9B930"/><circle cx="80" cy="45" r="5" fill="#5DBB7A"/>
+        <rect x="150" y="36" width="250" height="16" rx="8" fill="#fff"/>
+        <text x="275" y="48" text-anchor="middle" font-size="11" fill="#4A5A52" font-family="Hind Siliguri,sans-serif">yourshop.com</text>
+        <rect x="24" y="62" width="472" height="46" fill="#fff"/>
+        <circle cx="52" cy="85" r="12" fill="#0B3D2E"/><circle cx="52" cy="85" r="5" fill="#D4A017"/>
+        <text x="72" y="90" font-size="16" font-weight="700" fill="#0B3D2E" font-family="Hind Siliguri,sans-serif">আপনার দোকান</text>
+        <text x="300" y="90" font-size="13" fill="#4A5A52" font-family="Hind Siliguri,sans-serif">হোম</text>
+        <text x="342" y="90" font-size="13" fill="#4A5A52" font-family="Hind Siliguri,sans-serif">পণ্য</text>
+        <text x="388" y="90" font-size="13" fill="#4A5A52" font-family="Hind Siliguri,sans-serif">যোগাযোগ</text>
+        <rect x="24" y="108" width="472" height="168" fill="#F7F1E4"/>
+        <text x="48" y="156" font-size="22" font-weight="700" fill="#0B3D2E" font-family="Hind Siliguri,sans-serif">তাজা পণ্য,</text>
+        <text x="48" y="184" font-size="22" font-weight="700" fill="#0B3D2E" font-family="Hind Siliguri,sans-serif">এখন ঘরে বসে</text>
+        <rect x="48" y="204" width="120" height="34" rx="17" fill="#D4A017"/>
+        <text x="108" y="226" text-anchor="middle" font-size="14" font-weight="700" fill="#0B3D2E" font-family="Hind Siliguri,sans-serif">অর্ডার করুন</text>
+        <rect x="292" y="132" width="176" height="120" rx="14" fill="#0B3D2E"/>
+        <circle cx="430" cy="162" r="14" fill="#E9B930"/>
+        <path d="M292 230l40-36 28 22 36-40 72 54v8a14 14 0 0 1-14 14H306a14 14 0 0 1-14-14z" fill="#FAF7F0" opacity=".28"/>
+        <rect x="44" y="296" width="136" height="92" rx="12" fill="#fff"/>
+        <rect x="192" y="296" width="136" height="92" rx="12" fill="#fff"/>
+        <rect x="340" y="296" width="136" height="92" rx="12" fill="#fff"/>
+        <circle cx="68" cy="322" r="12" fill="#0B3D2E"/><circle cx="216" cy="322" r="12" fill="#D4A017"/><circle cx="364" cy="322" r="12" fill="#0B3D2E"/>
+        <rect x="60" y="344" width="88" height="8" rx="4" fill="#0B3D2E" opacity=".75"/>
+        <rect x="208" y="344" width="88" height="8" rx="4" fill="#0B3D2E" opacity=".75"/>
+        <rect x="356" y="344" width="88" height="8" rx="4" fill="#0B3D2E" opacity=".75"/>
+        <rect x="60" y="360" width="104" height="6" rx="3" fill="#E4DDD0"/>
+        <rect x="208" y="360" width="104" height="6" rx="3" fill="#E4DDD0"/>
+        <rect x="356" y="360" width="104" height="6" rx="3" fill="#E4DDD0"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="gain">
+  <div class="container">
+    <div class="center">
+      <p class="eyebrow">যা হাতে পাবেন</p>
+      <h2>সাইট থাকলে ব্যবসার যা বদলায়</h2>
+      <div class="stitch" aria-hidden="true"></div>
+    </div>
+    <div class="benefits">
+      <article class="benefit">
+        <div class="ic" aria-hidden="true">🔗</div>
+        <h3>নিজের ঠিকানা</h3>
+        <p>গুগলে নাম লিখলে আপনার সাইট আসে। ফেসবুক পেজ বন্ধ হলেও এই ঠিকানা থাকে।</p>
+      </article>
+      <article class="benefit">
+        <div class="ic" aria-hidden="true">📱</div>
+        <h3>ফোনে পরিষ্কার</h3>
+        <p>বেশিরভাগ গ্রাহক ফোন থেকে ঢোকেন। সাইট সেভাবেই বানানো হয়।</p>
+      </article>
+      <article class="benefit">
+        <div class="ic" aria-hidden="true">🛠️</div>
+        <h3>এক বছর দেখাশোনা</h3>
+        <p>ভেঙে গেলে ঠিক করা হবে। নম্বর, লেখা বা ছবি বদলানো যাবে।</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section packages" id="packages">
+  <div class="container">
+    <div class="center">
+      <p class="eyebrow">প্যাকেজ</p>
+      <h2>দুই ধরনের সাইট</h2>
+      <p class="lead">পরিচয়ের সাইট হলে স্ট্যান্ডার্ড। অনলাইনে বিক্রি করতে চাইলে প্রিমিয়াম।</p>
+      <div class="stitch" aria-hidden="true"></div>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <h3>স্ট্যান্ডার্ড</h3>
+        <p class="for">কোম্পানি বা দোকানের পরিচয়</p>
+        <p class="price">৳৩২৫ <small>/ মাস</small></p>
+        <p class="rule">১২ মাস নিতে হবে</p>
+        <ul>
+          <li><span class="dot">✓</span><span>হোম, সার্ভিস ও যোগাযোগের পাতা</span></li>
+          <li><span class="dot">✓</span><span>মোবাইলে দেখার মতো ডিজাইন</span></li>
+          <li><span class="dot">✓</span><span>ডোমেইন আপনার নিজের নামে</span></li>
+          <li><span class="dot">✓</span><span>হোস্টিংসহ সাইট চালু</span></li>
+        </ul>
+        <a class="btn btn-line" href="#contact">স্ট্যান্ডার্ড নিন</a>
+      </article>
+      <article class="card pop">
+        <span class="ribbon">অনলাইন দোকান</span>
+        <h3>প্রিমিয়াম</h3>
+        <p class="for">পণ্য বিক্রির ওয়েবসাইট</p>
+        <p class="price">৳৪২৫ <small>/ মাস</small></p>
+        <p class="rule">বার্ষিক প্যাকেজ নিতে হবে</p>
+        <ul>
+          <li><span class="dot">✓</span><span>স্ট্যান্ডার্ডের সবকিছু</span></li>
+          <li><span class="dot">✓</span><span>পণ্যের তালিকা, কার্ট ও অর্ডার</span></li>
+          <li><span class="dot">✓</span><span>বিকাশ, নগদ ও ক্যাশ অন ডেলিভারি</span></li>
+          <li><span class="dot">✓</span><span>অর্ডার এলে হোয়াটসঅ্যাপে খবর</span></li>
+          <li><span class="dot">✓</span><span>সোশ্যাল মিডিয়া সেটআপ</span></li>
+        </ul>
+        <a class="btn btn-gold" href="#contact">প্রিমিয়াম নিন</a>
+      </article>
+    </div>
+    <p class="fine">এই টাকা সাইট বানানোর বিল নয়। এটা এক বছরের সার্ভিস চার্জ।</p>
+  </div>
+</section>
+
+<section class="section band" id="care">
+  <div class="motif" style="position:absolute;inset:0;opacity:.35" aria-hidden="true"></div>
+  <div class="container">
+    <div class="center">
+      <p class="eyebrow">সার্ভিস চার্জ</p>
+      <h2>মাসে যা করা হয়</h2>
+    </div>
+    <div class="trio">
+      <article>
+        <h3>ঠিক করা</h3>
+        <p>পাতা, লিংক বা ফর্ম ভেঙে গেলে সেটা ঠিক করে দেওয়া।</p>
+      </article>
+      <article>
+        <h3>বদলানো</h3>
+        <p>ফোন নম্বর, লেখা বা ছবি বদলাতে চাইলে করে দেওয়া।</p>
+      </article>
+      <article>
+        <h3>চালু রাখা</h3>
+        <p>সাইট যাতে বন্ধ হয়ে না যায়, সেদিকে খেয়াল রাখা।</p>
+      </article>
+    </div>
+    <p class="quiet">নতুন অনেক পাতা বা আলাদা দোকান বানানো এই চার্জের মধ্যে পড়ে না।</p>
+  </div>
+</section>
+
+<section class="section" id="need">
+  <div class="container">
+    <div class="center">
+      <p class="eyebrow">শুরুর আগে</p>
+      <h2>আপনার কাছ থেকে যা লাগবে</h2>
+    </div>
+    <div class="need">
+      <article><b>নাম</b><span>লোগো থাকলে ভালো। না থাকলে ব্যবসার নামই চলবে।</span></article>
+      <article><b>ছবি</b><span>দোকান বা পণ্যের কয়েকটা ছবি পাঠালেই হয়।</span></article>
+      <article><b>যোগাযোগ</b><span>ফোন নম্বর আর ঠিকানা। গ্রাহক যেন আপনাকে পায়।</span></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="work" style="padding-top:0">
+  <div class="container">
+    <div class="center">
+      <p class="eyebrow">আগের কাজ</p>
+      <h2>কয়েকটা নমুনা</h2>
+      <div class="stitch" aria-hidden="true"></div>
+    </div>
+    <div class="works">
+      <article class="work">
+        <div class="thumb t1"><span>D</span></div>
+        <div class="body"><div><h3>DTex BD</h3><p>হোম টেক্সটাইলের দোকান</p></div><a class="btn btn-line" href="#">দেখুন</a></div>
+      </article>
+      <article class="work">
+        <div class="thumb t2"><span>ঘ</span></div>
+        <div class="body"><div><h3>ঘরোয়া খাবার</h3><p>অর্ডারের মেনু</p></div><a class="btn btn-line" href="#">দেখুন</a></div>
+      </article>
+      <article class="work">
+        <div class="thumb t3"><span>R</span></div>
+        <div class="body"><div><h3>রংধনু ফ্যাশন</h3><p>বুটিকের পরিচয়</p></div><a class="btn btn-line" href="#">দেখুন</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how" style="padding-top:0">
+  <div class="container">
+    <div class="center">
+      <p class="eyebrow">কাজের ধারা</p>
+      <h2>চার ধাপে সাইট চালু</h2>
+      <div class="stitch" aria-hidden="true"></div>
+    </div>
+    <ol class="steps">
+      <li class="step"><div class="num">১</div><h3>মেসেজ</h3><p>স্ট্যান্ডার্ড না প্রিমিয়াম, লিখে জানান।</p></li>
+      <li class="step"><div class="num">২</div><h3>তথ্য</h3><p>নাম, ছবি আর ফোন নম্বর দিন।</p></li>
+      <li class="step"><div class="num">৩</div><h3>বানানো</h3><p>৫ থেকে ৭ কর্মদিবসে সাইট চালু হয়।</p></li>
+      <li class="step"><div class="num">৪</div><h3>দেখাশোনা</h3><p>তারপর এক বছর সার্ভিস চলে।</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section faq" id="faq">
+  <div class="container">
+    <div class="center">
+      <p class="eyebrow">প্রশ্নোত্তর</p>
+      <h2>যা জিজ্ঞেস করেন</h2>
+      <div class="stitch" aria-hidden="true"></div>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">ডোমেইন কি আমার নামে হবে?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="faq-a"><div><p><strong>হ্যাঁ।</strong> ডোমেইন আপনার নামে রেজিস্টার হয়। সাইটের মালিক আপনি।</p></div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">মাসে কত টাকা?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="faq-a"><div><p>স্ট্যান্ডার্ড <strong>৳৩২৫</strong> প্রতি মাস, আর <strong>১২ মাস নিতে হবে</strong>। প্রিমিয়াম <strong>৳৪২৫</strong> প্রতি মাস, <strong>বার্ষিক প্যাকেজ</strong> নিতে হবে। এটা সার্ভিস চার্জ।</p></div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">এক বছরের আগে ছাড়া যাবে?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="faq-a"><div><p>না। মেয়াদ শেষে সাইট আপনারই থাকে। সার্ভিস আরও রাখতে চাইলে তখন আলাদা কথা হবে।</p></div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">কত দিনে সাইট পাব?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="faq-a"><div><p>নাম, ছবি ও লেখা পাওয়ার পর সাধারণত <strong>৫ থেকে ৭ কর্মদিবস</strong>।</p></div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">টাকা কীভাবে দেব?<span class="pm" aria-hidden="true">+</span></button>
+        <div class="faq-a"><div><p>বিকাশ, নগদ, রকেট অথবা ব্যাংক ট্রান্সফার। নম্বর মেসেজে দিয়ে দেব।</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section final" id="contact">
+  <div class="motif" style="position:absolute;inset:0;opacity:.4" aria-hidden="true"></div>
+  <div class="container">
+    <p class="eyebrow">শুরু</p>
+    <h2>একটা মেসেজেই <em>কাজ শুরু</em></h2>
+    <p class="lead">ব্যবসার নাম লিখুন। স্ট্যান্ডার্ড না প্রিমিয়াম, সেটাও বলে দিন।</p>
+    <a class="btn btn-gold" href="https://m.me/YOUR_PAGE" target="_blank" rel="noopener">এখনই মেসেজ করুন</a>
+    <div class="row">
+      <a class="btn btn-ghost" href="https://facebook.com/YOUR_PAGE" target="_blank" rel="noopener">ফেসবুক পেজ</a>
+      <a class="btn btn-ghost" href="https://wa.me/8801XXXXXXXXX" target="_blank" rel="noopener">হোয়াটসঅ্যাপ</a>
+    </div>
+    <p class="small">স্ট্যান্ডার্ড ৳৩২৫/মাস, ১২ মাস বাধ্যতামূলক। প্রিমিয়াম ৳৪২৫/মাস, বার্ষিক প্যাকেজ।</p>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <a class="logo" href="#top">WebDesigner<span>71</span></a>
+    <p>© ২০২৬ WebDesigner71 · বাংলাদেশি ব্যবসার জন্য ওয়েবসাইট</p>
+  </div>
+</footer>
+
+<a class="fab" href="https://m.me/YOUR_PAGE" target="_blank" rel="noopener" aria-label="মেসেঞ্জারে মেসেজ করুন">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.19 5.44 3.14 7.17.16.14.26.35.27.57l.05 1.78a.8.8 0 0 0 1.12.71l1.98-.87a.8.8 0 0 1 .53-.04c.91.25 1.87.38 2.91.38 5.64 0 10-4.13 10-9.7S17.64 2 12 2zm6 7.46-2.94 4.66a1.5 1.5 0 0 1-2.17.4l-2.34-1.75a.6.6 0 0 0-.72 0l-3.16 2.4c-.42.32-.97-.18-.69-.63l2.94-4.66a1.5 1.5 0 0 1 2.17-.4l2.34 1.75a.6.6 0 0 0 .72 0l3.16-2.4c.42-.32.97.18.69.63z"/></svg>
+</a>
+<script>
+document.querySelectorAll('.faq-q').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var item=btn.parentElement, open=item.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open?'true':'false');
+  });
+});
+</script>
+</body>
+</html>
