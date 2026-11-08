@@ -36,8 +36,8 @@ flowchart LR
 
 ```json
 {
-  "heroTitle": "আপনার ব্যবসার ওয়েবসাইট, মাত্র",
-  "heroHighlight": "৩৯০০ টাকায়",
+  "heroTitle": "উদ্যোক্তাদের জন্য ওয়েবসাইট ডিজাইন",
+  "heroHighlight": "সম্পূর্ণ ফ্রি।",
   "heroSub": "ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে",
   "accentColor": "#D4A017",
   "updatedAt": "2026-11-01T16:30:00.000Z",
