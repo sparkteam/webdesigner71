@@ -13,7 +13,7 @@ const BASE = `http://127.0.0.1:${PORT}`;
 const persist = mkdtempSync(join(tmpdir(), "wd71site-"));
 const ORIGINAL = readFileSync("public/index.html", "utf8");
 const V1_SEED = {
-  heroTitle: "আপনার ব্যবসার ওয়েবসাইট, মাত্র", heroHighlight: "৩৯০০ টাকায়",
+  heroTitle: "উদ্যোক্তাদের জন্য ওয়েবসাইট ডিজাইন", heroHighlight: "সম্পূর্ণ ফ্রি।",
   heroSub: "ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে", accentColor: "#D4A017",
   updatedAt: "2026-11-01T00:00:00.000Z", updatedBy: "seed", version: 1,
 };
@@ -53,7 +53,7 @@ try {
   check("Phase 1 key only -> original + style tag (migration keeps live output)", t === WITH_STYLE);
   putKV("content:homepage", { ...V1_SEED, heroTitle: "পুরনো <i>শিরোনাম</i>", accentColor: "#0B7A55" });
   ({ t } = await get("/"));
-  check("Phase 1 key edits still render (escaped title, accent)", inner(t, "hero.title") === "পুরনো &lt;i&gt;শিরোনাম&lt;/i&gt; <em>৩৯০০ টাকায়</em>" && t.includes("--gold:#0B7A55;--gold-2:#238766"), inner(t, "hero.title"));
+  check("Phase 1 key edits still render (escaped title, accent)", inner(t, "hero.title") === "পুরনো &lt;i&gt;শিরোনাম&lt;/i&gt; <em>সম্পূর্ণ ফ্রি।</em>" && t.includes("--gold:#0B7A55;--gold-2:#238766"), inner(t, "hero.title"));
 
   // 2. v2 seed
   putKV("content:homepage:v2", SEED); putKV("settings:site", SETTINGS);
