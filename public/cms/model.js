@@ -28,8 +28,8 @@ export const KEYS = {
   settingsPrev: "settings:site:prev",
   v1: "content:homepage", // Phase 1 (hero only) — read as a fallback/migration source, never written by Phase 2
 };
-export const BUTTON_STYLES = ["gold", "green", "ghost", "outline", "dr"];
-export const BUTTON_STYLE_LABELS = { gold: "সোনালি", green: "সবুজ", ghost: "স্বচ্ছ (গাঢ় ব্যাকগ্রাউন্ডে)", outline: "বর্ডার", dr: "কোরাল (ডার্ক সেকশন)" };
+export const BUTTON_STYLES = ["gold", "green", "ghost", "outline", "primary", "dr"];
+export const BUTTON_STYLE_LABELS = { gold: "সোনালি", green: "সবুজ", ghost: "স্বচ্ছ (গাঢ় ব্যাকগ্রাউন্ডে)", outline: "বর্ডার", primary: "কোরাল (ডার্ক সেকশন)", dr: "কোরাল (ডার্ক সেকশন)" };
 export const EXTRA_TYPES = ["heading", "text", "image", "button"];
 export const EXTRA_LABELS = { heading: "শিরোনাম", text: "প্যারাগ্রাফ", image: "ছবি", button: "বাটন" };
 export const DEFAULT_ACCENT = "#D4A017";
@@ -247,9 +247,9 @@ const RAW_DEFAULTS = {
       { id: "p7", icon: "", title: "নিজের ডোমেইনে প্রফেশনাল ইমেজ — বিশ্বাস বাড়ে", text: "" },
       { id: "p8", icon: "", title: "ক্যাটালগ, অর্ডার ফর্ম — এক জায়গায়", text: "" },
     ] },
-    solutionTitle: t("আজ না বানালে কালও ফেসবুকে বিক্রি হবে — কিন্তু [[ঝুঁকি]] প্রতিদিনই থাকবে।"),
+    solutionTitle: t("আজ না বানালে কালও ফেসবুকে বিক্রি হবে — কিন্তু ঝুঁকি প্রতিদিনই থাকবে।"),
     solutionText: t("অধিকাংশ উদ্যোক্তা শুধু ফেসবুকে বিক্রি করেন। পেজ রিমুভ, রিচ কমা বা একাউন্ট ঝুঁকিতে অর্ডার, কাস্টমার তালিকা আর অ্যাড ট্র্যাকিং — একসাথে হারাতে পারেন। Meta Pixel ও সঠিক কনভার্সন ট্র্যাকিংয়ের জন্য এখন ওয়েবসাইট বাধ্যতামূলক।"),
-    solutionButtons: { items: [B("b1", "প্যাকেজ ও দাম দেখুন", "#packages", "dr")] },
+    solutionButtons: { items: [B("b1", "প্যাকেজ ও দাম দেখুন", "#packages", "primary")] },
   },
   packages: {
     eyebrow: t("সহজ ও স্বচ্ছ দাম"),
