@@ -19,6 +19,7 @@
 :root{
   --green:#0B3D2E;--green-2:#12543F;--green-3:#0E4A38;--gold:#D4A017;--gold-2:#E9B930;
   --cream:#FAF7F0;--cream-2:#F3EDDF;--ink:#1B2620;--muted:#4A5A52;--white:#fff;
+  --dr-accent:#e85d3a;--dr-accent-2:#ff7a55;--dr-ok:#3dd68c;
   --radius:18px;--shadow:0 10px 30px rgba(11,61,46,.10);--shadow-lg:0 20px 50px rgba(11,61,46,.18);
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -61,19 +62,31 @@ a{color:inherit}
 .nav a::after{content:"";position:absolute;left:0;bottom:-4px;height:2px;width:0;background:var(--gold);transition:width .25s}
 .nav a:hover{color:#fff}.nav a:hover::after{width:100%}
 .header .btn{padding:8px 18px;font-size:.95rem}
-/* Hero */
-.hero{position:relative;background:var(--green);color:#fff;overflow:hidden;padding:64px 0 80px}
-.hero::before{content:"";position:absolute;inset:0;opacity:.55}
-.hero::after{content:"";position:absolute;width:520px;height:520px;right:-180px;top:-160px;border-radius:50%;background:radial-gradient(circle,rgba(212,160,23,.28),transparent 65%)}
+/* Hero — Dhruv academy typography + brand green / coral (section 2 red) */
+.hero{position:relative;overflow:hidden;padding:64px 0 80px}
+.hero.hero-dhruv{
+  background:linear-gradient(158deg,#0c0f12 0%,#0B3D2E 40%,#072a20 100%);
+  color:#f4f5f7;
+  padding:clamp(56px,7vw,92px) 0 clamp(64px,8vw,100px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.hero.hero-dhruv::before{content:"";position:absolute;inset:0;opacity:.35;background-image:radial-gradient(circle at 50% 50%,rgba(61,214,140,.12) 1px,transparent 1.5px);background-size:28px 28px}
+.hero.hero-dhruv::after{content:"";position:absolute;width:480px;height:480px;right:-140px;top:-120px;border-radius:50%;background:radial-gradient(circle,rgba(232,93,58,.2),transparent 65%)}
 .hero .container{position:relative;z-index:1;display:grid;gap:40px;align-items:center}
-.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(212,160,23,.15);border:1px solid rgba(212,160,23,.6);color:var(--gold-2);padding:6px 16px;border-radius:999px;font-weight:600;font-size:.95rem}
-.badge::before{content:"★"}
-.hero h1{font-size:clamp(2rem,7vw,3.4rem);line-height:1.25;margin:18px 0 14px;font-weight:700}
-.hero h1 em{font-style:normal;color:var(--gold-2)}
-.hero .sub{font-size:clamp(1.05rem,2.6vw,1.25rem);color:rgba(255,255,255,.88);max-width:560px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;font-weight:600;font-size:.9rem}
+.hero.hero-dhruv .badge{background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.35);color:#c5d4ce}
+.hero.hero-dhruv .badge::before{content:none}
+.hero h1{font-size:clamp(2rem,5.8vw,3.2rem);line-height:1.16;margin:16px 0 14px;font-weight:700;letter-spacing:-.02em}
+.hero.hero-dhruv h1 em,.hero.hero-dhruv h1 .hl{font-style:normal;color:var(--dr-accent)}
+.hero .sub{font-size:clamp(1.05rem,2.4vw,1.2rem);max-width:38em;line-height:1.6}
+.hero.hero-dhruv .sub{color:rgba(244,245,247,.88)}
 .hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px}
-.hero-trust{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:26px;color:rgba(255,255,255,.8);font-size:.95rem}
-.hero-trust span::before{content:"✓ ";color:var(--gold-2);font-weight:700}
+.btn-hero-primary{background:var(--dr-accent);color:#fff;box-shadow:0 12px 32px rgba(232,93,58,.38);border:2px solid transparent}
+.btn-hero-primary:hover{background:var(--dr-accent-2);transform:translateY(-3px);color:#fff}
+.hero-trust{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:26px;font-size:.95rem}
+.hero.hero-dhruv .hero-trust{color:rgba(244,245,247,.78)}
+.hero-trust span::before{content:"✓ ";font-weight:700}
+.hero.hero-dhruv .hero-trust span::before{color:var(--dr-ok)}
 .mockup{margin:0 auto;width:100%;max-width:560px}
 .mockup svg{width:100%;height:auto;overflow:visible}
 .mockup text{font-family:inherit}
@@ -258,15 +271,14 @@ a{color:inherit}
 <main id="top">
 
 <!-- 1) HERO -->
-<section class="hero" aria-labelledby="hero-title" data-cms-section="hero">
-  <div class="motif" style="position:absolute;inset:0;opacity:.5" aria-hidden="true"></div>
+<section class="hero hero-dhruv" aria-labelledby="hero-title" data-cms-section="hero">
   <div class="container">
     <div class="reveal" data-cms-slot="hero">
       <span class="badge" data-cms="hero.badge">ফ্রি ডোমেইন ও হোস্টিং</span>
       <h1 id="hero-title" data-cms="hero.title">উদ্যোক্তাদের জন্য ওয়েবসাইট ডিজাইন সম্পূর্ণ ফ্রি।</h1>
       <p class="sub" id="hero-sub" data-cms="hero.sub">কোম্পানি, পোর্টফোলিও, ল্যান্ডিং পেজ কিংবা ই-কমার্স, যেকোনো ওয়েবসাইট বানিয়ে নিন সম্পূর্ণ ফ্রিতে। শুধু মাসিক ৳৩২৫ সার্ভিস চার্জ।</p>
       <div class="hero-actions" data-cms="hero.buttons">
-        <a href="#packages" class="btn btn-gold">অফার নিন →</a>
+        <a href="#packages" class="btn btn-hero-primary">অফার নিন →</a>
         <a href="#work" class="btn btn-ghost">কাজের নমুনা দেখুন</a>
       </div>
       <div class="hero-trust" data-cms="hero.trust">
