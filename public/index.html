@@ -103,8 +103,26 @@ a{color:inherit}
   border-top:1px solid rgba(255,255,255,.1);
   box-shadow:inset 0 1px 0 rgba(61,214,140,.06);
 }
-.dr-section::before{content:"";position:absolute;inset:0;opacity:.24;pointer-events:none;background-image:radial-gradient(circle at 50% 50%,rgba(61,214,140,.1) 1px,transparent 1.5px);background-size:28px 28px}
-.dr-section::after{content:"";position:absolute;width:520px;height:520px;left:-160px;bottom:-180px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(232,93,58,.16),transparent 68%)}
+.dr-section::before{content:"";position:absolute;inset:0;z-index:0;opacity:.24;pointer-events:none;background-image:radial-gradient(circle at 50% 50%,rgba(61,214,140,.1) 1px,transparent 1.5px);background-size:28px 28px}
+.dr-section::after{content:"";position:absolute;z-index:0;width:520px;height:520px;left:-160px;bottom:-180px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(232,93,58,.16),transparent 68%)}
+.dr-floats{position:absolute;inset:0;z-index:0;pointer-events:none;mask-image:linear-gradient(180deg,rgba(0,0,0,.95) 0%,rgba(0,0,0,.55) 45%,rgba(0,0,0,.7) 100%)}
+.dr-float{position:absolute;width:var(--sz,56px);height:var(--sz,56px);color:rgba(244,245,247,.92);opacity:var(--op,.1);transform:rotate(var(--rot,0deg));filter:blur(.35px);animation:dr-drift var(--dur,15s) ease-in-out infinite;animation-delay:var(--delay,0s);will-change:transform}
+.dr-float svg{display:block;width:100%;height:100%}
+.dr-float--fb{top:6%;left:4%;--sz:62px;--op:.12;--rot:-8deg;--dur:17s;--delay:-3s}
+.dr-float--web{top:10%;right:5%;--sz:58px;--op:.09;--rot:12deg;--dur:14s;--delay:-1s}
+.dr-float--pixel{top:38%;left:2%;--sz:52px;--op:.11;--rot:6deg;--dur:19s;--delay:-5s}
+.dr-float--track{top:32%;right:3%;--sz:64px;--op:.1;--rot:-14deg;--dur:16s;--delay:-2s}
+.dr-float--inbox{bottom:18%;left:7%;--sz:54px;--op:.1;--rot:-5deg;--dur:18s;--delay:-4s}
+.dr-float--ads{bottom:22%;right:6%;--sz:50px;--op:.08;--rot:10deg;--dur:20s;--delay:-6s}
+.dr-float--cart{top:58%;left:11%;--sz:46px;--op:.07;--rot:18deg;--dur:21s;--delay:-7s;display:none}
+.dr-float--chart{bottom:8%;right:14%;--sz:48px;--op:.08;--rot:-12deg;--dur:15s;--delay:-1.5s;display:none}
+@keyframes dr-drift{
+  0%,100%{transform:translate3d(0,0,0) rotate(var(--rot,0deg))}
+  20%{transform:translate3d(10px,-14px,0) rotate(calc(var(--rot,0deg) + 5deg))}
+  45%{transform:translate3d(-8px,12px,0) rotate(calc(var(--rot,0deg) - 4deg))}
+  70%{transform:translate3d(12px,8px,0) rotate(calc(var(--rot,0deg) + 3deg))}
+  88%{transform:translate3d(-6px,-6px,0) rotate(calc(var(--rot,0deg) - 2deg))}
+}
 .dr-section .container{position:relative;z-index:1;max-width:920px}
 .dr-kicker{font-size:clamp(.95rem,2vw,1.05rem);color:var(--dr-muted);text-align:center;margin-bottom:20px;letter-spacing:.01em}
 .dr-headline{font-size:clamp(1.85rem,5.2vw,3.1rem);font-weight:700;line-height:1.18;text-align:center;letter-spacing:-.02em;color:var(--dr-text);max-width:18ch;margin:0 auto}
@@ -233,6 +251,13 @@ a{color:inherit}
 }
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* Breakpoints */
+@media (min-width:900px){
+  .dr-float--cart,.dr-float--chart{display:block}
+}
+@media (max-width:640px){
+  .dr-float{opacity:calc(var(--op,.1) * .75)}
+  .dr-float--pixel,.dr-float--ads{display:none}
+}
 @media (min-width:720px){
   .dr-compare{grid-template-columns:1fr 1fr;gap:24px;align-items:stretch}
   .dr-headline{max-width:none}
@@ -398,8 +423,18 @@ a{color:inherit}
   </div>
 </section>
 
-<!-- 2) PROBLEM & SOLUTION (matches /preview/section-2-urgency.html) -->
+<!-- 2) PROBLEM & SOLUTION -->
 <section class="dr-section" aria-labelledby="problem-title" data-cms-section="problem">
+  <div class="dr-floats" aria-hidden="true">
+    <div class="dr-float dr-float--fb"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.5V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg></div>
+    <div class="dr-float dr-float--web"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4.2" ry="9"/><path d="M3.2 8.5h17.6M3.2 15.5h17.6"/></svg></div>
+    <div class="dr-float dr-float--pixel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><circle cx="16.5" cy="16.5" r="3.5"/><path d="M14.5 16.5h4M16.5 14.5v4"/></svg></div>
+    <div class="dr-float dr-float--track"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" aria-hidden="true"><path d="M4 18V6M4 18h16"/><path d="M7 15l3.5-4 3 2.5L17 9l3 4"/><circle cx="18" cy="7" r="2.2"/><path d="M18 5.2v1.2M18 8.8v1.2M16.2 7h1.2M19.8 7h1.2"/></svg></div>
+    <div class="dr-float dr-float--inbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" aria-hidden="true"><path d="M4 6.5h16v11H4z"/><path d="M4 8.5l7.2 5.2c.6.4 1.4.4 2 0L20.5 8.5"/></svg></div>
+    <div class="dr-float dr-float--ads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" aria-hidden="true"><path d="M4 10v4a2 2 0 0 0 2 2h3l5 4V6L9 10H6a2 2 0 0 0-2 2z"/><path d="M16.5 8.5a4 4 0 0 1 0 7M18.8 6a7 7 0 0 1 0 12"/></svg></div>
+    <div class="dr-float dr-float--cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" aria-hidden="true"><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/><path d="M3 5h2l2.2 10.5a1 1 0 0 0 1 .8h8.6a1 1 0 0 0 1-.8L20 9H7"/></svg></div>
+    <div class="dr-float dr-float--chart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" aria-hidden="true"><path d="M6 20V10M12 20V4M18 20v-7"/></svg></div>
+  </div>
   <div class="container" data-cms-slot="problem">
     <p class="dr-kicker reveal" data-cms="problem.eyebrow">বাংলাদেশের উদ্যোক্তাদের জন্য — ফেসবুক ব্যবসা + ওয়েবসাইট</p>
     <h2 class="dr-headline reveal" id="problem-title" data-cms="problem.title">ফেসবুক পেজ আপনার ব্যবসা বাঁচাবে না। <span>নিজের ওয়েবসাইট</span> থাকলেই বাঁচবে।</h2>
