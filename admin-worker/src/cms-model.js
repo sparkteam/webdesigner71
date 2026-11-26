@@ -28,8 +28,8 @@ export const KEYS = {
   settingsPrev: "settings:site:prev",
   v1: "content:homepage", // Phase 1 (hero only) — read as a fallback/migration source, never written by Phase 2
 };
-export const BUTTON_STYLES = ["gold", "green", "ghost", "outline"];
-export const BUTTON_STYLE_LABELS = { gold: "সোনালি", green: "সবুজ", ghost: "স্বচ্ছ (গাঢ় ব্যাকগ্রাউন্ডে)", outline: "বর্ডার" };
+export const BUTTON_STYLES = ["gold", "green", "ghost", "outline", "dr"];
+export const BUTTON_STYLE_LABELS = { gold: "সোনালি", green: "সবুজ", ghost: "স্বচ্ছ (গাঢ় ব্যাকগ্রাউন্ডে)", outline: "বর্ডার", dr: "কোরাল (ডার্ক সেকশন)" };
 export const EXTRA_TYPES = ["heading", "text", "image", "button"];
 export const EXTRA_LABELS = { heading: "শিরোনাম", text: "প্যারাগ্রাফ", image: "ছবি", button: "বাটন" };
 export const DEFAULT_ACCENT = "#D4A017";
@@ -235,16 +235,21 @@ const RAW_DEFAULTS = {
     image: { src: "", alt: "", hidden: false },
   },
   problem: {
-    eyebrow: t("সমস্যাটা চেনা চেনা লাগছে?"),
-    title: t("ব্যবসা আছে, কিন্তু অনলাইনে আপনি কোথায়?"),
+    eyebrow: t("বাংলাদেশের উদ্যোক্তাদের জন্য — ফেসবুক ব্যবসা + ওয়েবসাইট"),
+    title: t("ফেসবুক পেজ আপনার ব্যবসা বাঁচাবে না। [[নিজের ওয়েবসাইট]] থাকলেই বাঁচবে।"),
     pains: { items: [
-      { id: "p1", icon: "🏪", title: "দোকান আছে, অনলাইনে কেউ খুঁজে পাচ্ছে না", text: "গুগলে আপনার ব্যবসার নাম লিখলে কিছুই আসে না, আর কাস্টমার চলে যায় অন্যের কাছে।" },
-      { id: "p2", icon: "📱", title: "ফেসবুকে পোস্ট করলেই বিক্রি, নিজের ঠিকানা নেই", text: "পেজ বন্ধ হলে বা রিচ কমলে সব শেষ। নিজের একটা স্থায়ী অনলাইন ঠিকানা দরকার।" },
-      { id: "p3", icon: "🤝", title: "কাস্টমার ভরসা পায় না", text: "নিজের ওয়েবসাইট না থাকলে নতুন কাস্টমার বুঝতেই পারে না আপনি কতটা সিরিয়াস ব্যবসায়ী।" },
+      { id: "p1", icon: "", title: "পেজ বন্ধ হলে কাস্টমার যোগাযোগের ঠিকানা হারায়", text: "" },
+      { id: "p2", icon: "", title: "অ্যাড বাজেট দিচ্ছেন, ট্র্যাকিং ঠিকমতো হয় না", text: "" },
+      { id: "p3", icon: "", title: "গুগলে খুঁজলে ব্যবসার কোনো সাইট দেখা যায় না", text: "" },
+      { id: "p4", icon: "", title: "ইনবক্স অর্ডার — বড় হলে ব্যবসা স্কেল করা কঠিন", text: "" },
+      { id: "p5", icon: "", title: "স্থায়ী লিংক — পেজ সমস্যায়ও ব্যবসা চালু রাখুন", text: "" },
+      { id: "p6", icon: "", title: "Pixel সেটআপে অ্যাড ট্র্যাকিং ও রিটার্গেটিং", text: "" },
+      { id: "p7", icon: "", title: "নিজের ডোমেইনে প্রফেশনাল ইমেজ — বিশ্বাস বাড়ে", text: "" },
+      { id: "p8", icon: "", title: "ক্যাটালগ, অর্ডার ফর্ম — এক জায়গায়", text: "" },
     ] },
-    solutionTitle: t("সমাধান: [[এক প্যাকেজেই]] আপনার পুরো অনলাইন উপস্থিতি"),
-    solutionText: t("ডিজাইন, ডোমেইন, হোস্টিং — সব আমরা সেটআপ করে দিই। আপনি শুধু ব্যবসায় মন দিন।"),
-    solutionButtons: { items: [B("b1", "প্যাকেজ দেখুন", "#packages", "gold")] },
+    solutionTitle: t("আজ না বানালে কালও ফেসবুকে বিক্রি হবে — কিন্তু [[ঝুঁকি]] প্রতিদিনই থাকবে।"),
+    solutionText: t("অধিকাংশ উদ্যোক্তা শুধু ফেসবুকে বিক্রি করেন। পেজ রিমুভ, রিচ কমা বা একাউন্ট ঝুঁকিতে অর্ডার, কাস্টমার তালিকা আর অ্যাড ট্র্যাকিং — একসাথে হারাতে পারেন। Meta Pixel ও সঠিক কনভার্সন ট্র্যাকিংয়ের জন্য এখন ওয়েবসাইট বাধ্যতামূলক।"),
+    solutionButtons: { items: [B("b1", "প্যাকেজ ও দাম দেখুন", "#packages", "dr")] },
   },
   packages: {
     eyebrow: t("সহজ ও স্বচ্ছ দাম"),
@@ -488,6 +493,16 @@ function linkAttrs(b, cls) {
 }
 const buttonNode = (b, extraClass) => el("a", linkAttrs(b, "btn btn-" + b.style + (extraClass ? " " + extraClass : "")), b.label);
 const visible = (list) => list.filter((x) => !x.hidden);
+function renderProblemCompare(items) {
+  const half = Math.max(1, Math.ceil(items.length / 2));
+  const neg = items.slice(0, half);
+  const pos = items.slice(half);
+  const row = (it, mark) => el("li", null, el("span", { class: "dr-mark", "aria-hidden": "true" }, mark), it.title, it.text ? [" — ", it.text] : []);
+  return nl([
+    el("div", { class: "dr-col most" }, el("h3", null, "আজ যে অধিকাংশ উদ্যোক্তা"), el("ul", null, neg.map((it) => row(it, "✕")))),
+    el("div", { class: "dr-col you" }, el("h3", null, "আপনি, ওয়েবসাইট সেটআপের পর"), el("ul", null, pos.map((it) => row(it, "✓")))),
+  ]);
+}
 const CARD_RENDER = {
   pain: (it, i) => el("article", { class: "pain reveal" + DELAY[i % 3] }, el("div", { class: "ic", "aria-hidden": "true" }, it.icon), el("h3", null, it.title), el("p", null, it.text)),
   package: (it, i) => {
@@ -568,6 +583,11 @@ export function plan(doc, settings, opts = {}) {
     if (s.hidden) { ops.push({ sel: '[data-cms-section="' + s.id + '"]', op: "remove", section: s.id }); continue; }
     for (const f of def.fields) {
       if (!opts.force && sameValue(s.fields[f.key], dflt.fields[f.key])) continue;
+      if (s.id === "problem" && f.key === "pains") {
+        const nodes = renderProblemCompare(visible(s.fields[f.key].items));
+        ops.push({ sel: sel(s.id, f.key), op: "inner", nodes, section: s.id, field: f.key });
+        continue;
+      }
       for (const o of fieldOps(s.id, f, s.fields[f.key])) ops.push({ ...o, section: s.id, field: f.key });
     }
     const ex = visible(s.extra);

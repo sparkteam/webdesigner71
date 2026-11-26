@@ -79,19 +79,39 @@ a{color:inherit}
 .mockup text{font-family:inherit}
 .mockup .mk-labels rect{filter:drop-shadow(0 4px 8px rgba(0,0,0,.25))}
 .check{flex:0 0 22px;width:22px;height:22px;border-radius:50%;background:var(--green);color:var(--gold-2);display:inline-grid;place-items:center;font-size:.8rem;font-weight:700;margin-top:3px}
-/* Problem */
-.pains{display:grid;gap:18px;margin-top:36px}
-.pain{background:#fff;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border-left:5px solid #C0503A;transition:transform .25s,box-shadow .25s}
-.pain:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
-.pain .ic{font-size:1.8rem}
-.pain h3{font-size:1.2rem;color:var(--green);margin:6px 0 4px;line-height:1.4}
-.pain p{color:var(--muted);font-size:1rem}
-.solution{margin-top:36px;background:var(--green);color:#fff;border-radius:24px;padding:32px 26px;display:grid;gap:20px;align-items:center;position:relative;overflow:hidden}
-.solution::before{content:"";position:absolute;inset:0;opacity:.35}
-.solution>*{position:relative}
-.solution h3{font-size:clamp(1.35rem,3.5vw,1.8rem);line-height:1.35}
-.solution h3 span{color:var(--gold-2)}
-.solution p{color:rgba(255,255,255,.88)}
+/* Problem (Dhruv-style compare) */
+.problem-dr{
+  --dr-bg:#0c0f12;--dr-surface:#151a1f;--dr-surface-2:#1c2229;--dr-line:rgba(255,255,255,.1);
+  --dr-text:#f4f5f7;--dr-muted:#9aa3ad;--dr-muted-2:#6b7580;--dr-accent:#e85d3a;--dr-accent-2:#ff7a55;
+  --dr-ok:#3dd68c;--dr-bad:#f87171;
+  background:var(--dr-bg);color:var(--dr-text);padding:clamp(64px,8vw,96px) 0;border-top:1px solid var(--dr-line);
+}
+.problem-dr .container{max-width:920px}
+.dr-kicker{font-size:clamp(.95rem,2vw,1.05rem);color:var(--dr-muted);text-align:center;margin-bottom:18px}
+.dr-headline{font-size:clamp(1.75rem,5.2vw,2.85rem);font-weight:700;line-height:1.2;text-align:center;letter-spacing:-.02em;color:var(--dr-text)}
+.dr-headline span{color:var(--dr-accent)}
+.dr-sub{text-align:center;color:var(--dr-muted);font-size:clamp(1.02rem,2.2vw,1.15rem);max-width:42em;margin:20px auto 0;line-height:1.65}
+.dr-stats{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 24px;margin:36px 0 40px;padding:16px 0;border-top:1px solid var(--dr-line);border-bottom:1px solid var(--dr-line)}
+.dr-stats span{font-size:.93rem;color:var(--dr-muted);font-weight:500}
+.dr-stats strong{color:var(--dr-text);font-weight:700}
+.dr-compare{display:grid;gap:18px;margin-top:8px}
+.dr-col{background:var(--dr-surface);border:1px solid var(--dr-line);border-radius:16px;padding:26px 24px}
+.dr-col h3{font-size:1.15rem;font-weight:700;margin-bottom:16px;color:var(--dr-text)}
+.dr-col.most h3{color:var(--dr-muted)}
+.dr-col.you{background:var(--dr-surface-2);border-color:rgba(61,214,140,.22);box-shadow:0 0 0 1px rgba(61,214,140,.06)}
+.dr-col.you h3{color:var(--dr-ok)}
+.dr-col ul{list-style:none;display:grid;gap:12px}
+.dr-col li{display:flex;gap:10px;align-items:flex-start;font-size:1rem;line-height:1.5;color:var(--dr-muted)}
+.dr-col.you li{color:rgba(244,245,247,.92)}
+.dr-mark{flex:0 0 22px;font-weight:700;font-size:1.05rem;text-align:center}
+.dr-col.most .dr-mark{color:var(--dr-bad)}
+.dr-col.you .dr-mark{color:var(--dr-ok)}
+.dr-bridge{margin-top:44px;text-align:center;padding-top:36px;border-top:1px solid var(--dr-line)}
+.dr-bridge h3{font-size:clamp(1.25rem,3vw,1.6rem);font-weight:700;line-height:1.35;color:var(--dr-text);margin-bottom:12px}
+.dr-bridge h3 span{color:var(--dr-accent)}
+.dr-bridge .dr-cta-note{color:var(--dr-muted);max-width:36em;margin:0 auto 20px;font-size:1.02rem;line-height:1.6}
+.btn-dr{background:var(--dr-accent);color:#fff;box-shadow:0 12px 32px rgba(232,93,58,.35)}
+.btn-dr:hover{background:var(--dr-accent-2);color:#fff}
 /* Packages */
 .packages{background:var(--cream-2)}
 .packages .cards{padding-top:22px;margin-top:28px}
@@ -195,10 +215,9 @@ a{color:inherit}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* Breakpoints */
 @media (min-width:700px){
-  .pains{grid-template-columns:repeat(3,1fr)}
+  .dr-compare{grid-template-columns:1fr 1fr;gap:22px}
   .works{grid-template-columns:repeat(3,1fr)}
   .steps{grid-template-columns:repeat(2,1fr)}
-  .solution{grid-template-columns:1.6fr auto;padding:40px}
   .work-body{flex-direction:column;align-items:flex-start}
 }
 @media (min-width:960px){
@@ -359,37 +378,40 @@ a{color:inherit}
 </section>
 
 <!-- 2) PROBLEM & SOLUTION -->
-<section class="section" aria-labelledby="problem-title" data-cms-section="problem">
+<section class="problem-dr" aria-labelledby="problem-title" data-cms-section="problem">
   <div class="container" data-cms-slot="problem">
-    <div class="center reveal">
-      <span class="eyebrow" data-cms="problem.eyebrow">সমস্যাটা চেনা চেনা লাগছে?</span>
-      <h2 class="section-title" id="problem-title" data-cms="problem.title">ব্যবসা আছে, কিন্তু অনলাইনে আপনি কোথায়?</h2>
-      <div class="stitch" aria-hidden="true"></div>
+    <p class="dr-kicker reveal" data-cms="problem.eyebrow">বাংলাদেশের উদ্যোক্তাদের জন্য — ফেসবুক ব্যবসা + ওয়েবসাইট</p>
+    <h2 class="dr-headline reveal" id="problem-title" data-cms="problem.title">ফেসবুক পেজ আপনার ব্যবসা বাঁচাবে না। <span>নিজের ওয়েবসাইট</span> থাকলেই বাঁচবে।</h2>
+    <p class="dr-sub reveal" data-cms="problem.solutionText">অধিকাংশ উদ্যোক্তা শুধু ফেসবুকে বিক্রি করেন। পেজ রিমুভ, রিচ কমা বা একাউন্ট ঝুঁকিতে অর্ডার, কাস্টমার তালিকা আর অ্যাড ট্র্যাকিং — একসাথে হারাতে পারেন। Meta Pixel ও সঠিক কনভার্সন ট্র্যাকিংয়ের জন্য এখন ওয়েবসাইট বাধ্যতামূলক।</p>
+    <div class="dr-stats reveal" role="list" aria-label="সংক্ষিপ্ত তথ্য">
+      <span role="listitem"><strong>শুধু পেজ</strong> = নিয়ন্ত্রণ অন্যের হাতে</span>
+      <span role="listitem"><strong>Pixel</strong> = সাইট ছাড়া অ্যাড অপ্টিমাইজ দুর্বল</span>
+      <span role="listitem"><strong>৳৩৯০০</strong> = ডোমেইন + হোস্টিং + ডিজাইন এক প্যাকেজ</span>
     </div>
-    <div class="pains" data-cms="problem.pains">
-      <article class="pain reveal">
-        <div class="ic" aria-hidden="true">🏪</div>
-        <h3>দোকান আছে, অনলাইনে কেউ খুঁজে পাচ্ছে না</h3>
-        <p>গুগলে আপনার ব্যবসার নাম লিখলে কিছুই আসে না, আর কাস্টমার চলে যায় অন্যের কাছে।</p>
-      </article>
-      <article class="pain reveal d1">
-        <div class="ic" aria-hidden="true">📱</div>
-        <h3>ফেসবুকে পোস্ট করলেই বিক্রি, নিজের ঠিকানা নেই</h3>
-        <p>পেজ বন্ধ হলে বা রিচ কমলে সব শেষ। নিজের একটা স্থায়ী অনলাইন ঠিকানা দরকার।</p>
-      </article>
-      <article class="pain reveal d2">
-        <div class="ic" aria-hidden="true">🤝</div>
-        <h3>কাস্টমার ভরসা পায় না</h3>
-        <p>নিজের ওয়েবসাইট না থাকলে নতুন কাস্টমার বুঝতেই পারে না আপনি কতটা সিরিয়াস ব্যবসায়ী।</p>
-      </article>
-    </div>
-    <div class="solution reveal">
-      <div class="motif" style="position:absolute;inset:0;opacity:.35" aria-hidden="true"></div>
-      <div>
-        <h3 data-cms="problem.solutionTitle">সমাধান: <span>এক প্যাকেজেই</span> আপনার পুরো অনলাইন উপস্থিতি</h3>
-        <p data-cms="problem.solutionText">ডিজাইন, ডোমেইন, হোস্টিং — সব আমরা সেটআপ করে দিই। আপনি শুধু ব্যবসায় মন দিন।</p>
+    <div class="dr-compare reveal" data-cms="problem.pains">
+      <div class="dr-col most">
+        <h3>আজ যে অধিকাংশ উদ্যোক্তা</h3>
+        <ul>
+          <li><span class="dr-mark" aria-hidden="true">✕</span> পেজ বন্ধ হলে কাস্টমার যোগাযোগের ঠিকানা হারায়</li>
+          <li><span class="dr-mark" aria-hidden="true">✕</span> অ্যাড বাজেট দিচ্ছেন, ট্র্যাকিং ঠিকমতো হয় না</li>
+          <li><span class="dr-mark" aria-hidden="true">✕</span> গুগলে খুঁজলে ব্যবসার কোনো সাইট দেখা যায় না</li>
+          <li><span class="dr-mark" aria-hidden="true">✕</span> ইনবক্স অর্ডার — বড় হলে ব্যবসা স্কেল করা কঠিন</li>
+        </ul>
       </div>
-      <a href="#packages" class="btn btn-gold" data-cms="problem.solutionButtons">প্যাকেজ দেখুন</a>
+      <div class="dr-col you">
+        <h3>আপনি, ওয়েবসাইট সেটআপের পর</h3>
+        <ul>
+          <li><span class="dr-mark" aria-hidden="true">✓</span> স্থায়ী লিংক — পেজ সমস্যায়ও ব্যবসা চালু রাখুন</li>
+          <li><span class="dr-mark" aria-hidden="true">✓</span> Pixel সেটআপে অ্যাড ট্র্যাকিং ও রিটার্গেটিং</li>
+          <li><span class="dr-mark" aria-hidden="true">✓</span> নিজের ডোমেইনে প্রফেশনাল ইমেজ — বিশ্বাস বাড়ে</li>
+          <li><span class="dr-mark" aria-hidden="true">✓</span> ক্যাটালগ, অর্ডার ফর্ম — এক জায়গায়</li>
+        </ul>
+      </div>
+    </div>
+    <div class="dr-bridge reveal">
+      <h3 data-cms="problem.solutionTitle">আজ না বানালে কালও ফেসবুকে বিক্রি হবে — কিন্তু <span>ঝুঁকি</span> প্রতিদিনই থাকবে।</h3>
+      <p class="dr-cta-note">ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে সেটআপ করে দিই। আপনি ব্যবসায় মন দিন।</p>
+      <a href="#packages" class="btn btn-dr" data-cms="problem.solutionButtons">প্যাকেজ ও দাম দেখুন</a>
     </div>
   </div>
 </section>
