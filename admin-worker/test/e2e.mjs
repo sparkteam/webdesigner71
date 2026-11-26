@@ -174,7 +174,7 @@ try {
   j = await r.json();
   check("public GET /content/homepage (empty) -> defaults, version 0", r.status === 200 && j.source === "defaults" && j.sections.length === M.SECTION_IDS.length && j.sections.every((s) => s.version === 0) && j.settings.accentColor === "#D4A017", JSON.stringify(j).slice(0, 200));
   // Phase 1 key present (what production has) -> migrated read
-  const V1 = { heroTitle: "আপনার ব্যবসার ওয়েবসাইট, মাত্র", heroHighlight: "৩৯০০ টাকায়", heroSub: "ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে", accentColor: "#D4A017", version: 3, updatedBy: ADMIN, updatedAt: "2026-11-01T00:00:00.000Z" };
+  const V1 = { heroTitle: "উদ্যোক্তাদের জন্য ওয়েবসাইট ডিজাইন", heroHighlight: "সম্পূর্ণ ফ্রি।", heroSub: "ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে", accentColor: "#D4A017", version: 3, updatedBy: ADMIN, updatedAt: "2026-11-01T00:00:00.000Z" };
   putLocalKV("CONTENT", "content:homepage", V1);
   r = await api("/content/homepage", { origin: null });
   j = await r.json();

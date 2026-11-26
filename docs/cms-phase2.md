@@ -53,7 +53,7 @@ A section (hero, abbreviated):
   "updatedAt": "2026-11-01T18:00:00.000Z", "updatedBy": "sohelhoo@gmail.com",
   "fields": {
     "badge":   { "text": "ফ্রি ডোমেইন ও হোস্টিং", "hidden": false },
-    "title":   { "text": "আপনার ব্যবসার ওয়েবসাইট, মাত্র", "highlight": "৩৯০০ টাকায়" },
+    "title":   { "text": "উদ্যোক্তাদের জন্য ওয়েবসাইট ডিজাইন", "highlight": "সম্পূর্ণ ফ্রি।" },
     "sub":     { "text": "ডোমেইন, হোস্টিং, ডিজাইন — সব এক প্যাকেজে", "hidden": false },
     "buttons": { "items": [ { "id": "b1", "label": "অফার নিন →", "href": "#packages", "style": "gold", "newTab": false, "hidden": false } ] },
     "trust":   { "items": [ { "id": "t1", "text": "ই-কমার্স ও বিজনেস ওয়েবসাইট", "hidden": false } ] },
