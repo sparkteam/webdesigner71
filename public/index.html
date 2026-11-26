@@ -213,23 +213,77 @@ a{color:inherit}
   0%,100%{box-shadow:0 20px 50px rgba(0,0,0,.38);border-color:rgba(61,214,140,.22)}
   12%,38%{box-shadow:0 0 0 3px rgba(61,214,140,.7),0 0 40px rgba(61,214,140,.4),0 28px 58px rgba(0,0,0,.45);border-color:rgba(61,214,140,.85);transform:translateY(-8px) scale(1.025)}
 }
-/* Work */
-.works{display:grid;gap:24px;margin-top:40px}
-.work{background:#fff;border-radius:22px;overflow:hidden;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
-.work:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
-.work-thumb{height:190px;display:grid;place-items:center;position:relative;overflow:hidden}
-.work-thumb .initial{width:86px;height:86px;border-radius:22px;background:rgba(255,255,255,.95);display:grid;place-items:center;font-size:2.2rem;font-weight:700;color:var(--green);box-shadow:0 10px 24px rgba(0,0,0,.18);transition:transform .35s}
-.work:hover .initial{transform:scale(1.08) rotate(-3deg)}
-.w1{background:linear-gradient(135deg,#0B3D2E,#1E6B52)}
-.w2{background:linear-gradient(135deg,#B3541E,#D4A017)}
-.w3{background:linear-gradient(135deg,#5B2A4E,#A3476F)}
-.work-thumb::before{content:"";position:absolute;inset:0;opacity:.5}
-.work-thumb .bar{position:absolute;top:0;left:0;right:0;height:26px;background:rgba(255,255,255,.18);display:flex;gap:6px;align-items:center;padding:0 12px}
-.work-thumb .bar i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.7)}
-.work-body{padding:20px 22px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.work-body h3{font-size:1.15rem;color:var(--green);line-height:1.35}
-.work-body p{color:var(--muted);font-size:.95rem}
-.work-body .btn{padding:8px 20px;font-size:.95rem;flex-shrink:0}
+/* Work / portfolio — Dhruv-style */
+.work-dhruv{
+  position:relative;overflow:hidden;
+  background:linear-gradient(188deg,#0c1216 0%,#0a2820 45%,#0B3D2E 70%,#0c0f12 100%);
+  color:#f4f5f7;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.1);
+}
+.work-dhruv::before{content:"";position:absolute;inset:0;opacity:.2;pointer-events:none;background-image:radial-gradient(circle at 50% 50%,rgba(61,214,140,.1) 1px,transparent 1.5px);background-size:28px 28px}
+.work-dhruv::after{content:"";position:absolute;width:420px;height:420px;left:-100px;bottom:-120px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(232,93,58,.12),transparent 68%)}
+.work-dhruv .container{position:relative;z-index:1}
+.work-dhruv .eyebrow{color:var(--dr-ok)}
+.work-dhruv .section-title{
+  color:#fff;
+  background:linear-gradient(92deg,#fff 0%,#c8f5e4 42%,#fff 78%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.work-dhruv .section-sub{color:rgba(244,245,247,.78)}
+.work-dhruv .stitch{background:repeating-linear-gradient(90deg,var(--dr-accent) 0 14px,transparent 14px 24px);opacity:.6}
+.works-grid{display:grid;gap:22px;margin-top:40px}
+.work-card{
+  background:linear-gradient(165deg,#151a1f 0%,#12181d 100%);
+  border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden;
+  box-shadow:0 18px 44px rgba(0,0,0,.38);
+  transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease;
+  display:flex;flex-direction:column;
+}
+.work-card:hover{transform:translateY(-8px);border-color:rgba(61,214,140,.28);box-shadow:0 26px 52px rgba(0,0,0,.45),0 0 36px rgba(232,93,58,.08)}
+.work-shot{position:relative;margin:0;padding:0;border:0;background:transparent;width:100%;cursor:pointer;aspect-ratio:16/10;overflow:hidden;display:block;text-align:left}
+.work-shot img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;transition:transform .45s ease}
+.work-card:hover .work-shot img{transform:scale(1.04)}
+.work-shot::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(9,12,14,.85) 100%);pointer-events:none}
+.work-shot-label{
+  position:absolute;left:14px;right:14px;bottom:12px;z-index:2;
+  display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:.92rem;color:#fff;
+}
+.work-shot-label::before{content:"▶";display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--dr-accent);font-size:.65rem;box-shadow:0 8px 20px rgba(232,93,58,.45)}
+.work-card-body{padding:18px 18px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
+.work-tag{align-self:flex-start;font-size:.78rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--dr-ok);background:rgba(61,214,140,.12);border:1px solid rgba(61,214,140,.28);padding:4px 10px;border-radius:999px}
+.work-card h3{font-size:1.12rem;font-weight:700;color:#fff;line-height:1.35;margin:0}
+.work-domain{font-size:.9rem;color:rgba(244,245,247,.62);margin:0}
+.work-card .btn-work-open{
+  margin-top:auto;width:100%;padding:12px 18px;font-size:.98rem;
+  background:transparent;border:2px solid rgba(61,214,140,.45);color:var(--dr-ok);
+}
+.work-card .btn-work-open:hover{background:rgba(61,214,140,.12);color:#fff;border-color:rgba(61,214,140,.65)}
+/* Work preview modal */
+.work-modal{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:16px;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .25s ease,visibility .25s}
+.work-modal.open{visibility:visible;opacity:1;pointer-events:auto}
+.work-modal-backdrop{position:absolute;inset:0;background:rgba(6,8,10,.88);backdrop-filter:blur(6px)}
+.work-modal-panel{
+  position:relative;z-index:1;width:min(1140px,100%);max-height:min(92vh,920px);
+  background:#0e1216;border:1px solid rgba(255,255,255,.12);border-radius:18px;
+  box-shadow:0 32px 80px rgba(0,0,0,.55),0 0 0 1px rgba(61,214,140,.08);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.work-modal-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,.1)}
+.work-modal-head h2{font-size:1.05rem;font-weight:700;color:#fff;margin:0;line-height:1.35}
+.work-modal-close{
+  flex-shrink:0;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.06);color:#fff;font-size:1.4rem;line-height:1;cursor:pointer;
+}
+.work-modal-close:hover{background:var(--dr-accent);border-color:transparent}
+.work-modal-frame-wrap{position:relative;flex:1;min-height:0;background:#fff}
+.work-modal-frame{width:100%;height:min(78vh,780px);border:0;display:block;background:#fff}
+.work-modal-loading{
+  position:absolute;inset:0;display:grid;place-items:center;background:#0e1216;color:rgba(244,245,247,.85);
+  font-weight:600;font-size:.95rem;
+}
+.work-modal-fallback{max-height:min(78vh,780px);overflow:auto;background:#0a0a0a}
+.work-modal-fallback img{width:100%;height:auto;display:block}
+.work-modal-foot{padding:10px 16px 12px;border-top:1px solid rgba(255,255,255,.1);font-size:.85rem;color:rgba(244,245,247,.65);text-align:center}
+body.work-modal-open{overflow:hidden}
 /* Steps */
 .steps{display:grid;gap:22px;margin-top:40px;counter-reset:s;position:relative}
 .step{background:#fff;border-radius:var(--radius);padding:26px 22px;box-shadow:var(--shadow);position:relative;transition:transform .25s,box-shadow .25s}
@@ -295,9 +349,11 @@ a{color:inherit}
   .dr-headline{max-width:none}
 }
 @media (min-width:700px){
-  .works{grid-template-columns:repeat(3,1fr)}
+  .works-grid{grid-template-columns:repeat(2,1fr)}
   .steps{grid-template-columns:repeat(2,1fr)}
-  .work-body{flex-direction:column;align-items:flex-start}
+}
+@media (min-width:1080px){
+  .works-grid{grid-template-columns:repeat(3,1fr)}
 }
 @media (min-width:960px){
   .section{padding:96px 0}
@@ -556,42 +612,106 @@ a{color:inherit}
 </section>
 
 <!-- 4) SAMPLE WORK -->
-<section class="section" id="work" aria-labelledby="work-title" data-cms-section="work">
+<section class="section work-dhruv" id="work" aria-labelledby="work-title" data-cms-section="work">
   <div class="container" data-cms-slot="work">
     <div class="center reveal">
       <span class="eyebrow" data-cms="work.eyebrow">আমাদের কাজ</span>
       <h2 class="section-title" id="work-title" data-cms="work.title">কাজের নমুনা</h2>
-      <p class="section-sub" data-cms="work.sub">বিভিন্ন ধরনের বাংলাদেশি ব্যবসার জন্য তৈরি ওয়েবসাইট।</p>
+      <p class="section-sub" data-cms="work.sub">কার্ডে ক্লিক করলে পপআপে পুরো হোমপেজ দেখুন — ই-কমার্স, অটো পার্টস, সিকিউরিটি ও প্রপার্টি।</p>
       <div class="stitch" aria-hidden="true"></div>
     </div>
-    <div class="works" data-cms="work.items">
-      <article class="work reveal">
-        <div class="work-thumb w1" aria-hidden="true"><div class="motif" style="position:absolute;inset:0;opacity:.5"></div><div class="bar"><i></i><i></i><i></i></div><span class="initial">D</span></div>
-        <div class="work-body">
-          <div><h3>DTex BD — হোম টেক্সটাইল</h3><p>ই-কমার্স ওয়েবসাইট</p></div>
-          <!-- REPLACE: project link -->
-          <a href="#" class="btn btn-outline">দেখুন</a>
+    <div class="works-grid" data-cms="work.items">
+      <article class="work-card reveal">
+        <button type="button" class="work-shot" data-work-preview="https://dtex.com.bd/" data-work-title="DTex BD — হোম টেক্সটাইল" aria-label="DTex BD হোমপেজ দেখুন">
+          <img src="/assets/portfolio/dtex.png" alt="DTex BD ওয়েবসাইট হোমপেজ" width="640" height="400" loading="lazy">
+          <span class="work-shot-label">হোমপেজ প্রিভিউ</span>
+        </button>
+        <div class="work-card-body">
+          <span class="work-tag">ই-কমার্স</span>
+          <h3>DTex BD — হোম টেক্সটাইল</h3>
+          <p class="work-domain">dtex.com.bd</p>
+          <button type="button" class="btn btn-work-open" data-work-preview="https://dtex.com.bd/" data-work-title="DTex BD — হোম টেক্সটাইল">হোমপেজ দেখুন →</button>
         </div>
       </article>
-      <article class="work reveal d1">
-        <div class="work-thumb w2" aria-hidden="true"><div class="motif" style="position:absolute;inset:0;opacity:.5"></div><div class="bar"><i></i><i></i><i></i></div><span class="initial">ঘ</span></div>
-        <div class="work-body">
-          <div><h3>ঘরোয়া খাবার — হোম কিচেন</h3><p>অর্ডার ও মেনু ওয়েবসাইট</p></div>
-          <!-- REPLACE: project link -->
-          <a href="#" class="btn btn-outline">দেখুন</a>
+      <article class="work-card reveal d1">
+        <button type="button" class="work-shot" data-work-preview="https://petshop.com.bd/" data-work-title="Pet Shop BD" aria-label="Pet Shop BD হোমপেজ দেখুন">
+          <img src="/assets/portfolio/petshop.png" alt="Pet Shop BD ওয়েবসাইট হোমপেজ" width="640" height="400" loading="lazy">
+          <span class="work-shot-label">হোমপেজ প্রিভিউ</span>
+        </button>
+        <div class="work-card-body">
+          <span class="work-tag">ই-কমার্স</span>
+          <h3>Pet Shop BD</h3>
+          <p class="work-domain">petshop.com.bd</p>
+          <button type="button" class="btn btn-work-open" data-work-preview="https://petshop.com.bd/" data-work-title="Pet Shop BD">হোমপেজ দেখুন →</button>
         </div>
       </article>
-      <article class="work reveal d2">
-        <div class="work-thumb w3" aria-hidden="true"><div class="motif" style="position:absolute;inset:0;opacity:.5"></div><div class="bar"><i></i><i></i><i></i></div><span class="initial">R</span></div>
-        <div class="work-body">
-          <div><h3>Rangdhanu Fashion — বুটিক</h3><p>বিজনেস ওয়েবসাইট</p></div>
-          <!-- REPLACE: project link -->
-          <a href="#" class="btn btn-outline">দেখুন</a>
+      <article class="work-card reveal d2">
+        <button type="button" class="work-shot" data-work-preview="https://amarautos.com/" data-work-title="Amar Autos" aria-label="Amar Autos হোমপেজ দেখুন">
+          <img src="/assets/portfolio/amarautos.png" alt="Amar Autos ওয়েবসাইট হোমপেজ" width="640" height="400" loading="lazy">
+          <span class="work-shot-label">হোমপেজ প্রিভিউ</span>
+        </button>
+        <div class="work-card-body">
+          <span class="work-tag">ই-কমার্স</span>
+          <h3>Amar Autos — কার পার্টস</h3>
+          <p class="work-domain">amarautos.com</p>
+          <button type="button" class="btn btn-work-open" data-work-preview="https://amarautos.com/" data-work-title="Amar Autos">হোমপেজ দেখুন →</button>
+        </div>
+      </article>
+      <article class="work-card reveal">
+        <button type="button" class="work-shot" data-work-preview="https://techdeal.com.bd/" data-work-title="Tech Deal" aria-label="Tech Deal হোমপেজ দেখুন">
+          <img src="/assets/portfolio/techdeal.png" alt="Tech Deal ওয়েবসাইট হোমপেজ" width="640" height="400" loading="lazy">
+          <span class="work-shot-label">হোমপেজ প্রিভিউ</span>
+        </button>
+        <div class="work-card-body">
+          <span class="work-tag">ই-কমার্স</span>
+          <h3>Tech Deal</h3>
+          <p class="work-domain">techdeal.com.bd</p>
+          <button type="button" class="btn btn-work-open" data-work-preview="https://techdeal.com.bd/" data-work-title="Tech Deal">হোমপেজ দেখুন →</button>
+        </div>
+      </article>
+      <article class="work-card reveal d1">
+        <button type="button" class="work-shot" data-work-preview="https://www.digimarkbd.com/" data-work-title="DigiMark Solution" aria-label="DigiMark BD হোমপেজ দেখুন">
+          <img src="/assets/portfolio/digimark.png" alt="DigiMark BD ওয়েবসাইট হোমপেজ" width="640" height="400" loading="lazy">
+          <span class="work-shot-label">হোমপেজ প্রিভিউ</span>
+        </button>
+        <div class="work-card-body">
+          <span class="work-tag">বিজনেস</span>
+          <h3>DigiMark Solution</h3>
+          <p class="work-domain">digimarkbd.com</p>
+          <button type="button" class="btn btn-work-open" data-work-preview="https://www.digimarkbd.com/" data-work-title="DigiMark Solution">হোমপেজ দেখুন →</button>
+        </div>
+      </article>
+      <article class="work-card reveal d2">
+        <button type="button" class="work-shot" data-work-preview="https://lordspropconsult.com/" data-work-title="Lord's Property Consultants" aria-label="Lord's Property Consultants হোমপেজ দেখুন">
+          <img src="/assets/portfolio/lordsprop.png" alt="Lord's Property Consultants ওয়েবসাইট হোমপেজ" width="640" height="400" loading="lazy">
+          <span class="work-shot-label">হোমপেজ প্রিভিউ</span>
+        </button>
+        <div class="work-card-body">
+          <span class="work-tag">রিয়েল এস্টেট</span>
+          <h3>Lord's Property Consultants</h3>
+          <p class="work-domain">lordspropconsult.com</p>
+          <button type="button" class="btn btn-work-open" data-work-preview="https://lordspropconsult.com/" data-work-title="Lord's Property Consultants">হোমপেজ দেখুন →</button>
         </div>
       </article>
     </div>
   </div>
 </section>
+
+<div class="work-modal" id="work-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="work-modal-title">
+  <div class="work-modal-backdrop" data-work-close tabindex="-1" aria-hidden="true"></div>
+  <div class="work-modal-panel">
+    <header class="work-modal-head">
+      <h2 id="work-modal-title">প্রজেক্ট প্রিভিউ</h2>
+      <button type="button" class="work-modal-close" data-work-close aria-label="বন্ধ করুন">×</button>
+    </header>
+    <div class="work-modal-frame-wrap">
+      <p class="work-modal-loading" id="work-modal-loading">লোড হচ্ছে…</p>
+      <iframe class="work-modal-frame" id="work-modal-frame" title="ওয়েবসাইট হোমপেজ প্রিভিউ" hidden sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+      <div class="work-modal-fallback" id="work-modal-fallback" hidden><img id="work-modal-fallback-img" alt="" width="1200" height="2400" loading="eager"></div>
+    </div>
+    <p class="work-modal-foot">স্ক্রল করে সম্পূর্ণ হোমপেজ দেখুন — আমাদের সাইট থেকে বের হবেন না।</p>
+  </div>
+</div>
 
 <!-- 5) HOW IT WORKS -->
 <section class="section" id="how" aria-labelledby="how-title" style="padding-top:0" data-cms-section="how">
@@ -713,6 +833,74 @@ a{color:inherit}
   }
   document.querySelectorAll('[data-flash-standard]').forEach(function(a){
     a.addEventListener('click',function(e){e.preventDefault();flashStandard();});
+  });
+  // Portfolio preview modal
+  var wm=document.getElementById('work-modal');
+  var wf=document.getElementById('work-modal-frame');
+  var wl=document.getElementById('work-modal-loading');
+  var wt=document.getElementById('work-modal-title');
+  var wfb=document.getElementById('work-modal-fallback');
+  var wfbi=document.getElementById('work-modal-fallback-img');
+  var workIframeTimer;
+  var lastFocus;
+  function closeWorkModal(){
+    if(!wm||!wm.classList.contains('open'))return;
+    clearTimeout(workIframeTimer);
+    wm.classList.remove('open');
+    wm.setAttribute('aria-hidden','true');
+    document.body.classList.remove('work-modal-open');
+    if(wf){wf.src='about:blank';wf.hidden=true;}
+    if(wfb)wfb.hidden=true;
+    if(wfbi)wfbi.removeAttribute('src');
+    if(wl)wl.hidden=false;
+    if(lastFocus&&lastFocus.focus)lastFocus.focus();
+  }
+  function showWorkFallback(src,title){
+    if(!wfb||!wfbi||!src)return;
+    if(wl)wl.hidden=true;
+    if(wf){wf.hidden=true;wf.src='about:blank';}
+    wfbi.src=src;
+    wfbi.alt=(title||'প্রজেক্ট')+' — হোমপেজ স্ক্রিনশট';
+    wfb.hidden=false;
+  }
+  function openWorkModal(url,title,from){
+    if(!wm||!wf||!url)return;
+    lastFocus=from||null;
+    clearTimeout(workIframeTimer);
+    if(wt)wt.textContent=title||'প্রজেক্ট প্রিভিউ';
+    var card=from&&from.closest('.work-card');
+    var shot=card&&card.querySelector('.work-shot img');
+    var fallbackSrc=shot?shot.getAttribute('src'):'';
+    if(wfb)wfb.hidden=true;
+    if(wfbi)wfbi.removeAttribute('src');
+    wl.hidden=false;wf.hidden=true;wf.src='about:blank';
+    wm.classList.add('open');
+    wm.setAttribute('aria-hidden','false');
+    document.body.classList.add('work-modal-open');
+    wf.onload=function(){
+      clearTimeout(workIframeTimer);
+      wl.hidden=true;wf.hidden=false;
+      if(wfb)wfb.hidden=true;
+    };
+    workIframeTimer=setTimeout(function(){
+      if(!wm.classList.contains('open')||!wl||wl.hidden)return;
+      if(fallbackSrc)showWorkFallback(fallbackSrc,title);
+    },4500);
+    wf.src=url;
+    var closeBtn=wm.querySelector('.work-modal-close');
+    if(closeBtn)closeBtn.focus();
+  }
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('[data-work-preview]');
+    if(!btn)return;
+    e.preventDefault();
+    openWorkModal(btn.getAttribute('data-work-preview'),btn.getAttribute('data-work-title'),btn);
+  });
+  wm&&wm.querySelectorAll('[data-work-close]').forEach(function(el){
+    el.addEventListener('click',closeWorkModal);
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape')closeWorkModal();
   });
 })();
 </script>

@@ -275,11 +275,14 @@ const RAW_DEFAULTS = {
   work: {
     eyebrow: t("আমাদের কাজ"),
     title: t("কাজের নমুনা"),
-    sub: t("বিভিন্ন ধরনের বাংলাদেশি ব্যবসার জন্য তৈরি ওয়েবসাইট।"),
+    sub: t("কার্ডে ক্লিক করলে পপআপে পুরো হোমপেজ দেখুন — ই-কমার্স, অটো পার্টস, সিকিউরিটি ও প্রপার্টি।"),
     items: { items: [
-      { id: "w1", theme: 1, initial: "D", image: "", imageAlt: "", title: "DTex BD — হোম টেক্সটাইল", text: "ই-কমার্স ওয়েবসাইট", buttonLabel: "দেখুন", buttonHref: "#" },
-      { id: "w2", theme: 2, initial: "ঘ", image: "", imageAlt: "", title: "ঘরোয়া খাবার — হোম কিচেন", text: "অর্ডার ও মেনু ওয়েবসাইট", buttonLabel: "দেখুন", buttonHref: "#" },
-      { id: "w3", theme: 3, initial: "R", image: "", imageAlt: "", title: "Rangdhanu Fashion — বুটিক", text: "বিজনেস ওয়েবসাইট", buttonLabel: "দেখুন", buttonHref: "#" },
+      { id: "w1", theme: 1, initial: "D", image: "/assets/portfolio/dtex.png", imageAlt: "DTex BD ওয়েবসাইট হোমপেজ", title: "DTex BD — হোম টেক্সটাইল", text: "ই-কমার্স", buttonLabel: "হোমপেজ দেখুন →", buttonHref: "https://dtex.com.bd/" },
+      { id: "w2", theme: 2, initial: "P", image: "/assets/portfolio/petshop.png", imageAlt: "Pet Shop BD ওয়েবসাইট হোমপেজ", title: "Pet Shop BD", text: "ই-কমার্স", buttonLabel: "হোমপেজ দেখুন →", buttonHref: "https://petshop.com.bd/" },
+      { id: "w3", theme: 3, initial: "A", image: "/assets/portfolio/amarautos.png", imageAlt: "Amar Autos ওয়েবসাইট হোমপেজ", title: "Amar Autos — কার পার্টস", text: "ই-কমার্স", buttonLabel: "হোমপেজ দেখুন →", buttonHref: "https://amarautos.com/" },
+      { id: "w4", theme: 1, initial: "T", image: "/assets/portfolio/techdeal.png", imageAlt: "Tech Deal ওয়েবসাইট হোমপেজ", title: "Tech Deal", text: "ই-কমার্স", buttonLabel: "হোমপেজ দেখুন →", buttonHref: "https://techdeal.com.bd/" },
+      { id: "w5", theme: 2, initial: "D", image: "/assets/portfolio/digimark.png", imageAlt: "DigiMark BD ওয়েবসাইট হোমপেজ", title: "DigiMark Solution", text: "বিজনেস", buttonLabel: "হোমপেজ দেখুন →", buttonHref: "https://www.digimarkbd.com/" },
+      { id: "w6", theme: 3, initial: "L", image: "/assets/portfolio/lordsprop.png", imageAlt: "Lord's Property Consultants ওয়েবসাইট হোমপেজ", title: "Lord's Property Consultants", text: "রিয়েল এস্টেট", buttonLabel: "হোমপেজ দেখুন →", buttonHref: "https://lordspropconsult.com/" },
     ] },
   },
   how: {
@@ -538,14 +541,28 @@ const CARD_RENDER = {
     el("ul", null, visible(it.features.items).map(packageFeatureLi)),
     it.buttonLabel ? el("a", { href: it.buttonHref, class: "btn btn-" + it.buttonStyle }, it.buttonLabel) : null);
   },
-  work: (it, i) => el("article", { class: "work reveal" + DELAY[i % 3] },
-    el("div", { class: "work-thumb w" + it.theme, "aria-hidden": "true" },
-      it.image ? el("img", { src: it.image, alt: it.imageAlt || "", loading: "lazy", style: "position:absolute;inset:0;width:100%;height:100%;object-fit:cover" }) : null,
-      el("div", { class: "motif", style: "position:absolute;inset:0;opacity:.5" }),
-      el("div", { class: "bar" }, el("i"), el("i"), el("i")),
-      !it.image && it.initial ? el("span", { class: "initial" }, it.initial) : null),
-    el("div", { class: "work-body" }, el("div", null, el("h3", null, it.title), it.text ? el("p", null, it.text) : null),
-      it.buttonLabel ? el("a", { href: it.buttonHref || "#", class: "btn btn-outline" }, it.buttonLabel) : null)),
+  work: (it, i) => {
+    const url = it.buttonHref && it.buttonHref !== "#" ? it.buttonHref : "";
+    let host = "";
+    if (url) try { host = new URL(url).hostname.replace(/^www\./, ""); } catch { host = ""; }
+    const prev = url ? { "data-work-preview": url, "data-work-title": it.title || "" } : {};
+    const shotBtn = url
+      ? el("button", { type: "button", class: "work-shot", ...prev, "aria-label": (it.title || "") + " হোমপেজ দেখুন" },
+          it.image ? el("img", { src: it.image, alt: it.imageAlt || it.title || "", width: "640", height: "400", loading: "lazy" }) : el("span", { class: "work-shot-fallback" }, it.initial || "?"),
+          el("span", { class: "work-shot-label" }, "হোমপেজ প্রিভিউ"))
+      : el("div", { class: "work-shot-static" },
+          it.image ? el("img", { src: it.image, alt: it.imageAlt || it.title || "", loading: "lazy" }) : null);
+    const openBtn = url && it.buttonLabel
+      ? el("button", { type: "button", class: "btn btn-work-open", ...prev }, it.buttonLabel)
+      : null;
+    return el("article", { class: "work-card reveal" + DELAY[i % 3] },
+      shotBtn,
+      el("div", { class: "work-card-body" },
+        it.text ? el("span", { class: "work-tag" }, it.text) : null,
+        el("h3", null, it.title),
+        host ? el("p", { class: "work-domain" }, host) : null,
+        openBtn));
+  },
   step: (it, i) => el("li", { class: "step reveal" + DELAY[i % 4] }, el("div", { class: "num" }, bnNum(i + 1)), el("h3", null, it.title), it.text ? el("p", null, it.text) : null),
   faq: (it, i) => el("div", { class: "faq-item reveal" },
     el("button", { class: "faq-q", "aria-expanded": "false", "aria-controls": "fa" + (i + 1), id: "fq" + (i + 1) }, it.q, el("span", { class: "pm", "aria-hidden": "true" }, "+")),
