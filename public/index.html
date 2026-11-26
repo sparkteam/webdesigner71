@@ -92,14 +92,20 @@ a{color:inherit}
 .mockup text{font-family:inherit}
 .mockup .mk-labels rect{filter:drop-shadow(0 4px 8px rgba(0,0,0,.25))}
 .check{flex:0 0 22px;width:22px;height:22px;border-radius:50%;background:var(--green);color:var(--gold-2);display:inline-grid;place-items:center;font-size:.8rem;font-weight:700;margin-top:3px}
-/* Problem — same as public/preview/section-2-urgency.html */
+/* Problem — hero-family gradient; distinct angle & glow vs .hero-dhruv */
 .dr-section{
   --dr-bg:#0c0f12;--dr-surface:#151a1f;--dr-surface-2:#1c2229;--dr-line:rgba(255,255,255,.1);
   --dr-text:#f4f5f7;--dr-muted:#9aa3ad;--dr-muted-2:#6b7580;--dr-accent:#e85d3a;--dr-accent-2:#ff7a55;
   --dr-ok:#3dd68c;--dr-bad:#f87171;
-  background:var(--dr-bg);color:var(--dr-text);padding:clamp(56px,8vw,100px) 0;border-top:1px solid var(--dr-line);
+  position:relative;overflow:hidden;
+  background:linear-gradient(198deg,#072a20 0%,#0a3025 38%,#0B3D2E 58%,#0c1216 100%);
+  color:var(--dr-text);padding:clamp(56px,8vw,100px) 0;
+  border-top:1px solid rgba(255,255,255,.1);
+  box-shadow:inset 0 1px 0 rgba(61,214,140,.06);
 }
-.dr-section .container{max-width:920px}
+.dr-section::before{content:"";position:absolute;inset:0;opacity:.24;pointer-events:none;background-image:radial-gradient(circle at 50% 50%,rgba(61,214,140,.1) 1px,transparent 1.5px);background-size:28px 28px}
+.dr-section::after{content:"";position:absolute;width:520px;height:520px;left:-160px;bottom:-180px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(232,93,58,.16),transparent 68%)}
+.dr-section .container{position:relative;z-index:1;max-width:920px}
 .dr-kicker{font-size:clamp(.95rem,2vw,1.05rem);color:var(--dr-muted);text-align:center;margin-bottom:20px;letter-spacing:.01em}
 .dr-headline{font-size:clamp(1.85rem,5.2vw,3.1rem);font-weight:700;line-height:1.18;text-align:center;letter-spacing:-.02em;color:var(--dr-text);max-width:18ch;margin:0 auto}
 .dr-headline span{color:var(--dr-accent)}
