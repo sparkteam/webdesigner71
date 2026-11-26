@@ -515,16 +515,27 @@ const packageIcon = (kind) =>
     el("svg", { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "1.75", "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true" },
       ...PKG_ICON_PATH[kind === "card-ecommerce" ? "ecommerce" : "business"].map((d) => el("path", { d })),
       ...(kind === "card-ecommerce" ? [el("circle", { cx: "9", cy: "20", r: "1.5" }), el("circle", { cx: "18", cy: "20", r: "1.5" })] : [])));
+const STD_INCLUDES_RE = /স্ট্যান্ডার্ডের\s*সব\s*ফিচার/i;
+const packageFeatureLi = (f) => {
+  if (STD_INCLUDES_RE.test(f.text || "")) {
+    return el("li", null,
+      el("span", { class: "check", "aria-hidden": "true" }, "✓"),
+      el("a", { href: "#package-standard", class: "feat-std-ref", "data-flash-standard": "true" }, f.text));
+  }
+  return el("li", null, el("span", { class: "check", "aria-hidden": "true" }, "✓"), f.text);
+};
 const CARD_RENDER = {
   pain: (it, i) => el("article", { class: "pain reveal" + DELAY[i % 3] }, el("div", { class: "ic", "aria-hidden": "true" }, it.icon), el("h3", null, it.title), el("p", null, it.text)),
   package: (it, i) => {
     const kind = /প্রিমিয়াম|premium/i.test(it.name || "") ? "card-ecommerce" : "card-business";
-    return el("article", { class: "card " + kind + (it.popular ? " popular" : "") + " reveal" + DELAY[i % 3] },
+    const artA = { class: "card " + kind + (it.popular ? " popular" : "") + " reveal" + DELAY[i % 3] };
+    if (kind === "card-business") artA.id = "package-standard";
+    return el("article", artA,
     it.popular && it.tag ? el("span", { class: "pop-tag" }, it.tag) : null,
     packageIcon(kind),
     el("h3", null, it.name), it.for ? el("p", { class: "for" }, it.for) : null,
     el("p", { class: "price" }, it.price, it.priceNote ? [" ", el("small", null, it.priceNote)] : null),
-    el("ul", null, visible(it.features.items).map((f) => el("li", null, el("span", { class: "check", "aria-hidden": "true" }, "✓"), f.text))),
+    el("ul", null, visible(it.features.items).map(packageFeatureLi)),
     it.buttonLabel ? el("a", { href: it.buttonHref, class: "btn btn-" + it.buttonStyle }, it.buttonLabel) : null);
   },
   work: (it, i) => el("article", { class: "work reveal" + DELAY[i % 3] },
